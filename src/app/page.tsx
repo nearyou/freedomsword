@@ -1,8 +1,8 @@
-import FreedomSwordApp from '@/components/FreedomSwordApp';
-import { demoAuthEnabled } from '@/server/config';
+import WelcomeScreen from '@/components/welcome/WelcomeScreen';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/playfair-display';
+import './welcome.css';
 export const dynamic = 'force-dynamic';
 export default function Home() {
-  return (
-    <FreedomSwordApp demoEnabled={demoAuthEnabled()} />
-  );
+  return <WelcomeScreen />;
 }

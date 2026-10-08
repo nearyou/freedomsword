@@ -24,6 +24,8 @@
     "outbox:worker": "tsx scripts/outbox-worker.ts"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/playfair-display": "^5.3.0",
     "@prisma/adapter-pg": "^6.19.3",
     "@prisma/client": "^6.19.0",
     "lucide-react": "^0.468.0",

@@ -7,6 +7,7 @@ declare global {
         initData: string;
         ready(): void;
         expand(): void;
+        close?(): void;
         isVersionAtLeast(version: string): boolean;
         setHeaderColor(color: string): void;
         setBackgroundColor(color: string): void;

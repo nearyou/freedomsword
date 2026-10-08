@@ -12,7 +12,9 @@ Next.js App Router, TypeScript, Tailwind CSS, PostgreSQL, Prisma, Zod, Recharts 
 4. `npm run dev`, then open http://127.0.0.1:3000.
 5. `npm run check` runs TypeScript, ESLint and Vitest.
 
-The interface includes a clearly labeled local demo entry point. Demo authentication requires `ALLOW_DEMO_AUTH=true` and is disabled in production. Telegram deployments require HTTPS, a bot token and the exact `APP_ORIGIN`. Launch the URL from your bot's Mini App menu; the browser submits the raw `initData` to the server.
+The home page is the ivory-and-gold FreedomSword welcome screen. Its two modal steps support mock verification and civic agreement acceptance, followed by a placeholder election space. EN/UK switches the interface language; the recorded agreement retains its original English wording and hash. Browser preview keeps progress in memory and never creates a session or writes verification records. Telegram launches use the authenticated backend. Verification, blockchain and elections remain demonstrations without official authorization.
+
+The existing election interface is available at `/elections`, including its clearly labeled local demo entry point. Demo authentication requires `ALLOW_DEMO_AUTH=true` and is disabled in production. Telegram deployments require HTTPS, a bot token and the exact `APP_ORIGIN`. Launch the home URL from your bot's Mini App menu; the browser submits raw signed `initData` only when a session needs to be established. Later steps reuse the session because launch data cannot be exchanged twice.
 
 ## Local PostgreSQL without Docker
 
@@ -31,7 +33,7 @@ Next.js uses Webpack here because Windows blocked Turbopack's persistence-file r
 
 Live results poll every eight seconds while the page is visible. Search matches full names case-insensitively. All election types use the same one-ballot rule. Endorsements bind authenticated consent to the exact platform text/version with a private hash commitment; wallet signatures are outside this MVP.
 
-Appearance follows Telegram's light/dark setting inside the Mini App and the device setting in a browser. The appearance control cycles through System, Light, and Dark; a manual choice is saved in local browser storage.
+The welcome experience uses a fixed parchment palette with self-hosted Playfair Display and Inter variable fonts, the unchanged original logo, and decorative engraved scenery. Telegram supplies its native Close/title/menu header; browser preview shows an equivalent header. The election interface at `/elections` follows Telegram's light/dark setting inside the Mini App and the device setting in a browser. Its appearance control cycles through System, Light, and Dark; a manual choice is saved in local browser storage.
 
 Mock blockchain receipts are processed after successful writes. If processing fails, the committed action is preserved. Authenticated `POST /api/blockchain/retry` with an empty JSON object retries up to ten records (five attempts per record). It requires the configured Origin and session cookie. An optional `npm run outbox:worker` processes the same commitment-only queue with expiring leases. There is no external broadcast.
 

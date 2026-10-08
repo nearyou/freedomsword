@@ -8,7 +8,7 @@ export function useModalAccessibility(key: string | null) {
     document.body.style.overflow = 'hidden';
     const backgrounds = [
       ...document.querySelectorAll<HTMLElement>(
-        '.app-shell, .mobile-nav, .admin-grid, .admin-heading',
+        '.app-shell, .mobile-nav, .admin-grid, .admin-heading, [data-modal-background]',
       ),
     ];
     backgrounds.forEach((element) => (element.inert = true));
@@ -16,7 +16,7 @@ export function useModalAccessibility(key: string | null) {
     const focusable = () =>
       [
         ...(dialog?.querySelectorAll<HTMLElement>(
-          'button:not(:disabled), input:not(:disabled), select:not(:disabled), a[href], summary, [tabindex="0"]',
+          'button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled), a[href], summary, [tabindex="0"]',
         ) ?? []),
       ].filter((element) => element.getClientRects().length > 0);
     focusable()[0]?.focus();
