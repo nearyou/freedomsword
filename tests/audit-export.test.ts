@@ -7,7 +7,7 @@ describe('audit export verification', () => {
   const previousHash = '0'.repeat(64);
   const event = { sequence: 1, commitment, previousHash, hash: chainHash(previousHash, commitment) };
   const bundle = {
-    schemaVersion: 'dynamic-democracy-audit-bundle/v1',
+    schemaVersion: 'freedomsword-audit-bundle/v1',
     publicAuditChain: [event],
     aggregates: { voteUnitsCast: 100, recalledUnits: 25, activeUnits: 75 },
     candidates: [{ activeUnits: 75 }],
@@ -24,5 +24,9 @@ describe('audit export verification', () => {
     expect(verifyAuditExport({ ...exportValue, bundle: tampered, sha256: hashAuditBundle(tampered) })).toBe(false);
     const arithmetic = { ...bundle, aggregates: { ...bundle.aggregates, activeUnits: 80 } };
     expect(verifyAuditExport({ ...exportValue, bundle: arithmetic, sha256: hashAuditBundle(arithmetic) })).toBe(false);
+  });
+  it('continues verifying previously downloaded bundles with the legacy schema name', () => {
+    const legacy = { ...bundle, schemaVersion: 'dynamic-democracy-audit-bundle/v1' };
+    expect(verifyAuditExport({ algorithm: 'SHA-256', sha256: hashAuditBundle(legacy), bundle: legacy })).toBe(true);
   });
 });

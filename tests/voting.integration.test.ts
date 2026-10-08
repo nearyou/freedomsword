@@ -265,6 +265,7 @@ it('publishes election aggregates and commitments without private ballot or iden
     { params: Promise.resolve({ id: electionId }) });
   expect(exportResponse.status).toBe(200);
   const auditBundle = await exportResponse.json();
+  expect(auditBundle.bundle.schemaVersion).toBe('freedomsword-audit-bundle/v1');
   expect(verifyAuditExport(auditBundle)).toBe(true);
   const exportText = JSON.stringify(auditBundle);
   for (const secretValue of [user.id, user.telegramId, credential.token,

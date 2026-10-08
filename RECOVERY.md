@@ -1,4 +1,4 @@
-# Dynamic Democracy backup and recovery plan
+# FreedomSword backup and recovery plan
 
 This is an operator-run plan for a staging or future production deployment. The app does not restore, delete, or rewrite evidence automatically. Before accepting real voters, choose an RPO/RTO, an encrypted offsite retention policy, a legal data-retention policy, and named operators for backup and restoration.
 

@@ -102,7 +102,7 @@ try {
   await run(process.execPath, ['node_modules/prisma/build/index.js', 'migrate', 'deploy'], env);
 
   status('tunnel');
-  const portable = join(tmpdir(), 'cloudflared-dynamic-democracy.exe');
+  const portable = join(tmpdir(), 'cloudflared-freedomsword.exe');
   const cloudflared = process.env.CLOUDFLARED_PATH ??
     (process.platform === 'win32' && existsSync(portable) ? portable : 'cloudflared');
   const tunnel = start(cloudflared, ['tunnel', '--url', 'http://127.0.0.1:3001',
@@ -146,13 +146,16 @@ try {
   await healthy(new URL(script[1].replaceAll('&amp;', '&'), origin));
 
   status('bot-menu');
-  const menu = { type: 'web_app', text: 'Dynamic Democracy', web_app: { url: `${origin}/` } };
+  await telegram(env, 'setMyName', { name: 'FreedomSword' });
+  if ((await telegram(env, 'getMyName')).name !== 'FreedomSword')
+    throw new Error('Telegram did not confirm the FreedomSword bot name');
+  const menu = { type: 'web_app', text: 'FreedomSword', web_app: { url: `${origin}/` } };
   await telegram(env, 'setChatMenuButton', { menu_button: menu });
   const saved = await telegram(env, 'getChatMenuButton');
   if (saved.type !== 'web_app' || saved.web_app?.url !== menu.web_app.url)
     throw new Error('Telegram did not confirm the new menu URL');
   status('connected', { serverPid: server.pid, tunnelPid: tunnel.pid });
-  console.log(`Open https://t.me/${username} and use the Dynamic Democracy menu button.`);
+  console.log(`Open https://t.me/${username} and use the FreedomSword menu button.`);
   console.log('Keep this process running. Quick Tunnel URLs are temporary.');
   for (const child of children) {
     if (child.exitCode !== null) continue;

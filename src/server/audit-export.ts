@@ -12,7 +12,7 @@ export async function exportElectionAudit(electionId: string) {
         blockchain: { select: { adapter: true, status: true, receipt: true } } },
     });
     const bundle = {
-      schemaVersion: 'dynamic-democracy-audit-bundle/v1',
+      schemaVersion: 'freedomsword-audit-bundle/v1',
       generatedAt: new Date().toISOString(),
       election: publicData.election,
       candidates: publicData.candidates,

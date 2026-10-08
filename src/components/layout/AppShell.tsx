@@ -26,9 +26,7 @@ export default function AppShell({
           <header className="topbar">
             <div className="mobile-brand">
               <BrandMark />
-              <span>
-                Dynamic<span>Democracy</span>
-              </span>
+              <span>FreedomSword</span>
             </div>
             <div className="breadcrumb">
               Citizen space <ChevronRight size={14} />

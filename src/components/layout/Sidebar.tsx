@@ -16,9 +16,7 @@ export default function Sidebar({
     <aside className="sidebar">
       <Link href="/" className="brand">
         <BrandMark />
-        <span>
-          Dynamic<span className="brand-second">Democracy</span>
-        </span>
+        <span>FreedomSword</span>
       </Link>
       <p className="nav-label">YOUR CITIZEN SPACE</p>
       <nav aria-label="Main navigation">

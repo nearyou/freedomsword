@@ -1,16 +1,16 @@
-# Dynamic Democracy UI refresh
+# FreedomSword UI refresh
 
 Implemented and validated on October 8, 2026 (Asia/Tokyo).
 
 ## Scope
 
-The citizen UI, election-manager UI, and public transparency styling now share navy/blue panels, consistent radii, spacing, controls, status colors, and light/dark design tokens. The supplied `logo.jpg` is used as the brand mark, with the Dynamic Democracy name retained. `public/brand/logo.jpg` is an unchanged copy of the supplied file.
+The citizen UI, election-manager UI, and public transparency styling now share navy/blue panels, consistent radii, spacing, controls, status colors, and light/dark design tokens. The supplied `logo.jpg` is used as the FreedomSword brand mark. `public/brand/logo.jpg` is an unchanged copy of the supplied file.
 
 Telegram HMAC verification, eligibility providers, agreements, casting/recall transactions, persistence, Prisma models, migrations, audit/outbox services, idempotency, rate limits, election lifecycle enforcement, and manager authorization were not replaced or simplified. No migrations or mutation services were changed. Existing tests were retained.
 
 ## Component organization
 
-- `src/components/DemocracyApp.tsx`: screen composition, selected election, tabs, and exclusive modal coordination.
+- `src/components/FreedomSwordApp.tsx`: screen composition, selected election, tabs, and exclusive modal coordination.
 - `src/components/layout/`: app shell, sidebar, and mobile navigation.
 - `src/components/elections/`: selector and selected election configuration/date summary.
 - `src/components/candidates/`: search, sort, cards, and profile with Overview/Platform/Promises/Updates tabs.

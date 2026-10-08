@@ -11,3 +11,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Commit and push workflow
 
 For every completed user prompt in this project, commit the resulting project changes and push the current branch to its configured remote. Run checks appropriate to the changes before committing. If the prompt produces no file changes, push any existing unpushed commits without creating an empty commit. Keep secrets, local environment files, database data, build output and ignored artifacts out of commits. Do not force-push unless the user explicitly requests it.
+
+## Project name
+
+The project is named FreedomSword. Use this exact spelling in branding, metadata, documentation and Telegram settings.

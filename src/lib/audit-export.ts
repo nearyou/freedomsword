@@ -25,7 +25,8 @@ const envelope = z.object({
   algorithm: z.literal('SHA-256'),
   sha256: z.string().regex(/^[a-f0-9]{64}$/),
   bundle: z.object({
-    schemaVersion: z.literal('dynamic-democracy-audit-bundle/v1'),
+    // Previously downloaded bundles retain their original schema identifier and hash.
+    schemaVersion: z.enum(['freedomsword-audit-bundle/v1', 'dynamic-democracy-audit-bundle/v1']),
     publicAuditChain: z.array(chainEvent),
     aggregates: z.object({
       voteUnitsCast: z.number().int().nonnegative(),

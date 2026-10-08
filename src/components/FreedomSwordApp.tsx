@@ -50,7 +50,7 @@ const headings: Record<AppTab, [string, string]> = {
     'Explore reported milestones and the evidence behind them.',
   ],
 };
-export default function DemocracyApp({ demoEnabled }: { demoEnabled: boolean }) {
+export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean }) {
   const citizenState = useCitizen();
   const electionState = useElections();
   const telegram = useTelegram();

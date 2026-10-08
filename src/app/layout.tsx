@@ -4,8 +4,8 @@ import Script from 'next/script';
 import './globals.css';
 import './theme.css';
 export const metadata: Metadata = {
-  title: 'Dynamic Democracy',
-  description: 'Your voice, continuously. A fictional Telegram democracy demo.',
+  title: 'FreedomSword',
+  description: 'FreedomSword: your voice, continuously. A fictional Telegram democracy demo.',
   icons: { icon: '/brand/logo.jpg' },
 };
 export const viewport: Viewport = {
