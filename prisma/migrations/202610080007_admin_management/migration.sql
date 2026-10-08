@@ -1,0 +1,16 @@
+ALTER TYPE "ElectionStatus" ADD VALUE 'DRAFT';
+ALTER TYPE "ElectionStatus" ADD VALUE 'UPCOMING';
+ALTER TYPE "ElectionStatus" ADD VALUE 'ACTIVE';
+ALTER TYPE "ElectionStatus" ADD VALUE 'FINISHED';
+ALTER TYPE "ElectionStatus" ADD VALUE 'ARCHIVED';
+CREATE TYPE "AdminRole" AS ENUM ('ELECTION_MANAGER');
+CREATE TABLE "AdminGrant" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "role" "AdminRole" NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "AdminGrant_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX "AdminGrant_userId_role_key" ON "AdminGrant"("userId", "role");
+ALTER TABLE "AdminGrant" ADD CONSTRAINT "AdminGrant_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Candidate" ADD COLUMN "withdrawn" BOOLEAN NOT NULL DEFAULT false;

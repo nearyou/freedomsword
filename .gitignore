@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.next-staging/
+.env
+.env.*
+!.env.example
+coverage/
+*.tsbuildinfo
+.local-postgres/
+.local-postgres-password
+artifacts/

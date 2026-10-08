@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "client"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum ElectionType {
+  COUNCIL
+  BUDGET
+  COMMUNITY
+}
+enum ElectionStatus {
+  DRAFT
+  UPCOMING
+  ACTIVE
+  FINISHED
+  ARCHIVED
+}
+enum AdminRole {
+  ELECTION_MANAGER
+}
+enum VoteEventType {
+  CAST
+  RECALL
+}
+enum PromiseStatus {
+  PLANNED
+  IN_PROGRESS
+  DELIVERED
+  DELAYED
+}
+enum BlockchainStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  PROCESSING
+}
+model RateLimitCounter {
+  key String @id
+  count Int
+  resetAt DateTime
+  @@index([resetAt])
+}
+model User {
+  id             String   @id @default(uuid())
+  telegramId     String   @unique
+  voterKey       String   @unique @default(uuid())
+  sessionVersion Int      @default(1)
+  createdAt      DateTime @default(now())
+  verifications  VoterVerification[]
+  agreements     VoterAgreement[]
+  credentials    VotingCredential[]
+  adminGrants    AdminGrant[]
+}
+model AdminGrant {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  role      AdminRole
+  createdAt DateTime  @default(now())
+  @@unique([userId, role])
+}
+model TelegramAuthReplay {
+  digest    String   @id
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([expiresAt])
+}
+model VotingCredential {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  electionId      String
+  election        Election @relation(fields: [electionId], references: [id])
+  token           String   @unique
+  legacyPseudonym String?
+  createdAt       DateTime @default(now())
+  @@unique([userId, electionId])
+  @@index([electionId])
+}
+model VoterVerification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  provider  String
+  receipt   String
+  subjectCommitment String?
+  verified  Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@unique([userId, provider])
+  @@unique([provider, subjectCommitment])
+}
+model VoterAgreement {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  documentId    String
+  version       Int
+  textHash      String
+  signatureHash String
+  createdAt     DateTime @default(now())
+  @@unique([userId, documentId, version])
+  @@index([documentId, version])
+}
+model Election {
+  id          String         @id
+  title       String
+  description String
+  type        ElectionType
+  status      ElectionStatus @default(DRAFT)
+  opensAt     DateTime
+  closesAt    DateTime
+  recallEnabled Boolean @default(true)
+  fullRecallEnabled Boolean @default(true)
+  partialRecallEnabled Boolean @default(true)
+  partialRecallAmount Int @default(25)
+  firstRecallDelaySeconds Int @default(0)
+  recallCooldownSeconds Int @default(0)
+  maxRecallOperations Int?
+  candidates  Candidate[]
+  votes       Vote[]
+  credentials VotingCredential[]
+  auditEvents AuditEvent[]
+}
+model Candidate {
+  id         String   @id
+  electionId String
+  election   Election @relation(fields: [electionId], references: [id])
+  fullName   String
+  party      String
+  ideology   String
+  bio        String
+  color      String
+  withdrawn  Boolean @default(false)
+  platforms  CandidatePlatform[]
+  votes      Vote[]
+  @@unique([id, electionId])
+  @@index([electionId, fullName])
+}
+model CandidatePlatform {
+  id          String   @id
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  version     Int
+  title       String
+  content     String
+  contentHash String
+  createdAt   DateTime @default(now())
+  promises    PlatformPromise[]
+  @@unique([candidateId, version])
+}
+model PlatformPromise {
+  id         String        @id
+  platformId String
+  platform   CandidatePlatform @relation(fields: [platformId], references: [id])
+  title      String
+  status     PromiseStatus @default(PLANNED)
+  progress   Int           @default(0)
+  evidence   String
+  updatedAt  DateTime      @updatedAt
+}
+model Vote {
+  id          String    @id @default(uuid())
+  electionId  String
+  election    Election  @relation(fields: [electionId], references: [id])
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId, electionId], references: [id, electionId])
+  pseudonym   String
+  balance     Int       @default(100)
+  createdAt   DateTime  @default(now())
+  events      VoteEvent[]
+  @@unique([electionId, pseudonym])
+  @@index([candidateId])
+}
+model VoteEvent {
+  id        String        @id @default(uuid())
+  voteId    String
+  vote      Vote          @relation(fields: [voteId], references: [id])
+  type      VoteEventType
+  units     Int
+  requestId String
+  requestHash String
+  createdAt DateTime      @default(now())
+  @@unique([voteId, requestId])
+}
+model AuditEvent {
+  id             String   @id @default(uuid())
+  sequence       Int      @unique @default(autoincrement())
+  commitment     String   @unique
+  previousHash   String
+  hash           String   @unique
+  createdAt      DateTime @default(now())
+  electionId     String?
+  election       Election? @relation(fields: [electionId], references: [id])
+  blockchain     BlockchainRecord?
+  @@index([electionId, sequence])
+}
+model BlockchainRecord {
+  id          String           @id @default(uuid())
+  auditId     String           @unique
+  audit       AuditEvent       @relation(fields: [auditId], references: [id])
+  commitment  String
+  adapter     String           @default("MOCK")
+  status      BlockchainStatus @default(PENDING)
+  receipt     String?
+  attempts    Int              @default(0)
+  createdAt   DateTime         @default(now())
+  confirmedAt DateTime?
+  claimToken String?
+  leaseExpiresAt DateTime?
+}

@@ -1,0 +1,6 @@
+node_modules
+.next
+.local-postgres
+artifacts
+package-lock.json
+AGENTS.md
