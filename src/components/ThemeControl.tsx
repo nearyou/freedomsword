@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { Monitor, Moon, Sun } from 'lucide-react';
 
-type ThemePreference = 'system' | 'light' | 'dark';
+export type ThemePreference = 'system' | 'light' | 'dark';
 
 const preferences: ThemePreference[] = ['system', 'light', 'dark'];
-const background = { light: '#f5f8fd', dark: '#0b1018' };
+const background = { light: '#f4f7fc', dark: '#090f1d' };
 
 function savedPreference(): ThemePreference {
   try {
@@ -17,9 +17,10 @@ function savedPreference(): ThemePreference {
   }
 }
 
-function resolvedTheme(preference: ThemePreference): 'light' | 'dark' {
+export function resolvedTheme(preference: ThemePreference): 'light' | 'dark' {
   if (preference !== 'system') return preference;
-  const telegram = window.Telegram?.WebApp.colorScheme;
+  const webapp = window.Telegram?.WebApp;
+  const telegram = webapp?.initData ? webapp.colorScheme : undefined;
   if (telegram === 'light' || telegram === 'dark') return telegram;
   return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 }
@@ -29,7 +30,7 @@ function applyTheme(preference: ThemePreference) {
   document.documentElement.dataset.theme = theme;
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', background[theme]);
   const telegram = window.Telegram?.WebApp;
-  if (telegram?.isVersionAtLeast('6.10')) {
+  if (telegram?.initData && telegram.isVersionAtLeast('6.10')) {
     telegram.setHeaderColor(background[theme]);
     telegram.setBackgroundColor(background[theme]);
   }

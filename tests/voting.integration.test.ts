@@ -133,6 +133,43 @@ it('requires an explicit election manager grant and audits each management actio
   expect((await db.election.findUniqueOrThrow({ where: { id: electionId } })).status).toBe('UPCOMING');
 });
 
+it('archives naturally expired elections through the required persisted state transition', async () => {
+  const before = await db.auditEvent.count();
+  for (const status of ['ACTIVE', 'UPCOMING'] as const) {
+    const electionId = `archive-expired-${randomUUID()}`;
+    await db.election.create({ data: { id: electionId, title: 'Expired fixture',
+      description: 'Fictional', type: 'COUNCIL', status,
+      opensAt: new Date(Date.now() - 120_000), closesAt: new Date(Date.now() - 60_000) } });
+    await administer(citizen.id, { action: 'archive', electionId });
+    expect((await db.election.findUniqueOrThrow({ where: { id: electionId } })).status).toBe('ARCHIVED');
+  }
+  expect(await db.auditEvent.count()).toBe(before + 2);
+});
+
+it('activates drafts within their window and allows expired drafts to be rescheduled', async () => {
+  for (const expired of [false, true]) {
+    const electionId = `late-draft-${randomUUID()}`;
+    const candidateId = randomUUID();
+    await db.election.create({ data: { id: electionId, title: 'Late draft fixture',
+      description: 'Fictional', type: 'COMMUNITY', status: 'DRAFT',
+      opensAt: new Date(Date.now() - 120_000),
+      closesAt: new Date(Date.now() + (expired ? -60_000 : 3_600_000)) } });
+    for (const id of [candidateId, randomUUID()])
+      await administer(citizen.id, { action: 'addCandidate', electionId, fullName: id,
+        party: 'Independent', ideology: 'Civic', bio: 'Fictional', color: '#3377cc' });
+    if (expired) {
+      await expect(administer(citizen.id, { action: 'activate', electionId })).rejects.toThrow('Reschedule');
+      await administer(citizen.id, { action: 'edit', electionId, title: 'Rescheduled draft',
+        description: 'Fictional', type: 'COMMUNITY',
+        opensAt: new Date(Date.now() + 3_600_000).toISOString(),
+        closesAt: new Date(Date.now() + 7_200_000).toISOString() });
+    }
+    await administer(citizen.id, { action: 'activate', electionId });
+    expect((await db.election.findUniqueOrThrow({ where: { id: electionId } })).status)
+      .toBe(expired ? 'UPCOMING' : 'ACTIVE');
+  }
+});
+
 it('rejects draft, pre-window and expired ballots at the database-controlled boundary', async () => {
   const user = await enroll('boundary');
   const now = Date.now();
@@ -467,6 +504,7 @@ it('rejects duplicate provider subjects without exposing the subject', async () 
 });
 it('rejects replayed Telegram initData, including reordered fields', async () => {
   const bot = '123456:integration-token';
+  vi.stubEnv('TELEGRAM_AUTH_ENABLED', 'true');
   vi.stubEnv('TELEGRAM_BOT_TOKEN', bot);
   try {
     const params = new URLSearchParams({
@@ -516,6 +554,28 @@ it('serves private ballot state without emitting Telegram IDs or credential mate
     (await db.votingCredential.findFirstOrThrow({ where: { userId: citizen.id } })).token,
   );
   expect(body).not.toContain('pseudonym');
+  const state = JSON.parse(body);
+  expect(state.votes.length).toBeGreaterThan(0);
+  for (const ballot of state.votes) {
+    const vote = await db.vote.findFirstOrThrow({
+      where: {
+        electionId: ballot.electionId,
+        pseudonym: await pseudonymFor(citizen, ballot.electionId),
+      },
+      include: { events: { where: { type: 'RECALL' }, orderBy: { createdAt: 'desc' } } },
+    });
+    expect(ballot.castAt).toBe(vote.createdAt.toISOString());
+    expect(ballot.recallCount).toBe(vote.events.length);
+    expect(ballot.lastRecallAt).toBe(vote.events[0]?.createdAt.toISOString() ?? null);
+    expect(Object.keys(ballot).sort()).toEqual([
+      'balance',
+      'candidateId',
+      'castAt',
+      'electionId',
+      'lastRecallAt',
+      'recallCount',
+    ]);
+  }
 });
 it('reports database readiness through the minimal endpoint', async () => {
   expect(await (await ready()).json()).toMatchObject({ status: 'ok', dependencies: { postgres: 'ok', schema: 'ok' } });

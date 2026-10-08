@@ -7,7 +7,7 @@ import { ApiError } from '@/server/errors';
 import { TelegramAuthError, validateInitData } from '@/lib/telegram';
 import { createSession } from '@/lib/session';
 import { sha256 } from '@/lib/hash';
-import { authMaxAgeSeconds, demoAuthEnabled, sessionMaxAgeSeconds } from '@/server/config';
+import { authMaxAgeSeconds, demoAuthEnabled, sessionMaxAgeSeconds, telegramAuthEnabled } from '@/server/config';
 import { secret } from '@/server/secrets';
 import { sessionCookieName, sessionCookieOptions } from '@/server/auth';
 import { logAuthOutcome } from '@/server/safe-log';
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         throw new ApiError(403, 'Demo authentication is disabled');
       telegramId = 'demo:local';
     } else {
-      if (!process.env.TELEGRAM_BOT_TOKEN) {
+      if (!telegramAuthEnabled() || !process.env.TELEGRAM_BOT_TOKEN) {
         logAuthOutcome('UNAVAILABLE');
         throw new ApiError(503, 'Telegram authentication is not configured');
       }

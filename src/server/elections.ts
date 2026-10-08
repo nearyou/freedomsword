@@ -43,6 +43,7 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
                   title: true,
                   content: true,
                   contentHash: true,
+                  createdAt: true,
                   promises: {
                     orderBy: { id: 'asc' },
                     select: { id: true, title: true, progress: true, status: true, evidence: true },
@@ -76,9 +77,12 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
           opensAt: e.opensAt.toISOString(),
           closesAt: e.closesAt.toISOString(),
           recallPolicy: {
-            enabled: e.recallEnabled, fullEnabled: e.fullRecallEnabled,
-            partialEnabled: e.partialRecallEnabled, partialAmount: e.partialRecallAmount,
-            firstDelaySeconds: e.firstRecallDelaySeconds, cooldownSeconds: e.recallCooldownSeconds,
+            enabled: e.recallEnabled,
+            fullEnabled: e.fullRecallEnabled,
+            partialEnabled: e.partialRecallEnabled,
+            partialAmount: e.partialRecallAmount,
+            firstDelaySeconds: e.firstRecallDelaySeconds,
+            cooldownSeconds: e.recallCooldownSeconds,
             maxOperations: e.maxRecallOperations,
           },
           activeUnits,
@@ -106,6 +110,7 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
                       title: p.title,
                       content: p.content,
                       contentHash: p.contentHash,
+                      createdAt: p.createdAt.toISOString(),
                       promises: p.promises,
                       signatures:
                         signatures.find(

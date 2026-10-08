@@ -81,13 +81,14 @@ export async function administer(userId: string, input: AdminCommand) {
     const now = await databaseNow(tx);
     const current = effectiveElectionStatus(election, now);
     const editable = current === 'DRAFT' &&
-      now < election.opensAt &&
       (await tx.vote.count({ where: { electionId: election.id } })) === 0;
     if (input.action === 'close') {
       if (current !== 'ACTIVE') throw new ApiError(409, 'Only an active election can be closed');
       await tx.election.update({ where: { id: election.id }, data: { status: 'FINISHED' } });
     } else if (input.action === 'archive') {
       if (current !== 'FINISHED') throw new ApiError(409, 'Only a finished election can be archived');
+      if (election.status !== 'FINISHED')
+        await tx.election.update({ where: { id: election.id }, data: { status: 'FINISHED' } });
       await tx.election.update({ where: { id: election.id }, data: { status: 'ARCHIVED' } });
     } else {
       if (!editable) throw new ApiError(409, 'Election can no longer be changed');
@@ -130,6 +131,8 @@ export async function administer(userId: string, input: AdminCommand) {
           break;
         }
         case 'activate': {
+          if (now >= election.closesAt)
+            throw new ApiError(409, 'Reschedule this draft before activating it');
           const count = await tx.candidate.count({ where: { electionId: election.id, withdrawn: false } });
           if (count < 2) throw new ApiError(409, 'At least two candidates are required');
           await tx.election.update({ where: { id: election.id }, data: { status: now < election.opensAt ? 'UPCOMING' : 'ACTIVE' } });

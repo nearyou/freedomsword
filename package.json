@@ -17,6 +17,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "test:integration": "node scripts/integration.mjs",
     "db:local": "node scripts/local-db.mjs",
+    "telegram:staging": "node scripts/telegram-staging.mjs",
     "admin:grant": "tsx scripts/grant-admin.ts",
     "audit:verify": "tsx scripts/verify-audit-export.ts",
     "audit:check": "tsx scripts/check-integrity.ts",

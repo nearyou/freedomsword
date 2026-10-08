@@ -6,7 +6,11 @@ export function useModalAccessibility(key: string | null) {
     const previous = document.activeElement as HTMLElement | null;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const backgrounds = [...document.querySelectorAll<HTMLElement>('.app-shell, .mobile-nav')];
+    const backgrounds = [
+      ...document.querySelectorAll<HTMLElement>(
+        '.app-shell, .mobile-nav, .admin-grid, .admin-heading',
+      ),
+    ];
     backgrounds.forEach((element) => (element.inert = true));
     const dialog = [...document.querySelectorAll<HTMLElement>('[role="dialog"]')].at(-1);
     const focusable = () =>

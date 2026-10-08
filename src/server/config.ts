@@ -6,6 +6,13 @@ const seconds = (fallback: number) =>
 const environment = z.enum(['development', 'test', 'staging', 'production']);
 const provider = z.enum(['mock']);
 
+export function telegramAuthEnabled(env: Record<string, string | undefined> = process.env) {
+  const mode = environment.parse(env.APP_ENV ?? env.NODE_ENV ?? 'development');
+  const setting = z.enum(['true', 'false']).optional().parse(env.TELEGRAM_AUTH_ENABLED);
+  return setting === 'true' ||
+    (setting !== 'false' && (mode === 'staging' || mode === 'production' || !!env.TELEGRAM_BOT_TOKEN));
+}
+
 export function loadConfig(env: Record<string, string | undefined> = process.env) {
   const mode = environment.parse(env.APP_ENV ?? env.NODE_ENV ?? 'development');
   if (env.NODE_ENV === 'production' && (mode === 'development' || mode === 'test'))
@@ -16,9 +23,7 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
   const sessionSecret = env.SESSION_SECRET;
   const ballotSecret = env.BALLOT_SECRET;
   const eligibilityCommitmentSecret = env.ELIGIBILITY_COMMITMENT_SECRET;
-  const authSetting = z.enum(['true', 'false']).optional().parse(env.TELEGRAM_AUTH_ENABLED);
-  const authEnabled =
-    authSetting === 'true' || (authSetting !== 'false' && (strict || !!env.TELEGRAM_BOT_TOKEN));
+  const authEnabled = telegramAuthEnabled(env);
   const authMaxAgeSeconds = seconds(300).parse(env.TELEGRAM_AUTH_MAX_AGE_SECONDS);
   const sessionMaxAgeSeconds = seconds(21_600).parse(env.SESSION_MAX_AGE_SECONDS);
   const eligibilityProvider = provider.parse(

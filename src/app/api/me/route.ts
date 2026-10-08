@@ -28,7 +28,19 @@ export async function GET(request: NextRequest) {
       where: {
         OR: lookups,
       },
-      select: { electionId: true, candidateId: true, balance: true },
+      select: {
+        electionId: true,
+        candidateId: true,
+        balance: true,
+        createdAt: true,
+        _count: { select: { events: { where: { type: 'RECALL' } } } },
+        events: {
+          where: { type: 'RECALL' },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          select: { createdAt: true },
+        },
+      },
     });
     return json({
       connected: true,
@@ -43,7 +55,14 @@ export async function GET(request: NextRequest) {
       signedPlatforms: agreements
         .filter((a) => a.documentId.startsWith('platform:'))
         .map((a) => a.documentId.slice(9)),
-      votes,
+      votes: votes.map((vote) => ({
+        electionId: vote.electionId,
+        candidateId: vote.candidateId,
+        balance: vote.balance,
+        castAt: vote.createdAt.toISOString(),
+        recallCount: vote._count.events,
+        lastRecallAt: vote.events[0]?.createdAt.toISOString() ?? null,
+      })),
     });
   });
 }

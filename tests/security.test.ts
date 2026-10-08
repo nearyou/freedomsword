@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto';
 import { afterEach, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
@@ -62,6 +63,27 @@ it('rejects demo login in production even when explicitly enabled', async () => 
     }),
   );
   expect(response.status).toBe(403);
+});
+it('rejects valid Telegram launch data when authentication is explicitly disabled', async () => {
+  const bot = '123456:disabled-auth-test-token';
+  vi.stubEnv('TELEGRAM_AUTH_ENABLED', 'false');
+  vi.stubEnv('TELEGRAM_BOT_TOKEN', bot);
+  vi.stubEnv('APP_ORIGIN', origin);
+  const params = new URLSearchParams({
+    auth_date: String(Math.floor(Date.now() / 1000)), user: JSON.stringify({ id: 123456 }),
+  });
+  const check = [...params.entries()].sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}=${value}`).join('\n');
+  const key = createHmac('sha256', 'WebAppData').update(bot).digest();
+  params.set('hash', createHmac('sha256', key).update(check).digest('hex'));
+  const transaction = vi.spyOn(db, '$transaction');
+  const response = await authenticate(new Request(`${origin}/api/auth`, {
+    method: 'POST', headers: { origin, 'content-type': 'application/json' },
+    body: JSON.stringify({ initData: params.toString() }),
+  }));
+  expect(response.status).toBe(503);
+  expect(response.headers.has('set-cookie')).toBe(false);
+  expect(transaction).not.toHaveBeenCalled();
 });
 it('rejects existing demo sessions and honors session revocation in production', async () => {
   vi.stubEnv('NODE_ENV', 'production');

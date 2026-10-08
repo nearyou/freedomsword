@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { CheckCircle2, LockKeyhole, X } from 'lucide-react';
+import { CheckCircle2, LockKeyhole } from 'lucide-react';
+import Dialog from './ui/Dialog';
 import type { AuditView } from '@/lib/contracts';
 interface AuditPage {
   events: AuditView[];
@@ -34,86 +35,76 @@ export default function AuditExplorer({ onClose }: { onClose: () => void }) {
     return () => clearTimeout(timer);
   }, []);
   return (
-    <div className="modal-backdrop">
-      <section
-        className="modal audit-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="audit-title"
-      >
-        <button className="close-modal" aria-label="Close audit" onClick={onClose}>
-          <X size={20} />
-        </button>
-        <div className="modal-symbol">
-          <LockKeyhole size={26} />
+    <Dialog titleId="audit-title" onClose={onClose} className="audit-modal">
+      <div className="modal-symbol">
+        <LockKeyhole size={26} />
+      </div>
+      <div className="eyebrow">PUBLIC COMMITMENTS ONLY</div>
+      <h2 id="audit-title">A record you can inspect.</h2>
+      <p className="modal-copy">
+        Append-only, salted SHA-256 commitments. No identities or individual ballot details are
+        published. Mock receipts provide no independent blockchain evidence.
+      </p>
+      {page && (
+        <div className="audit-summary">
+          <span>{page.total} commitments</span>
+          <span className="signed-badge">
+            <CheckCircle2 size={14} />
+            {page.verifiedRange ? 'Page links verified' : 'Integrity check failed'}
+          </span>
         </div>
-        <div className="eyebrow">PUBLIC COMMITMENTS ONLY</div>
-        <h2 id="audit-title">A record you can inspect.</h2>
-        <p className="modal-copy">
-          Append-only, salted SHA-256 commitments. No identities or individual ballot details are
-          published. Mock receipts provide no independent blockchain evidence.
+      )}
+      {events.map((event) => (
+        <details className="audit-row" key={event.sequence}>
+          <summary>
+            <span>Commitment #{event.sequence}</span>
+            <span>{event.blockchain?.status ?? 'PENDING'}</span>
+          </summary>
+          <dl>
+            <dt>Commitment</dt>
+            <dd>{event.commitment}</dd>
+            <dt>Previous hash</dt>
+            <dd>{event.previousHash}</dd>
+            <dt>Chain hash</dt>
+            <dd>{event.hash}</dd>
+            <dt>Mock receipt</dt>
+            <dd>{event.blockchain?.receipt ?? 'Awaiting mock adapter'}</dd>
+          </dl>
+        </details>
+      ))}
+      {page?.total === 0 && (
+        <p className="fine-print">
+          No commitments yet. Verified participation creates the first record.
         </p>
-        {page && (
-          <div className="audit-summary">
-            <span>{page.total} commitments</span>
-            <span className="signed-badge">
-              <CheckCircle2 size={14} />
-              {page.verifiedRange ? 'Page links verified' : 'Integrity check failed'}
-            </span>
-          </div>
-        )}
-        {events.map((event) => (
-          <details className="audit-row" key={event.sequence}>
-            <summary>
-              <span>Commitment #{event.sequence}</span>
-              <span>{event.blockchain?.status ?? 'PENDING'}</span>
-            </summary>
-            <dl>
-              <dt>Commitment</dt>
-              <dd>{event.commitment}</dd>
-              <dt>Previous hash</dt>
-              <dd>{event.previousHash}</dd>
-              <dt>Chain hash</dt>
-              <dd>{event.hash}</dd>
-              <dt>Mock receipt</dt>
-              <dd>{event.blockchain?.receipt ?? 'Awaiting mock adapter'}</dd>
-            </dl>
-          </details>
-        ))}
-        {page?.total === 0 && (
-          <p className="fine-print">
-            No commitments yet. Verified participation creates the first record.
-          </p>
-        )}
-        {error && (
-          <p className="fine-print" role="alert">
-            {error}
-          </p>
-        )}
-        {page?.hasMore && (
-          <button
-            className="button secondary full"
-            disabled={busy}
-            onClick={() => void load(page.nextAfter)}
-          >
-            Load more commitments
-          </button>
-        )}
-        {error && (
-          <button
-            className="button secondary full"
-            disabled={busy}
-            onClick={() => void load(page?.nextAfter ?? 0)}
-          >
-            Retry
-          </button>
-        )}
-        {busy && (
-          <p className="fine-print" role="status">
-            Loading commitments…
-          </p>
-        )}
-      </section>
-    </div>
+      )}
+      {error && (
+        <p className="fine-print" role="alert">
+          {error}
+        </p>
+      )}
+      {page?.hasMore && (
+        <button
+          className="button secondary full"
+          disabled={busy}
+          onClick={() => void load(page.nextAfter)}
+        >
+          Load more commitments
+        </button>
+      )}
+      {error && (
+        <button
+          className="button secondary full"
+          disabled={busy}
+          onClick={() => void load(page?.nextAfter ?? 0)}
+        >
+          Retry
+        </button>
+      )}
+      {busy && (
+        <p className="fine-print" role="status">
+          Loading commitments…
+        </p>
+      )}
+    </Dialog>
   );
 }

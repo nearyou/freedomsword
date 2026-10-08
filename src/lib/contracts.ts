@@ -11,6 +11,7 @@ export interface PlatformView {
   title: string;
   content: string;
   contentHash: string;
+  createdAt?: string;
   signatures: number;
   promises: PromiseView[];
 }
@@ -53,7 +54,14 @@ export interface CitizenView {
   provider: string;
   agreementSigned: boolean;
   signedPlatforms: string[];
-  votes: { electionId: string; candidateId: string; balance: number }[];
+  votes: {
+    electionId: string;
+    candidateId: string;
+    balance: number;
+    castAt?: string;
+    recallCount?: number;
+    lastRecallAt?: string | null;
+  }[];
 }
 export interface AuditView {
   sequence: number;
