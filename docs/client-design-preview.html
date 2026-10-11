@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FreedomSword — client direction preview</title>
+  <style>
+    @font-face { font-family: Inter; src: url('../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; }
+    @font-face { font-family: Playfair; src: url('../node_modules/@fontsource-variable/playfair-display/files/playfair-display-latin-wght-normal.woff2') format('woff2'); font-weight: 400 900; }
+    :root { --navy:#071522; --navy2:#0b2135; --surface:#10273b; --surface2:#152f45; --line:#284358; --text:#f6f7f4; --muted:#a5b6c2; --blue:#1685e8; --gold:#d4ad62; --ivory:#f8f3e8; --green:#30b77d; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#06111c; color:var(--text); font-family:Inter,Arial,sans-serif; }
+    a { color:inherit; }
+    .canvas { max-width:1430px; padding:54px 42px 70px; margin:auto; }
+    .eyebrow { color:var(--gold); font-size:12px; font-weight:750; letter-spacing:.19em; text-transform:uppercase; }
+    h1 { margin:9px 0 10px; font:600 clamp(33px,3vw,48px)/1.12 Playfair,Georgia,serif; letter-spacing:-.03em; }
+    .intro { display:flex; justify-content:space-between; gap:40px; align-items:end; margin-bottom:38px; }
+    .intro p { max-width:570px; color:#aab9c7; font-size:15px; line-height:1.55; margin:0; }
+    .legend { display:flex; gap:9px; flex-wrap:wrap; align-items:center; justify-content:flex-end; }
+    .legend span { display:inline-flex; padding:8px 12px; border-radius:100px; background:#102439; border:1px solid #284159; color:#d4e0e7; font-size:11px; font-weight:650; white-space:nowrap; }
+    .legend .light-chip { background:#e8dcc5; border-color:#c7ac79; color:#182c40; }
+    .grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:34px 25px; }
+    .frame { min-width:0; }
+    .frame-label { color:#dbe6ee; font-size:13px; font-weight:750; margin:0 0 12px 3px; display:flex; gap:10px; align-items:center; }
+    .frame-label span { color:var(--gold); font-size:11px; letter-spacing:.12em; }
+    .phone { width:100%; height:615px; border-radius:36px; border:5px solid #26394a; box-shadow:0 20px 34px #0008, inset 0 0 0 2px #6e7c7e; overflow:hidden; position:relative; background:var(--navy); }
+    .screen { position:absolute; inset:5px; border-radius:28px; overflow:hidden; background:linear-gradient(150deg,#0a1b2b,#071523 72%); }
+    .screen.light { background:var(--ivory); color:#132a41; }
+    .screen.light::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.45; background:radial-gradient(circle at 50% 12%,#fff9 0,transparent 40%),radial-gradient(circle at 15% 87%,#d9bd85 0,transparent 31%); }
+    .status { height:27px; padding:11px 18px 0; display:flex; justify-content:space-between; font-size:10px; font-weight:800; position:relative; z-index:1; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; padding:14px 18px 12px; height:43px; position:relative; z-index:1; font-size:11px; }
+    .topbar strong { font-size:11px; letter-spacing:-.02em; }
+    .topbar .back { color:#9ed5ff; }
+    .light .topbar .back { color:#285375; }
+    .more { border:1px solid currentColor; border-radius:50%; width:19px; height:19px; display:grid; place-items:center; line-height:1; }
+    .content { position:relative; z-index:1; padding:15px 18px 18px; }
+    h2 { margin:0; font-size:24px; line-height:1.14; letter-spacing:-.045em; }
+    h3 { margin:0; font-size:14px; line-height:1.25; letter-spacing:-.02em; }
+    p { margin:0; }
+    .sub { font-size:11px; line-height:1.45; color:var(--muted); }
+    .light .sub { color:#516576; }
+    .serif { font-family:Playfair,Georgia,serif; font-weight:650; }
+    .tiny { font-size:9px; line-height:1.4; color:var(--muted); }
+    .light .tiny { color:#637381; }
+    .btn { min-height:40px; width:100%; display:flex; justify-content:center; align-items:center; gap:7px; border:0; border-radius:13px; background:linear-gradient(#278dec,#0566d1); color:white; font:750 11px Inter,Arial,sans-serif; box-shadow:0 7px 16px #0357b63b; text-decoration:none; }
+    .btn.ivory { background:linear-gradient(#f2d698,#d8b56e); color:#11233b; box-shadow:0 7px 14px #6d4c112c; }
+    .btn.outline { background:transparent; border:1px solid var(--line); box-shadow:none; color:#d7e6ef; }
+    .bottom { position:absolute; left:18px; right:18px; bottom:18px; z-index:2; }
+    .step { color:#96aac0; font-size:9px; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+    .progress { height:4px; border-radius:8px; background:#294058; display:flex; overflow:hidden; margin:11px 0 22px; }
+    .progress i { width:var(--w); background:var(--blue); border-radius:8px; }
+    .card { border:1px solid var(--line); background:linear-gradient(155deg,#142e45,#0c2033); border-radius:15px; padding:13px; }
+    .light .card { background:#fffdf8d9; border-color:#ddcead; box-shadow:0 10px 25px #61502b14; }
+    .rule { height:1px; background:var(--line); margin:10px 0; }
+    .light .rule { background:#dfd3bf; }
+    .tag { display:inline-flex; border-radius:7px; padding:4px 6px; background:#173e5c; color:#9ed7ff; font-size:8px; font-weight:750; letter-spacing:.03em; }
+    .tag.gold { background:#4b3824; color:#ffda8b; }
+    .tag.green { background:#113f34; color:#79e0a4; }
+    .tag.demo { background:#332b1d; color:#edd18c; }
+    .row { display:flex; gap:10px; align-items:center; }
+    .row.between { justify-content:space-between; }
+    .icon { width:31px; height:31px; flex:none; border-radius:10px; display:grid; place-items:center; background:#173f5d; color:#a2dfff; font-weight:850; font-size:16px; }
+    .icon.gold { color:#f3d48c; background:#4c3928; }
+    .icon.green { color:#a2eac0; background:#17463a; }
+    .check { width:16px; height:16px; flex:none; border-radius:50%; background:#175b46; color:#8ff1bb; font-size:10px; display:grid; place-items:center; }
+    .bullet { display:flex; gap:9px; align-items:start; margin:10px 0; font-size:10px; line-height:1.35; }
+    .bullet .check { margin-top:0; }
+    .logo-original { width:200px; height:200px; object-fit:cover; display:block; margin:47px auto 0; border-radius:50%; box-shadow:0 9px 28px #674d2927; }
+    .welcome h2 { margin:21px 0 6px; font-size:27px; text-align:center; line-height:1.12; }
+    .welcome .sub { text-align:center; padding:0 22px; font-size:11px; }
+    .welcome .motto { margin-top:35px; text-align:center; color:#8b652b; font-size:10px; letter-spacing:.17em; text-transform:uppercase; font-weight:800; }
+    .welcome .bottom { bottom:25px; }
+    .welcome .tiny { text-align:center; margin-top:12px; }
+    .mission { padding-top:25px; }
+    .mission h2 { font:650 29px/1.13 Playfair,Georgia,serif; }
+    .mission .sub { margin:12px 0 20px; }
+    .mission-list { display:grid; gap:9px; }
+    .mission-list .card { padding:10px; }
+    .mission .bottom { bottom:25px; }
+    .mission .dots { display:flex; gap:5px; justify-content:center; margin-top:15px; }
+    .dots b { display:block; width:5px; height:5px; background:#c0c7ca; border-radius:50%; }
+    .dots b:first-child { width:17px; border-radius:5px; background:#1869bf; }
+    .connect h2 { margin:3px 0 9px; }
+    .connect .sub { margin-bottom:15px; }
+    .connect .card + .card { margin-top:10px; }
+    .connect .card { padding:14px 12px; }
+    .connect .bottom { bottom:18px; }
+    .connect .bottom .tiny { margin-top:9px; text-align:center; }
+    .verify .orb { width:146px; height:146px; border:2px solid #188ce4; border-radius:50%; margin:22px auto 25px; display:grid; place-items:center; box-shadow:0 0 0 13px #0d2f4a,0 0 44px #0a92dd33; background:radial-gradient(circle,#1c577b,#0b2539 70%); position:relative; }
+    .verify .orb::before,.verify .orb::after { content:""; position:absolute; width:84px; height:84px; border:1px solid #72c9f5; border-radius:50%; opacity:.7; }
+    .verify .orb::after { width:58px; height:58px; border-style:dashed; opacity:.55; }
+    .verify .orb span { font-size:48px; color:#a7e1ff; font-weight:200; opacity:.72; }
+    .verify h2,.verify .sub { text-align:center; }
+    .verify .sub { margin:8px 8px 20px; }
+    .verify .card { margin-top:13px; }
+    .verify .bottom .tiny { text-align:center; margin-top:9px; }
+    .agreement .document { width:69px; height:78px; border-radius:13px; display:grid; place-items:center; margin:13px auto 16px; background:linear-gradient(145deg,#1d5474,#12324b); box-shadow:0 0 23px #1685e837; font:700 34px Playfair,Georgia,serif; color:#94d7ff; }
+    .agreement h2,.agreement .sub { text-align:center; }
+    .agreement .sub { margin:8px 0 16px; }
+    .agreement .card { margin-top:11px; }
+    .agreement .bottom { bottom:17px; }
+    .agreement .tickbox { width:17px; height:17px; border:1px solid #8db9d7; border-radius:4px; background:#176bc2; flex:none; display:grid; place-items:center; font-size:11px; }
+    .candidate .hero-photo { height:170px; margin:-15px -18px 0; position:relative; overflow:hidden; }
+    .candidate .hero-photo img { width:100%; height:100%; object-fit:cover; object-position:center 29%; filter:saturate(.88); }
+    .candidate .hero-photo::after { content:""; position:absolute; inset:55% 0 0; background:linear-gradient(transparent,#081827); }
+    .candidate .name { margin-top:-25px; position:relative; }
+    .candidate h2 { font-size:23px; }
+    .candidate .pills { display:flex; gap:5px; margin-top:9px; }
+    .candidate .meter { background:#2a4053; border-radius:10px; height:6px; overflow:hidden; margin:7px 0 15px; }
+    .candidate .meter i { display:block; height:100%; width:42%; background:var(--blue); border-radius:10px; }
+    .tabs { display:flex; justify-content:space-between; border-bottom:1px solid var(--line); margin:14px 0 11px; padding-bottom:9px; color:#9bafbf; font-size:9px; }
+    .tabs b { color:#f0f5f8; border-bottom:2px solid var(--blue); padding-bottom:8px; margin-bottom:-10px; }
+    .candidate .bottom { bottom:15px; }
+    .aftervote .success { width:57px; height:57px; border-radius:50%; background:linear-gradient(145deg,#36d598,#0d996b); display:grid; place-items:center; margin:8px auto 8px; font-size:32px; box-shadow:0 0 0 8px #134533,0 0 25px #36d59849; }
+    .aftervote h2,.aftervote>.sub { text-align:center; }
+    .aftervote .sub { margin-top:6px; }
+    .aftervote .ballot { margin-top:12px; }
+    .aftervote .ballot strong { font-size:17px; }
+    .aftervote .bar { display:flex; gap:3px; margin-top:9px; }
+    .aftervote .bar i { display:block; height:8px; border-radius:3px; background:#34516a; flex:1; }
+    .aftervote .bar i:nth-child(-n+3) { background:var(--blue); }
+    .aftervote .share { margin-top:8px; background:#183149; border-color:#466076; }
+    .recall-actions { display:flex; gap:5px; margin-top:9px; }
+    .recall-actions span { flex:1; border:1px solid #8a7036; color:#f2d48e; border-radius:6px; padding:5px 2px; text-align:center; font-size:8px; font-weight:750; }
+    .recall-actions span:last-child { border-color:#96504e; color:#ffb7ad; }
+    .share .link { padding:8px; background:#0b2237; color:#abd9fc; font-size:9px; border-radius:7px; margin-top:9px; }
+    .social { display:flex; justify-content:space-around; gap:8px; margin-top:10px; }
+    .social span { display:grid; justify-items:center; gap:4px; font-size:8px; color:#c4d2dc; }
+    .social b { display:grid; place-items:center; width:24px; height:24px; border-radius:50%; background:#1376cb; font-size:12px; color:white; }
+    .social span:nth-child(2) b { background:#151b23; border:1px solid #9bb0bc; }
+    .social span:nth-child(3) b { background:#2458aa; }
+    .social span:nth-child(4) b { background:#178658; }
+    .results .headerline { display:flex; justify-content:space-between; align-items:center; margin:4px 0 7px; }
+    .results h2 { font-size:23px; }
+    .results .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin:14px 0; }
+    .results .stats .card { text-align:center; padding:10px 2px; }
+    .results .stats b { font-size:14px; display:block; }
+    .results .stats small { font-size:7px; color:var(--muted); }
+    .donut { width:154px; height:154px; margin:16px auto 12px; border-radius:50%; background:conic-gradient(#1393e8 0 42%,#e5bd69 42% 70%,#6badd1 70% 88%,#41a875 88% 100%); display:grid; place-items:center; }
+    .donut div { width:106px; height:106px; border-radius:50%; background:#0d2134; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+    .donut strong { font-size:22px; }
+    .donut small { color:var(--muted); font-size:8px; }
+    .result-row { display:flex; align-items:center; gap:7px; margin:10px 0; font-size:9px; }
+    .result-row b { min-width:68px; font-size:9px; }
+    .result-row .track { height:5px; background:#2d4658; flex:1; border-radius:5px; overflow:hidden; }
+    .result-row .track i { display:block; height:100%; width:var(--w); background:var(--c); border-radius:5px; }
+    .result-row em { font-style:normal; font-weight:750; min-width:27px; text-align:right; }
+    .nav { position:absolute; left:0; right:0; bottom:0; height:51px; display:flex; justify-content:space-around; align-items:center; border-top:1px solid #253e50; background:#081a29; z-index:2; }
+    .nav span { text-align:center; color:#8599a8; font-size:8px; line-height:1.25; }
+    .nav span b { display:block; font-size:15px; margin-bottom:2px; line-height:1; }
+    .nav .active { color:#79c3ff; }
+    .footnote { margin-top:30px; padding:20px 23px; border:1px solid #264055; border-radius:16px; background:#0c2032; color:#acbfca; font-size:12px; line-height:1.6; }
+    .footnote strong { color:#f0f5f7; }
+    @media (max-width:1100px) { .grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .intro { align-items:start; } }
+    @media (max-width:760px) { .canvas { padding:30px 18px 45px; } .intro { display:block; } .legend { justify-content:flex-start; margin-top:17px; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:23px 13px; } .phone { height:575px; border-radius:27px; border-width:3px; } .screen { inset:3px; border-radius:22px; } .content { padding-left:12px; padding-right:12px; } .topbar { padding-left:12px; padding-right:12px; } .bottom { left:12px; right:12px; } .logo-original { width:145px; height:145px; } }
+    @media (max-width:450px) { .grid { grid-template-columns:1fr; max-width:310px; margin:auto; } .phone { height:615px; } .logo-original { width:200px; height:200px; } }
+  </style>
+</head>
+<body>
+<main class="canvas">
+  <div class="intro">
+    <div><div class="eyebrow">FreedomSword · client review concept</div><h1>Light welcome. Dark civic core.</h1><p>The two opening screens carry the logo and message. The rest becomes a calm navy voting interface with one clear action at a time.</p></div>
+    <div class="legend"><span class="light-chip">01–02 · light opening</span><span>03–08 · dark experience</span><span>illustrative content</span></div>
+  </div>
+  <section class="grid" aria-label="FreedomSword design screens">
+    <article class="frame"><div class="frame-label"><span>01</span> Launch</div><div class="phone"><div class="screen light welcome"><div class="status"><span>9:41</span><span>● ▰ ▰</span></div><div class="topbar"><span class="back">Close</span><strong>FreedomSword</strong><span class="more">···</span></div><img class="logo-original" src="../public/brand/logo.jpg" alt="Original FreedomSword logo"><h2 class="serif">Your voice.<br>Your choice.</h2><p class="sub">A place to explore candidates and make your choice.</p><div class="motto">People · Voice · Action</div><div class="bottom"><a class="btn ivory" href="#mission">Get started <span aria-hidden="true">→</span></a><p class="tiny">Design concept · demonstration election</p></div></div></div></article>
+    <article class="frame" id="mission"><div class="frame-label"><span>02</span> Mission</div><div class="phone"><div class="screen light"><div class="status"><span>9:41</span><span>● ▰ ▰</span></div><div class="topbar"><span class="back">‹ Back</span><strong>FreedomSword</strong><span>Skip</span></div><div class="content mission"><p class="step" style="color:#a67e3d">Welcome · 01 / 02</p><h2>Real people.<br>Real influence.</h2><p class="sub">Your voice builds a stronger future. See the people, ideas and progress behind each election.</p><div class="mission-list"><div class="card row"><span class="icon gold">◇</span><div><h3>One person, one voice</h3><p class="tiny">A clear path to participation</p></div></div><div class="card row"><span class="icon gold">▤</span><div><h3>Explore candidates</h3><p class="tiny">Compare plans before choosing</p></div></div><div class="card row"><span class="icon gold">↗</span><div><h3>Track progress</h3><p class="tiny">Follow public promises</p></div></div></div><div class="dots"><b></b><b></b><b></b></div></div><div class="bottom"><a class="btn" href="#connect">Continue <span aria-hidden="true">→</span></a></div></div></div></article>
+    <article class="frame" id="connect"><div class="frame-label"><span>03</span> Connect</div><div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>● ▰ ▰</span></div><div class="topbar"><span class="back">‹ Back</span><strong>FreedomSword</strong><span class="more">···</span></div><div class="content connect"><p class="step">Getting ready · 01 / 03</p><div class="progress" style="--w:33%"><i></i></div><h2>Connect to<br>FreedomSword</h2><p class="sub">Connect your Telegram account, then a compatible wallet to continue.</p><div class="card"><div class="row"><span class="icon">➤</span><div><h3>Telegram account</h3><p class="tiny">Use the account you opened this app with</p></div></div><div class="rule"></div><span class="tag green">CONNECTED · DEMO</span></div><div class="card"><div class="row"><span class="icon gold">◈</span><div><h3>Connect wallet</h3><p class="tiny">Telegram Wallet or another compatible option</p></div></div><div class="rule"></div><span class="tag demo">INTEGRATION TO CONFIRM</span></div><div class="card" style="margin-top:12px;padding:10px 12px"><div class="row between"><span class="tiny">Questions or ideas?</span><strong style="font-size:10px;color:#9ed5ff">Send feedback ↗</strong></div></div></div><div class="bottom"><a class="btn" href="#verify">Continue <span aria-hidden="true">→</span></a><p class="tiny">Powered by <a href="https://freedomtool.org/" target="_blank" rel="noopener noreferrer" style="color:#bcdfff;text-decoration:underline">FreedomTool</a></p></div></div></div></article>
+    <article class="frame" id="verify"><div class="frame-label"><span>04</span> Verify with Rarimo</div><div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>● ▰ ▰</span></div><div class="topbar"><span class="back">‹ Back</span><strong>FreedomSword</strong><span class="more">···</span></div><div class="content verify"><p class="step">Getting ready · 02 / 03</p><div class="progress" style="--w:67%"><i></i></div><div class="orb" aria-hidden="true"><span>◌</span></div><h2>Verify your identity</h2><p class="sub">Rarimo is the verification provider for this step.</p><div class="card"><div class="row between"><div class="row"><span class="icon">◈</span><div><h3>Rarimo</h3><p class="tiny">Identity check</p></div></div><span class="tag demo">DEMO</span></div><div class="rule"></div><p class="tiny">A real Rarimo connection is required before this state can verify anyone.</p></div></div><div class="bottom"><a class="btn" href="#agreement">Continue in demo <span aria-hidden="true">→</span></a><p class="tiny">Powered by <a href="https://freedomtool.org/" target="_blank" rel="noopener noreferrer" style="color:#bcdfff;text-decoration:underline">FreedomTool</a></p></div></div></div></article>
+    <article class="frame" id="agreement"><div class="frame-label"><span>05</span> Agreement</div><div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>● ▰ ▰</span></div><div class="topbar"><span class="back">‹ Back</span><strong>FreedomSword</strong><span class="more">···</span></div><div class="content agreement"><p class="step">Getting ready · 03 / 03</p><div class="progress" style="--w:100%"><i></i></div><div class="document" aria-hidden="true">▤</div><h2>Citizen agreement</h2><p class="sub">Review the participation terms before entering the demo election.</p><div class="card"><div class="row between"><div><h3>Agreement · draft</h3><p class="tiny">Review the full text</p></div><span>↗</span></div><div class="rule"></div><p class="tiny">One account per participant · respectful participation · clear election rules</p></div><div class="card row" style="margin-top:11px"><span class="tickbox">✓</span><p style="font-size:10px;line-height:1.4">I have read and accept the Citizen Agreement.</p></div></div><div class="bottom"><a class="btn" href="#candidate">Accept &amp; continue <span aria-hidden="true">→</span></a></div></div></div></article>
+    <article class="frame" id="candidate"><div class="frame-label"><span>06</span> Candidate</div><div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>● ▰ ▰</span></div><div class="topbar"><span class="back">‹ Elections</span><strong>FreedomSword</strong><span class="more">···</span></div><div class="content candidate"><div class="hero-photo"><img src="./client-design-candidate.png" alt="Fictional candidate portrait"></div><div class="name"><span class="tag demo">DEMO ELECTION</span><h2 style="margin-top:8px">Maya Chen</h2><p class="sub">People's Alliance · City Council</p></div><div class="pills"><span class="tag">Community</span><span class="tag gold">Housing</span></div><div class="row between" style="margin-top:16px"><span class="tiny">Current support</span><strong style="font-size:13px">42%</strong></div><div class="meter"><i></i></div><div class="tabs"><b>Overview</b><span>Platform</span><span>Promises</span><span>Updates</span></div><h3>About Maya</h3><p class="tiny" style="margin-top:7px">A community organizer focused on affordable housing, open local records and practical neighborhood services.</p><div class="card" style="margin-top:15px"><div class="row between"><div><h3>Platform</h3><p class="tiny">Read proposals and milestones</p></div><span>↗</span></div></div></div><div class="bottom"><a class="btn" href="#aftervote">Choose this candidate <span aria-hidden="true">→</span></a></div></div></div></article>
+    <article class="frame" id="aftervote"><div class="frame-label"><span>07</span> After the choice</div><div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>● ▰ ▰</span></div><div class="topbar"><span class="back">‹ My ballot</span><strong>FreedomSword</strong><span class="more">···</span></div><div class="content aftervote"><div class="success" aria-hidden="true">✓</div><h2>Your vote is cast</h2><p class="sub">Your demo ballot now supports Maya Chen.</p><div class="card ballot"><div class="row between"><div><p class="tiny">YOUR BALLOT</p><strong>75 / 100</strong><p class="tiny">units remaining</p></div><span class="tag green">ACTIVE</span></div><div class="bar"><i></i><i></i><i></i><i></i></div><div class="recall-actions"><span>Recall 25 units</span><span>Recall remaining</span></div></div><div class="card share"><h3>Invite someone to take part</h3><p class="tiny" style="margin-top:5px">I made my choice on FreedomSword. Explore the candidates, make yours, and help shape what comes next.</p><div class="link">t.me/freedomswordbot　<span style="float:right">▢</span></div><div class="social"><span><b>➤</b>Telegram</span><span><b>𝕏</b>X</span><span><b>f</b>Facebook</span><span><b>↗</b>More</span></div></div></div><div class="nav"><span><b>▦</b>Elections</span><span><b>▥</b>Results</span><span class="active"><b>▣</b>My ballot</span><span><b>◇</b>Promises</span></div></div></div></article>
+    <article class="frame"><div class="frame-label"><span>08</span> Live results</div><div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>● ▰ ▰</span></div><div class="topbar"><span class="back">‹ Elections</span><strong>FreedomSword</strong><span class="more">···</span></div><div class="content results"><div class="headerline"><h2>Live results</h2><span class="tag green">DEMO</span></div><p class="sub">City Council · sample figures</p><div class="stats"><div class="card"><b>10,000</b><small>active units</small></div><div class="card"><b>100</b><small>ballots cast</small></div><div class="card"><b>2,500</b><small>recalled units</small></div></div><div class="donut"><div><strong>10,000</strong><small>active units</small></div></div><div class="result-row"><span style="color:#1393e8">●</span><b>Maya Chen</b><span class="track"><i style="--w:42%;--c:#1393e8"></i></span><em>42%</em></div><div class="result-row"><span style="color:#e5bd69">●</span><b>Alex Rivera</b><span class="track"><i style="--w:28%;--c:#e5bd69"></i></span><em>28%</em></div><div class="result-row"><span style="color:#6badd1">●</span><b>Jordan Blake</b><span class="track"><i style="--w:18%;--c:#6badd1"></i></span><em>18%</em></div><div class="result-row"><span style="color:#41a875">●</span><b>Samira Okafor</b><span class="track"><i style="--w:12%;--c:#41a875"></i></span><em>12%</em></div><p class="tiny" style="margin-top:11px">Illustrative values for visual review only.</p></div><div class="nav"><span><b>▦</b>Elections</span><span class="active"><b>▥</b>Results</span><span><b>▣</b>My ballot</span><span><b>◇</b>Promises</span></div></div></div></article>
+  </section>
+  <div class="footnote"><strong>Design concept only.</strong> The candidate portrait and election figures are fictional. Telegram wallet, Rarimo verification and the feedback bot are proposed integration points; this preview does not connect them. The original FreedomSword logo is used unchanged on the launch screen. <a href="./CLIENT_DESIGN_DIRECTION.md" style="color:#a6d9fc">Read the design decisions</a>.</div>
+</main>
+</body>
+</html>
