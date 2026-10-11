@@ -3,21 +3,20 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Script from 'next/script';
+import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ArrowRight,
+  Check,
   ChevronDown,
   FileText,
   Globe2,
-  MessageCircle,
   MoreHorizontal,
   Send,
   ShieldCheck,
   Users,
-  Wallet,
 } from 'lucide-react';
 import {
-  openTelegramLink,
   telegramHaptic,
   useTelegram,
   useTelegramBackButton,
@@ -26,7 +25,6 @@ import { nextWelcomeStep } from '@/lib/welcome';
 import { copy, type Language } from './copy';
 import { useWelcomeFlow } from './useWelcomeFlow';
 import { AgreementModal, InfoModal, VerificationModal } from './WelcomeModals';
-import ElectionLobby from './ElectionLobby';
 
 type Modal = 'verification' | 'agreement' | 'about' | 'privacy' | 'exit' | null;
 type Stage = 'launch' | 'mission' | 'connect';
@@ -36,14 +34,14 @@ const stageCopy = {
     launchTitle: 'Your voice. Your choice.',
     launchDetail: 'A place to explore candidates and make your choice.',
     launchMotto: 'PEOPLE · VOICE · ACTION',
-    start: 'Get started',
-    missionTitle: 'Real people. Real influence.',
+    start: 'Continue in Telegram',
+    missionTitle: 'A new generation of democracy',
     missionDetail:
-      'Your voice builds a stronger future. See the people, ideas and progress behind each election.',
+      'Explore the choices, make your own decision and follow what happens next.',
     missionSteps: [
-      ['A clear path to participation', 'Learn how the demonstration works.'],
-      ['Explore candidates', 'Compare plans before choosing.'],
-      ['Track progress', 'Follow published promises.'],
+      ['Verified citizens', 'One person, one voice in this demonstration.'],
+      ['Meaningful participation', 'Compare candidates and their plans.'],
+      ['Public accountability', 'Follow published promises and results.'],
     ],
     connectTitle: 'Connect to FreedomSword',
     connectDetail: 'Connect your Telegram account to continue. Wallet support is planned.',
@@ -60,19 +58,32 @@ const stageCopy = {
     powered: 'Powered by',
     aboutDemo: 'Fictional election · mock verification',
     back: 'Back',
+    passportTitle: 'Citizen Passport',
+    passportDetail: 'Complete three steps to explore the election demo.',
+    stepConnect: 'Connect Telegram',
+    stepVerify: 'Verify your identity',
+    stepAgreement: 'Accept civic agreement',
+    stepConnectDetail: 'Your Mini App account',
+    previewAccount: 'Browser preview; no Telegram account connected',
+    stepVerifyDetail: 'Mock check · Rarimo planned',
+    stepAgreementDetail: 'Read and accept the participation rules',
+    done: 'Complete',
+    next: 'Continue',
+    viewElections: 'Explore elections',
+    walletNote: 'Telegram Wallet integration is planned.',
   },
   uk: {
     launchTitle: 'Ваш голос. Ваш вибір.',
     launchDetail: 'Місце, де можна ознайомитися з кандидатами та зробити вибір.',
     launchMotto: 'ЛЮДИ · ГОЛОС · ДІЯ',
-    start: 'Почати',
-    missionTitle: 'Справжні люди. Справжній вплив.',
+    start: 'Продовжити в Telegram',
+    missionTitle: 'Нове покоління демократії',
     missionDetail:
-      'Ваш голос творить сильніше майбутнє. Дізнавайтеся про людей, ідеї та поступ у кожних виборах.',
+      'Знайомтеся з варіантами, робіть власний вибір і стежте за тим, що відбувається далі.',
     missionSteps: [
-      ['Зрозумілий шлях до участі', 'Дізнайтеся, як працює демонстрація.'],
-      ['Знайомтеся з кандидатами', 'Порівнюйте плани перед вибором.'],
-      ['Стежте за поступом', 'Читайте опубліковані обіцянки.'],
+      ['Перевірені громадяни', 'Одна людина — один голос у цій демонстрації.'],
+      ['Змістовна участь', 'Порівнюйте кандидатів та їхні плани.'],
+      ['Публічна відповідальність', 'Стежте за обіцянками та результатами.'],
     ],
     connectTitle: 'Підключіться до FreedomSword',
     connectDetail: 'Підключіть Telegram, щоб продовжити. Підтримку гаманця заплановано.',
@@ -89,15 +100,28 @@ const stageCopy = {
     powered: 'За підтримки',
     aboutDemo: 'Вигадані вибори · демонстраційна перевірка',
     back: 'Назад',
+    passportTitle: 'Паспорт громадянина',
+    passportDetail: 'Виконайте три кроки, щоб переглянути демонстрацію виборів.',
+    stepConnect: 'Підключіть Telegram',
+    stepVerify: 'Підтвердьте особу',
+    stepAgreement: 'Прийміть громадянську угоду',
+    stepConnectDetail: 'Ваш обліковий запис міні застосунку',
+    previewAccount: 'Перегляд у браузері; Telegram не підключено',
+    stepVerifyDetail: 'Демонстраційна перевірка · Rarimo заплановано',
+    stepAgreementDetail: 'Прочитайте й прийміть правила участі',
+    done: 'Виконано',
+    next: 'Продовжити',
+    viewElections: 'Переглянути вибори',
+    walletNote: 'Інтеграцію з Telegram Wallet заплановано.',
   },
 } as const;
 
 export default function WelcomeScreen() {
+  const router = useRouter();
   const [lang, setLang] = useState<Language>('en');
   const [stage, setStage] = useState<Stage>('launch');
   const [modal, setModal] = useState<Modal>(null);
-  const [dashboard, setDashboard] = useState(false);
-  const light = !dashboard && (stage === 'launch' || stage === 'mission') && !modal;
+  const light = (stage === 'launch' || stage === 'connect') && !modal;
   const telegram = useTelegram(light ? '#F8F3E8' : '#071522');
   const flow = useWelcomeFlow(telegram.launch);
   const t = copy[lang];
@@ -106,13 +130,10 @@ export default function WelcomeScreen() {
 
   useTelegramBackButton(
     telegram.launch,
-    !flow.busy && (!!modal || dashboard || stage !== 'launch'),
+    !flow.busy && (!!modal || stage !== 'launch'),
     () => {
       if (modal) setModal(null);
-      else if (dashboard) {
-        setDashboard(false);
-        go('connect');
-      } else go(stage === 'connect' ? 'mission' : 'launch');
+      else go(stage === 'connect' ? 'mission' : 'launch');
     },
   );
 
@@ -128,10 +149,6 @@ export default function WelcomeScreen() {
     const color = light ? '#F8F3E8' : '#071522';
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
   }, [light]);
-
-  useEffect(() => {
-    if (dashboard) document.getElementById('civic-lobby-title')?.focus();
-  }, [dashboard]);
 
   function go(next: Stage) {
     setStage(next);
@@ -149,8 +166,7 @@ export default function WelcomeScreen() {
     const next = nextWelcomeStep(flow.verified, flow.accepted);
     if (next === 'dashboard') {
       setModal(null);
-      setDashboard(true);
-      window.scrollTo(0, 0);
+      router.push('/elections');
     } else open(next);
   }
   function closeApp() {
@@ -211,16 +227,7 @@ export default function WelcomeScreen() {
             <ChevronDown size={13} aria-hidden="true" />
           </label>
         </div>
-        {dashboard ? (
-          <ElectionLobby
-            t={t}
-            preview={flow.preview}
-            onBack={() => {
-              setDashboard(false);
-              go('connect');
-            }}
-          />
-        ) : stage === 'launch' ? (
+        {stage === 'launch' ? (
           <main className="fs-stage fs-launch" aria-labelledby="fs-launch-title">
             <Image
               className="fs-original-logo"
@@ -237,7 +244,7 @@ export default function WelcomeScreen() {
             <p>{s.launchDetail}</p>
             <span className="fs-launch-motto">{s.launchMotto}</span>
             <div className="fs-stage-bottom">
-              <button type="button" className="fs-button fs-gold" onClick={() => go('mission')}>
+              <button type="button" className="fs-button" onClick={() => go('mission')}>
                 {s.start}
                 <ArrowRight size={18} />
               </button>
@@ -246,7 +253,6 @@ export default function WelcomeScreen() {
           </main>
         ) : stage === 'mission' ? (
           <main className="fs-stage fs-mission" aria-labelledby="fs-mission-title">
-            <span className="fs-stage-kicker">WELCOME · 01 / 02</span>
             <h1 id="fs-mission-title">{s.missionTitle}</h1>
             <p className="fs-stage-intro">{s.missionDetail}</p>
             <div className="fs-mission-list">
@@ -263,7 +269,7 @@ export default function WelcomeScreen() {
               ))}
             </div>
             <div className="fs-stage-bottom">
-              <button type="button" className="fs-button" onClick={() => go('connect')}>
+              <button type="button" className="fs-button fs-gold" onClick={() => go('connect')}>
                 {t.continueReady}
                 <ArrowRight size={18} />
               </button>
@@ -276,51 +282,34 @@ export default function WelcomeScreen() {
           </main>
         ) : (
           <main className="fs-stage fs-connect" aria-labelledby="fs-connect-title">
-            <span className="fs-stage-kicker">GETTING READY · 01 / 03</span>
-            <div className="fs-progress">
-              <span />
-            </div>
-            <h1 id="fs-connect-title">{s.connectTitle}</h1>
-            <p className="fs-stage-intro">{s.connectDetail}</p>
-            <div className="fs-connect-card">
-              <span className="fs-connect-icon telegram">
-                <Send size={22} />
-              </span>
-              <div>
-                <strong>{s.telegramAccount}</strong>
-                <p>{s.telegramDetail}</p>
-                <span className="fs-chip success">
-                  {telegram.launch === 'ready'
-                    ? s.connected
-                    : telegram.launch === 'outside'
-                      ? s.demo
-                      : s.waiting}
-                </span>
+            <span className="fs-stage-kicker">01 / 03</span>
+            <h1 id="fs-connect-title">{s.passportTitle}</h1>
+            <p className="fs-stage-intro">{s.passportDetail}</p>
+            <div className="fs-passport-steps">
+              <div className="fs-passport-step">
+                <span className="fs-passport-number">1</span>
+                <span className="fs-passport-icon"><Send size={20} aria-hidden="true" /></span>
+                <span className="fs-passport-copy"><strong>{s.stepConnect}</strong><small>{telegram.launch === 'ready' ? s.stepConnectDetail : s.previewAccount}</small></span>
+                {telegram.launch === 'ready' ? (
+                  <span className="fs-passport-status"><Check size={16} aria-label={s.connected} /></span>
+                ) : (
+                  <span className="fs-passport-preview">{s.demo}</span>
+                )}
               </div>
+              <button className="fs-passport-step" type="button" onClick={() => open('verification')} disabled={!available}>
+                <span className="fs-passport-number">2</span>
+                <span className="fs-passport-icon"><ShieldCheck size={20} aria-hidden="true" /></span>
+                <span className="fs-passport-copy"><strong>{s.stepVerify}</strong><small>{s.stepVerifyDetail}</small></span>
+                {flow.verified ? <span className="fs-passport-status"><Check size={16} aria-label={s.done} /></span> : <ArrowRight className="fs-passport-arrow" size={17} aria-hidden="true" />}
+              </button>
+              <button className="fs-passport-step" type="button" onClick={() => open('agreement')} disabled={!available}>
+                <span className="fs-passport-number">3</span>
+                <span className="fs-passport-icon"><FileText size={20} aria-hidden="true" /></span>
+                <span className="fs-passport-copy"><strong>{s.stepAgreement}</strong><small>{s.stepAgreementDetail}</small></span>
+                {flow.accepted ? <span className="fs-passport-status"><Check size={16} aria-label={s.done} /></span> : <ArrowRight className="fs-passport-arrow" size={17} aria-hidden="true" />}
+              </button>
             </div>
-            <div className="fs-connect-card">
-              <span className="fs-connect-icon wallet">
-                <Wallet size={22} />
-              </span>
-              <div>
-                <strong>{s.walletTitle}</strong>
-                <p>{s.walletDetail}</p>
-                <span className="fs-chip planned">{s.planned}</span>
-              </div>
-            </div>
-            <a
-              className="fs-feedback"
-              href="https://t.me/freedomswordbot?start=feedback"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(event) => {
-                if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
-              }}
-            >
-              <MessageCircle size={16} />
-              {s.feedback}
-              <ArrowRight size={15} />
-            </a>
+            <p className="fs-wallet-note">{s.walletNote}</p>
             {telegram.launch === 'failed' && (
               <p className="civic-field-error" role="alert">
                 {t.failed}
@@ -338,7 +327,7 @@ export default function WelcomeScreen() {
                 onClick={proceed}
                 disabled={flow.busy || !available}
               >
-                {s.continue}
+                {flow.verified && flow.accepted ? s.viewElections : s.next}
                 <ArrowRight size={18} />
               </button>
               <small>
@@ -395,7 +384,6 @@ export default function WelcomeScreen() {
           onClose={() => setModal(null)}
           onWelcome={() => {
             setModal(null);
-            setDashboard(false);
             go('launch');
           }}
         />

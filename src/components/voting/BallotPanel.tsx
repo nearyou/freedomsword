@@ -1,4 +1,4 @@
-import { ArrowRight, Fingerprint, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import type { ElectionView } from '@/lib/contracts';
 import type { BallotView } from '@/lib/ui';
 import { supportSegments } from '@/lib/ballot-ui';
@@ -35,12 +35,12 @@ export default function BallotPanel({
   );
   return (
     <div className="panel ballot-panel">
-      <div className="panel-heading">
-        <h3>My ballot</h3>
-        <ShieldCheck size={19} />
-      </div>
       {ballot ? (
         <>
+          <div className="panel-heading">
+            <h3>Your choice</h3>
+            <ShieldCheck size={19} />
+          </div>
           <div className="ballot-candidate">
             {candidate && <Avatar name={candidate.fullName} color={candidate.color} />}
             <div>
@@ -92,22 +92,15 @@ export default function BallotPanel({
         </>
       ) : (
         <div className="empty-ballot">
-          <div className="modal-symbol">
-            <Fingerprint size={30} />
-          </div>
-          <h3>Your support starts here.</h3>
-          <p>
-            Choose one candidate and allocate a 100-unit ballot. Review the election rules before
-            confirming your choice.
-          </p>
-          <div className="balance">
-            <strong>100</strong>
-            <span>units in your initial ballot</span>
-          </div>
-          <button className="button primary" onClick={ready ? onExplore : onPassport}>
-            {ready ? 'Explore candidates' : 'Get ready to vote'}
+          <h3>No choice recorded yet</h3>
+          <p>Explore the candidates, then choose one to support.</p>
+          <button className="button primary" onClick={onExplore}>
+            Explore candidates
             <ArrowRight size={17} />
           </button>
+          {!ready && (
+            <button className="text-button" onClick={onPassport}>Complete Citizen Passport to vote</button>
+          )}
         </div>
       )}
     </div>

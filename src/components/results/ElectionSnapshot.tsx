@@ -24,7 +24,7 @@ export default function ElectionSnapshot({
       <div className="panel-heading">
         <h3>
           <BarChart3 size={18} />
-          Election snapshot
+          Support by candidate
         </h3>
         <span className={`live-tag ${stale ? 'stale-tag' : ''}`}>
           {source === 'preview' ? 'SAMPLE' : stale ? 'STALE' : 'LIVE'}
@@ -75,7 +75,7 @@ export default function ElectionSnapshot({
               <i style={{ background: candidate.color }} />
               {candidate.fullName}
             </span>
-            <strong>{support(candidate, election).toFixed(1)}%</strong>
+            <strong>{support(candidate, election).toFixed(1)}% · {count(candidate.units)}</strong>
           </div>
         ))}
       </div>
@@ -83,6 +83,10 @@ export default function ElectionSnapshot({
         <div>
           <strong>{count(election.ballotCount)}</strong>
           <span>ballots cast</span>
+        </div>
+        <div>
+          <strong>{count(election.ballotCount * 100)}</strong>
+          <span>original units</span>
         </div>
         <div>
           <strong>{count(election.recalledUnits)}</strong>

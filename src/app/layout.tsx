@@ -5,6 +5,7 @@ import '@fontsource-variable/playfair-display';
 import './globals.css';
 import './theme.css';
 import './redesign.css';
+import './elections-clarity.css';
 export const metadata: Metadata = {
   title: 'FreedomSword',
   description: 'FreedomSword: your voice, continuously. A fictional Telegram democracy demo.',

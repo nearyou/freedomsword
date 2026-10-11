@@ -1,25 +1,18 @@
 import { Search } from 'lucide-react';
 import type { CandidateView, ElectionView } from '@/lib/contracts';
 import { searchCandidates } from '@/lib/contracts';
-import type { BallotView } from '@/lib/ui';
 import CandidateCard from './CandidateCard';
 import CandidateSearch from './CandidateSearch';
 export default function CandidateList({
   election,
-  ballot,
-  busy,
   onProfile,
-  onCast,
   query,
   onQuery,
   sort,
   onSort,
 }: {
   election: ElectionView;
-  ballot?: BallotView;
-  busy: boolean;
   onProfile: (candidate: CandidateView) => void;
-  onCast: (candidate: CandidateView) => void;
   query: string;
   onQuery: (query: string) => void;
   sort: string;
@@ -39,10 +32,7 @@ export default function CandidateList({
             key={candidate.id}
             candidate={candidate}
             election={election}
-            ballot={ballot}
-            busy={busy}
             onProfile={onProfile}
-            onCast={onCast}
           />
         ))}
       </div>

@@ -2,33 +2,27 @@
 import { useCallback, useEffect, useState } from 'react';
 import Script from 'next/script';
 import {
-  ArrowRight,
+  ArrowLeft,
   ArrowUpRight,
-  Check,
   CheckCircle2,
-  CircleHelp,
   Layers3,
-  LockKeyhole,
   RefreshCw,
-  ShieldCheck,
-  Sparkles,
   X,
 } from 'lucide-react';
 import type { CandidateView } from '@/lib/contracts';
-import { electionOpen, type AppTab } from '@/lib/ui';
+import type { AppTab } from '@/lib/ui';
 import { useCitizen } from '@/hooks/useCitizen';
 import { useElections } from '@/hooks/useElections';
 import { telegramHaptic, useTelegram, useTelegramBackButton } from '@/hooks/useTelegram';
 import { useVoting, type Action } from '@/hooks/useVoting';
 import AppShell from './layout/AppShell';
-import ElectionSelector, { ElectionDetail } from './elections/ElectionSelector';
+import ElectionSelector, { ElectionGallery } from './elections/ElectionSelector';
 import CandidateList from './candidates/CandidateList';
 import CandidateProfile from './candidates/CandidateProfile';
 import CitizenPassport from './onboarding/CitizenPassport';
 import VoteConfirmation from './voting/VoteConfirmation';
 import BallotPanel from './voting/BallotPanel';
 import ResultsPanel from './results/ResultsPanel';
-import ElectionSnapshot from './results/ElectionSnapshot';
 import AccountabilityPanel from './accountability/AccountabilityPanel';
 import LoadingCards from './ui/LoadingCards';
 import AuditExplorer from './AuditExplorer';
@@ -39,10 +33,10 @@ type Modal =
   | { type: 'audit' }
   | null;
 const headings: Record<AppTab, [string, string]> = {
-  Candidates: ['Meet the candidates', 'Compare people, platforms and plans before you choose.'],
-  'Live results': ['Live results', 'Follow active support as recorded ballots change.'],
-  'My ballot': ['My ballot', 'See your choice and manage your support.'],
-  Accountability: ['Promises', 'Explore reported milestones and the evidence behind them.'],
+  Candidates: ['Elections', 'Explore candidates and their plans before choosing.'],
+  'Live results': ['Results', 'See how recorded support is distributed.'],
+  'My ballot': ['My ballot', 'Review your choice and manage your support.'],
+  Accountability: ['Promises', 'Follow reported progress and supporting evidence.'],
 };
 export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean }) {
   const citizenState = useCitizen();
@@ -59,13 +53,15 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
   const actions = useVoting(() => refresh(true));
   const [activeId, setActiveId] = useState('council-2026');
   const [tab, setTab] = useState<AppTab>('Candidates');
+  const [showElectionList, setShowElectionList] = useState(true);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('support');
   const [modal, setModal] = useState<Modal>(null);
   const [now, setNow] = useState(0);
-  useTelegramBackButton(telegram.launch, !actions.busy && (!!modal || tab !== 'Candidates'), () => {
+  useTelegramBackButton(telegram.launch, !actions.busy && (!!modal || tab !== 'Candidates' || !showElectionList), () => {
     if (modal) setModal(null);
-    else setTab('Candidates');
+    else if (tab === 'Candidates') setShowElectionList(true);
+    else { setTab('Candidates'); setShowElectionList(true); }
   });
   useEffect(() => {
     const initial = setTimeout(() => {
@@ -178,50 +174,32 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
         onTab={(value) => {
           if (value !== tab) telegramHaptic('selection');
           setTab(value);
+          if (value === 'Candidates') setShowElectionList(true);
+          window.scrollTo(0, 0);
         }}
         citizen={citizen}
         onPassport={openPassport}
         inTelegram={telegram.launch === 'ready'}
       >
-        <div className="intro">
+        <div className="elections-page-heading">
           <div>
-            <p className="eyebrow">
-              <Sparkles size={13} />
-              PEOPLE IN CONTROL
-            </p>
-            <h1>
-              Your voice.
-              <br className="mobile-break" /> <span>Your choice.</span>
-            </h1>
-            <p>
-              Explore the candidates. Make your choice.
-              <br />
-              Follow what comes next.
-            </p>
+            {tab === 'Candidates' && !showElectionList && (
+              <button className="elections-back" type="button" onClick={() => setShowElectionList(true)}>
+                <ArrowLeft size={16} aria-hidden="true" /> All elections
+              </button>
+            )}
+            <h1>{tab === 'Candidates' && !showElectionList ? election?.title : headings[tab][0]}</h1>
+            <p>{tab === 'Candidates' && !showElectionList ? 'Review candidates and their plans before choosing.' : headings[tab][1]}</p>
           </div>
           <span className={`network-status ${stale ? 'interrupted' : ''}`}>
             <span className="mini-dot" />
-            {source === 'preview'
-              ? 'Sample preview'
-              : stale
-                ? 'Refresh interrupted'
-                : 'Live · updates every 8s'}
+            {source === 'preview' ? 'Sample' : stale ? 'Refresh paused' : 'Updated live'}
           </span>
         </div>
-        <div className="demo-note">
-          <CircleHelp size={18} />
-          <div>
-            <strong>Fictional elections for demonstration.</strong>
-            <span>
-              {source === 'preview'
-                ? 'Synthetic preview totals. Participation requires the database.'
-                : 'Mock eligibility and blockchain · results from the database.'}
-            </span>
-          </div>
-          <button aria-label="Learn about this demonstration" onClick={openPassport}>
-            <ArrowUpRight size={18} />
-          </button>
-        </div>
+        <p className="elections-demo-note">
+          <strong>DEMO</strong> Fictional elections · mock eligibility and blockchain
+          {source === 'preview' && ' · sample figures'}
+        </p>
         {refreshError && (
           <div className="refresh-banner" role="status">
             <div>
@@ -241,129 +219,62 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
           <LoadingCards />
         ) : election ? (
           <>
-            <ElectionSelector
-              elections={elections}
-              selected={election.id}
-              onSelect={(id) => {
-                setActiveId(id);
-                setQuery('');
-              }}
-            />
-            <ElectionDetail election={election} />
-            <div className="content-grid">
-              <div className="primary-content">
-                <div className="section-heading">
-                  <div>
-                    <h2>{headings[tab][0]}</h2>
-                    <p>{headings[tab][1]}</p>
-                  </div>
-                  <span
-                    className={`open-badge ${electionOpen(election, now || undefined) ? '' : 'closed'}`}
-                  >
-                    {electionOpen(election, now || undefined) ? 'Voting open' : 'Voting closed'}
-                  </span>
-                </div>
-                <div className="tabs" role="tablist" aria-label="Election views">
-                  {(['Candidates', 'Live results', 'My ballot', 'Accountability'] as AppTab[]).map(
-                    (value) => (
-                      <button
-                        key={value}
-                        id={`election-tab-${value.replaceAll(' ', '-')}`}
-                        role="tab"
-                        aria-selected={tab === value}
-                        aria-controls="election-tab-panel"
-                        className={tab === value ? 'selected' : ''}
-                        onClick={() => {
-                          if (value !== tab) telegramHaptic('selection');
-                          setTab(value);
-                        }}
-                      >
-                        {value === 'Accountability' ? 'Promises' : value}
-                      </button>
-                    ),
-                  )}
-                </div>
-                <div
-                  id="election-tab-panel"
-                  role="tabpanel"
-                  aria-labelledby={`election-tab-${tab.replaceAll(' ', '-')}`}
-                >
-                  {tab === 'Candidates' && (
-                    <CandidateList
-                      election={election}
-                      ballot={ballot}
-                      busy={actions.busy}
-                      query={query}
-                      onQuery={setQuery}
-                      sort={sort}
-                      onSort={setSort}
-                      onProfile={(candidate) => setModal({ type: 'profile', id: candidate.id })}
-                      onCast={cast}
-                    />
-                  )}
-                  {tab === 'Live results' && (
-                    <ResultsPanel election={election} source={source} stale={stale} />
-                  )}
-                  {tab === 'My ballot' &&
-                    (citizenState.loading ? (
-                      <LoadingCards label="Loading your private ballot" />
-                    ) : (
-                      <BallotPanel
-                        election={election}
-                        ballot={ballot}
-                        ready={ready}
-                        busy={actions.busy}
-                        privateError={!!citizenState.error}
-                        now={now}
-                        onRecall={recall}
-                        onExplore={() => setTab('Candidates')}
-                        onPassport={openPassport}
-                      />
-                    ))}
-                  {tab === 'Accountability' && (
-                    <AccountabilityPanel
-                      candidates={election.candidates}
-                      onProfile={(candidate) => setModal({ type: 'profile', id: candidate.id })}
-                    />
-                  )}
-                </div>
-              </div>
-              <aside className="right-column">
-                {tab !== 'Live results' && (
-                  <ElectionSnapshot election={election} source={source} stale={stale} />
-                )}
-                <section className="panel journey-panel">
-                  <div className="panel-heading">
-                    <h3>
-                      <ShieldCheck size={19} />
-                      Citizen Passport
-                    </h3>
-                  </div>
-                  {[
-                    ['Connect Telegram', citizen.connected],
-                    ['Verify eligibility · MOCK', citizen.verified],
-                    ['Accept citizen agreement', citizen.agreementSigned],
-                  ].map(([label, done], index) => (
-                    <div className="journey-step" key={String(label)}>
-                      <span className={done ? 'done' : ''}>
-                        {done ? <Check size={14} /> : index + 1}
-                      </span>
-                      <strong>{label}</strong>
-                    </div>
-                  ))}
-                  <button className="button primary full" onClick={openPassport}>
-                    {ready ? 'View citizen status' : 'Get started'}
-                    <ArrowRight size={16} />
-                  </button>
-                </section>
-                <div className="privacy-note">
-                  <LockKeyhole size={18} />
-                  <p>
-                    Public results show aggregate support. Your Telegram identity is never published
-                    with a ballot.
-                  </p>
-                </div>
-              </aside>
+            {tab === 'Candidates' && showElectionList ? (
+              <ElectionGallery
+                elections={elections}
+                onSelect={(id) => {
+                  setActiveId(id);
+                  setShowElectionList(false);
+                  setQuery('');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              />
+            ) : tab !== 'Candidates' ? (
+              <ElectionSelector
+                elections={elections}
+                selected={election.id}
+                onSelect={(id) => {
+                  setActiveId(id);
+                  setQuery('');
+                }}
+              />
+            ) : null}
+            <div className="elections-content" aria-label={headings[tab][0]}>
+              {tab === 'Candidates' && !showElectionList && (
+                <CandidateList
+                  election={election}
+                  query={query}
+                  onQuery={setQuery}
+                  sort={sort}
+                  onSort={setSort}
+                  onProfile={(candidate) => setModal({ type: 'profile', id: candidate.id })}
+                />
+              )}
+              {tab === 'Live results' && (
+                <ResultsPanel election={election} source={source} stale={stale} />
+              )}
+              {tab === 'My ballot' &&
+                (citizenState.loading ? (
+                  <LoadingCards label="Loading your private ballot" />
+                ) : (
+                  <BallotPanel
+                    election={election}
+                    ballot={ballot}
+                    ready={ready}
+                    busy={actions.busy}
+                    privateError={!!citizenState.error}
+                    now={now}
+                    onRecall={recall}
+                    onExplore={() => { setTab('Candidates'); setShowElectionList(false); }}
+                    onPassport={openPassport}
+                  />
+                ))}
+              {tab === 'Accountability' && (
+                <AccountabilityPanel
+                  candidates={election.candidates}
+                  onProfile={(candidate) => setModal({ type: 'profile', id: candidate.id })}
+                />
+              )}
             </div>
           </>
         ) : (
@@ -377,10 +288,6 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
           </div>
         )}
         <footer className="main-footer">
-          <span>
-            <Layers3 size={14} />
-            Accountability, throughout the election.
-          </span>
           <button className="text-button" onClick={() => setModal({ type: 'audit' })}>
             Inspect public audit trail <ArrowUpRight size={14} />
           </button>

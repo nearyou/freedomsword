@@ -1,0 +1,211 @@
+.fs-welcome.fs-light .fs-sheet {
+  background-color: #f8f3e8;
+  background-image: url('/illustrations/civic-parchment.webp');
+  background-size: cover;
+  background-position: center bottom;
+}
+
+.fs-launch .fs-original-logo {
+  box-shadow: 0 12px 32px #6b502322;
+}
+
+.fs-launch-motto {
+  margin-top: 22px;
+}
+
+.fs-welcome.fs-dark .fs-mission {
+  background-image: linear-gradient(180deg, #071522 0%, #071522ed 48%, #071522c9 100%),
+    url('/illustrations/city-council.webp');
+  background-size: cover;
+  background-position: center bottom;
+}
+
+.fs-welcome.fs-dark .fs-mission h1 {
+  font-family: 'Inter Variable', Inter, sans-serif;
+  font-weight: 780;
+  font-size: clamp(30px, 8vw, 39px);
+  max-width: 330px;
+  margin-top: 0;
+}
+
+.fs-welcome.fs-dark .fs-mission .fs-stage-intro {
+  color: #c1d0d8;
+}
+
+.fs-welcome.fs-dark .fs-mission-card {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #46607570;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 13px 0;
+}
+
+.fs-welcome.fs-dark .fs-mission-icon {
+  border: 1px solid #b9924f;
+  border-radius: 50%;
+  background: #102940;
+  color: #e8bd69;
+}
+
+.fs-welcome.fs-dark .fs-mission-card p {
+  color: #aebec8;
+}
+
+.fs-welcome.fs-dark .fs-mission .fs-dots i.active {
+  background: #e8bd69;
+}
+
+.fs-welcome.fs-light .fs-connect {
+  color: #102541;
+  padding-top: 34px !important;
+}
+
+.fs-welcome.fs-light .fs-connect .fs-stage-kicker {
+  color: #946f32;
+}
+
+.fs-welcome.fs-light .fs-connect h1 {
+  margin: 8px 0 7px;
+  font-size: clamp(27px, 7vw, 34px);
+}
+
+.fs-welcome.fs-light .fs-connect .fs-stage-intro {
+  color: #566876;
+  margin-bottom: 20px;
+}
+
+.fs-passport-steps {
+  display: grid;
+  gap: 10px;
+}
+
+.fs-passport-step {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  min-height: 75px;
+  padding: 11px 12px;
+  border: 1px solid #decaa6;
+  border-radius: 13px;
+  color: #102541;
+  background: #fffdf6e6;
+  box-shadow: 0 6px 16px #7054230e;
+  text-align: left;
+}
+
+button.fs-passport-step:hover:not(:disabled) {
+  border-color: #b99c60;
+  background: #fffaf0;
+}
+
+button.fs-passport-step:disabled {
+  opacity: 0.65;
+}
+
+.fs-passport-number,
+.fs-passport-status,
+.fs-passport-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.fs-passport-number {
+  width: 21px;
+  height: 21px;
+  border: 1px solid #d6b675;
+  color: #8a662e;
+  background: #f9efd9;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.fs-passport-icon {
+  width: 36px;
+  height: 36px;
+  color: #0e73d5;
+  background: #e4f2fb;
+}
+
+.fs-passport-step:nth-child(2) .fs-passport-icon {
+  color: #9a702f;
+  background: #f6ead0;
+}
+
+.fs-passport-step:nth-child(3) .fs-passport-icon {
+  color: #102541;
+  background: #ebeced;
+}
+
+.fs-passport-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.fs-passport-copy strong {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.fs-passport-copy small {
+  color: #60717a;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.fs-passport-status {
+  width: 23px;
+  height: 23px;
+  margin-left: auto;
+  color: #fff;
+  background: #16965c;
+}
+
+.fs-passport-preview {
+  margin-left: auto;
+  padding: 4px 5px;
+  border-radius: 5px;
+  color: #89692c;
+  background: #f7e9c7;
+  font-size: 8px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.fs-passport-arrow {
+  margin-left: auto;
+  color: #8b7349;
+  flex: none;
+}
+
+.fs-wallet-note {
+  margin-top: 16px;
+  color: #6e756f;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.fs-welcome.fs-light .fs-connect .fs-button {
+  color: #102541;
+  background: linear-gradient(180deg, #f4da97, #dfad43);
+  box-shadow: 0 8px 18px #a57d2838;
+}
+
+.fs-welcome.fs-light .fs-connect .fs-stage-bottom small a {
+  color: #315a80;
+}
+
+@media (max-height: 700px) {
+  .fs-welcome.fs-light .fs-connect {
+    padding-top: 16px !important;
+  }
+
+  .fs-passport-step {
+    min-height: 65px;
+  }
+}

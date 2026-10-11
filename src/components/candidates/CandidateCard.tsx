@@ -1,74 +1,39 @@
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import type { CandidateView, ElectionView } from '@/lib/contracts';
-import { count, support, voteExplanation, type BallotView } from '@/lib/ui';
+import { support } from '@/lib/ui';
 import Avatar from '../ui/Avatar';
-import IdeologyBadge from '../ui/IdeologyBadge';
-import ProgressBar from '../ui/ProgressBar';
+
 export default function CandidateCard({
   candidate,
   election,
-  ballot,
-  busy,
   onProfile,
-  onCast,
 }: {
   candidate: CandidateView;
   election: ElectionView;
-  ballot?: BallotView;
-  busy: boolean;
   onProfile: (candidate: CandidateView) => void;
-  onCast: (candidate: CandidateView) => void;
 }) {
-  const reason = voteExplanation(election, ballot, busy);
+  const percentage = support(candidate, election);
+
   return (
-    <article className="candidate-card">
-      <div className="candidate-head">
+    <article className="candidate-card candidate-card-clear">
+      <div className="candidate-card-identity">
         <Avatar name={candidate.fullName} color={candidate.color} />
-        <IdeologyBadge label={candidate.ideology} color={candidate.color} />
+        <div>
+          <h3>{candidate.fullName}</h3>
+          <p>{candidate.party}</p>
+        </div>
+        <ChevronRight className="candidate-row-arrow" size={18} aria-hidden="true" />
       </div>
-      <h3>{candidate.fullName}</h3>
-      <div className="party">
-        <span style={{ background: candidate.color }} />
-        {candidate.party}
-      </div>
-      <p className="candidate-bio">{candidate.bio}</p>
-      <div className="candidate-support">
+      <div className="candidate-card-support">
         <span>Current support</span>
-        <strong>
-          {support(candidate, election).toFixed(1)}
-          <small>%</small>
-        </strong>
+        <strong>{percentage.toFixed(1)}%</strong>
       </div>
-      <ProgressBar
-        value={support(candidate, election)}
-        color={candidate.color}
-        label={`${candidate.fullName} support`}
-      />
-      <div className="units-label">{count(candidate.units)} vote units</div>
-      <div className="candidate-actions">
-        <button className="button secondary" onClick={() => onProfile(candidate)}>
-          View profile <ArrowUpRight size={15} />
-        </button>
-        <button
-          className="button primary"
-          disabled={!!reason}
-          title={reason || undefined}
-          aria-describedby={reason ? `cast-reason-${candidate.id}` : undefined}
-          onClick={() => onCast(candidate)}
-        >
-          {ballot?.candidateId === candidate.id
-            ? 'Your ballot'
-            : ballot
-              ? 'Already voted'
-              : 'Cast vote'}
-          <ArrowRight size={15} />
-        </button>
+      <div className="progress-track" role="progressbar" aria-label={`${candidate.fullName} support`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentage}>
+        <span style={{ width: `${percentage}%`, background: candidate.color }} />
       </div>
-      {reason && (
-        <p className="disabled-reason" id={`cast-reason-${candidate.id}`}>
-          {reason}
-        </p>
-      )}
+      <button className="candidate-card-open" type="button" aria-label={`View ${candidate.fullName} profile`} onClick={() => onProfile(candidate)}>
+        <span className="sr-only">View {candidate.fullName} profile</span>
+      </button>
     </article>
   );
 }

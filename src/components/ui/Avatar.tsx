@@ -2,7 +2,13 @@ import type { CSSProperties } from 'react';
 import Image from 'next/image';
 
 export function candidatePortrait(name: string) {
-  return name === 'Maya Chen' ? '/candidates/maya-chen.png' : null;
+  const portraits: Record<string, string> = {
+    'Maya Chen': '/candidates/maya-chen.png',
+    'Alex Rivera': '/candidates/alex-rivera.webp',
+    'Jordan Blake': '/candidates/jordan-blake.webp',
+    'Samira Okafor': '/candidates/samira-okafor.webp',
+  };
+  return portraits[name] ?? null;
 }
 
 export default function Avatar({
