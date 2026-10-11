@@ -54,22 +54,20 @@ export default function CandidateProfile({
           <IdeologyBadge label={candidate.ideology} color={candidate.color} />
         </div>
       </div>
-      <div className="profile-stats">
-        <div>
-          <strong>{support(candidate, election).toFixed(1)}%</strong>
-          <span>Current support</span>
+      {election.activeUnits > 0 && (
+        <div className="profile-stats profile-stats-clear">
+          <div>
+            <strong>{support(candidate, election).toFixed(1)}%</strong>
+            <span>Current support</span>
+          </div>
+          <div>
+            <strong>{platform ? count(platform.signatures) : '—'}</strong>
+            <span>Endorsements</span>
+          </div>
         </div>
-        <div>
-          <strong>{count(candidate.units)}</strong>
-          <span>Vote units</span>
-        </div>
-        <div>
-          <strong>{platform ? count(platform.signatures) : '—'}</strong>
-          <span>Endorsements</span>
-        </div>
-      </div>
+      )}
       <div className="tabs profile-tabs" role="tablist" aria-label="Candidate profile sections">
-        {['Overview', 'Platform', 'Promises', 'Updates'].map((value) => (
+        {['Overview', 'Platform', 'Promises'].map((value) => (
           <button
             key={value}
             role="tab"
@@ -92,11 +90,13 @@ export default function CandidateProfile({
           <>
             <h3>About {candidate.fullName.split(' ')[0]}</h3>
             <p className="modal-copy">{candidate.bio}</p>
-            <ProgressBar
-              value={support(candidate, election)}
-              color={candidate.color}
-              label="Current support"
-            />
+            {election.activeUnits > 0 && (
+              <ProgressBar
+                value={support(candidate, election)}
+                color={candidate.color}
+                label="Current support"
+              />
+            )}
             {platform && (
               <button className="platform-preview" onClick={() => setTab('Platform')}>
                 <FileText size={21} />
@@ -195,16 +195,6 @@ export default function CandidateProfile({
               <p>No promises published yet.</p>
             </div>
           ))}
-        {tab === 'Updates' && (
-          <div className="empty-state">
-            <FileText size={28} />
-            <h3>No update history available</h3>
-            <p>
-              Published milestones are available in Promises. Dated progress history is not
-              currently provided.
-            </p>
-          </div>
-        )}
       </div>
       <div className="profile-cta">
         <button

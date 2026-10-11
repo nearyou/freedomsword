@@ -25,7 +25,7 @@
 }
 
 .elections-demo-note {
-  margin: 0 0 23px;
+  margin: 0 0 18px;
   color: var(--muted);
   font-size: 11px;
   line-height: 1.5;
@@ -39,17 +39,20 @@
 }
 
 .election-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 5px 10px;
   max-width: 960px;
-  padding: 16px 18px;
-  margin-bottom: 24px;
-  background: #10283a;
-  border: 1px solid #29475b;
-  border-radius: 14px;
+  padding: 0;
+  margin-bottom: 21px;
+  background: transparent;
+  border: 0;
 }
 
 .election-picker label {
   display: block;
-  margin-bottom: 8px;
+  grid-column: 1 / -1;
   color: #aac0ce;
   font-size: 11px;
   font-weight: 700;
@@ -61,7 +64,7 @@
 
 .election-picker-control select {
   width: 100%;
-  min-height: 48px;
+  min-height: 44px;
   appearance: none;
   padding: 10px 42px 10px 13px;
   border: 1px solid #486a7f;
@@ -87,9 +90,8 @@
 .election-picker-meta {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 7px 14px;
-  margin-top: 11px;
+  gap: 7px;
+  margin-top: 0;
   color: #a7bbc8;
   font-size: 11px;
 }
@@ -144,7 +146,7 @@
   position: relative;
   display: block;
   min-width: 0;
-  aspect-ratio: 1.45;
+  aspect-ratio: 1.65;
   overflow: hidden;
   border: 1px solid #3d5c70;
   border-radius: 14px;
@@ -222,7 +224,7 @@
 .candidate-card-clear {
   position: relative;
   display: block;
-  padding: 16px;
+  padding: 13px 15px;
   background: #10283b;
   border-color: #2b495d;
 }
@@ -245,9 +247,15 @@
   font-size: 11px;
 }
 
-.candidate-row-arrow {
+.candidate-row-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   margin-left: auto;
-  color: #92b3c7;
+  color: #9dcdea;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .candidate-card-support {
@@ -304,12 +312,84 @@
 }
 
 .main-footer {
-  justify-content: flex-start;
-  margin-top: 38px;
+  justify-content: space-between;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.main-footer > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #aacfe5;
+}
+
+.profile-stats-clear {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.accountability-cards {
+  gap: 10px;
+}
+
+.accountability-cards > .panel {
+  padding: 13px 14px;
+}
+
+.accountability-row {
+  min-height: 49px;
+  padding: 0;
+  border: 0;
+}
+
+.accountability-row[aria-expanded='true'] {
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.accountability-row > .accountability-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+  color: #a4d5f2;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.accountability-row[aria-expanded='true'] .accountability-action svg {
+  transform: rotate(90deg);
+}
+
+.accountability-cards .promise-tracker {
+  margin-top: 16px;
+}
+
+.results-empty {
+  margin: 8px 0 0;
+  padding: 28px 18px;
+  border: 1px solid #29495f;
+  border-radius: 12px;
+  background: #122d42;
+  text-align: center;
+}
+
+.results-empty strong {
+  display: block;
+  font-size: 16px;
+}
+
+.results-empty p {
+  max-width: 280px;
+  margin: 8px auto 0;
+  color: #aebfca;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .results-dashboard .snapshot-stats {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .results-transparency-link {
@@ -329,6 +409,33 @@
 }
 
 @media (max-width: 760px) {
+  .modal-backdrop:has(.profile-modal) {
+    align-items: stretch;
+    padding: 0;
+  }
+
+  .profile-modal {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    padding: 24px 20px max(20px, env(safe-area-inset-bottom));
+  }
+
+  .profile-modal .profile-photo {
+    flex: none;
+    height: 265px;
+    margin: -24px -20px 18px;
+  }
+
+  .profile-modal .profile-cta {
+    margin-top: auto;
+  }
+
   .elections-page-heading h1 {
     font-size: 29px;
   }
@@ -350,7 +457,7 @@
   }
 
   .election-gallery-card {
-    aspect-ratio: 1.9;
+    aspect-ratio: 2.2;
   }
 }
 
@@ -372,7 +479,7 @@
   }
 
   .election-picker {
-    padding: 14px;
+    padding: 0;
   }
 
   .election-picker-meta {
@@ -381,6 +488,6 @@
   }
 
   .candidate-card-clear {
-    padding: 14px;
+    padding: 12px 13px;
   }
 }
