@@ -96,9 +96,22 @@ try {
       await delay(1000);
     }
   }
-  const client = new Client({ connectionString: settings.DATABASE_URL });
-  try { await client.connect(); await client.query('SELECT 1'); }
-  finally { await client.end(); }
+  const databaseReadyBy = Date.now() + 60_000;
+  let databaseReady = false;
+  while (Date.now() < databaseReadyBy && !stopping) {
+    const client = new Client({ connectionString: settings.DATABASE_URL, connectionTimeoutMillis: 3000 });
+    try {
+      await client.connect();
+      await client.query('SELECT 1');
+      databaseReady = true;
+      break;
+    } catch {
+      await delay(1000);
+    } finally {
+      await client.end().catch(() => {});
+    }
+  }
+  if (!databaseReady) throw new Error('Local PostgreSQL did not become ready');
   await run(process.execPath, ['node_modules/prisma/build/index.js', 'migrate', 'deploy'], env);
 
   status('tunnel');
