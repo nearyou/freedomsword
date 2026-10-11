@@ -489,6 +489,13 @@ html[data-theme='light'] .intro h1 span {
   color: #7cccff;
 }
 @media (max-width: 760px) {
+  .app-shell[data-telegram='true'] .topbar {
+    justify-content: flex-end;
+    min-height: 52px;
+  }
+  .app-shell[data-telegram='true'] .mobile-brand {
+    display: none;
+  }
   .topbar {
     min-height: 60px;
     background: #081a2a;

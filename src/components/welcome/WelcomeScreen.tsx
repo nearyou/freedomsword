@@ -16,7 +16,12 @@ import {
   Users,
   Wallet,
 } from 'lucide-react';
-import { useTelegram } from '@/hooks/useTelegram';
+import {
+  openTelegramLink,
+  telegramHaptic,
+  useTelegram,
+  useTelegramBackButton,
+} from '@/hooks/useTelegram';
 import { nextWelcomeStep } from '@/lib/welcome';
 import { copy, type Language } from './copy';
 import { useWelcomeFlow } from './useWelcomeFlow';
@@ -92,12 +97,24 @@ export default function WelcomeScreen() {
   const [stage, setStage] = useState<Stage>('launch');
   const [modal, setModal] = useState<Modal>(null);
   const [dashboard, setDashboard] = useState(false);
-  const telegram = useTelegram();
+  const light = !dashboard && (stage === 'launch' || stage === 'mission') && !modal;
+  const telegram = useTelegram(light ? '#F8F3E8' : '#071522');
   const flow = useWelcomeFlow(telegram.launch);
   const t = copy[lang];
   const s = stageCopy[lang];
   const available = telegram.launch === 'ready' || telegram.launch === 'outside';
-  const light = !dashboard && (stage === 'launch' || stage === 'mission') && !modal;
+
+  useTelegramBackButton(
+    telegram.launch,
+    !flow.busy && (!!modal || dashboard || stage !== 'launch'),
+    () => {
+      if (modal) setModal(null);
+      else if (dashboard) {
+        setDashboard(false);
+        go('connect');
+      } else go(stage === 'connect' ? 'mission' : 'launch');
+    },
+  );
 
   useEffect(() => {
     const previous = document.documentElement.lang;
@@ -110,14 +127,7 @@ export default function WelcomeScreen() {
   useEffect(() => {
     const color = light ? '#F8F3E8' : '#071522';
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
-    if (telegram.launch === 'ready') {
-      const webapp = window.Telegram?.WebApp;
-      if (webapp?.isVersionAtLeast('6.1')) {
-        webapp.setHeaderColor(color);
-        webapp.setBackgroundColor(color);
-      }
-    }
-  }, [light, telegram.launch]);
+  }, [light]);
 
   useEffect(() => {
     if (dashboard) document.getElementById('civic-lobby-title')?.focus();
@@ -125,6 +135,7 @@ export default function WelcomeScreen() {
 
   function go(next: Stage) {
     setStage(next);
+    telegramHaptic('impact');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   function open(next: Modal) {
@@ -302,6 +313,9 @@ export default function WelcomeScreen() {
               href="https://t.me/freedomswordbot?start=feedback"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(event) => {
+                if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
+              }}
             >
               <MessageCircle size={16} />
               {s.feedback}
@@ -347,7 +361,11 @@ export default function WelcomeScreen() {
           preview={flow.preview}
           verified={flow.verified}
           available={available}
-          onVerify={() => flow.perform('verify')}
+          onVerify={async () => {
+            const completed = await flow.perform('verify');
+            telegramHaptic(completed ? 'success' : 'error');
+            return completed;
+          }}
           onAgreement={() => open('agreement')}
         />
       )}
@@ -361,7 +379,11 @@ export default function WelcomeScreen() {
           preview={flow.preview}
           verified={flow.verified}
           accepted={flow.accepted}
-          onAccept={(document) => flow.perform('agreement', document)}
+          onAccept={async (document) => {
+            const completed = await flow.perform('agreement', document);
+            telegramHaptic(completed ? 'success' : 'error');
+            return completed;
+          }}
           onVerify={() => open('verification')}
           onContinue={proceed}
         />

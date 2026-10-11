@@ -18,7 +18,7 @@ import type { CandidateView } from '@/lib/contracts';
 import { electionOpen, type AppTab } from '@/lib/ui';
 import { useCitizen } from '@/hooks/useCitizen';
 import { useElections } from '@/hooks/useElections';
-import { useTelegram } from '@/hooks/useTelegram';
+import { telegramHaptic, useTelegram, useTelegramBackButton } from '@/hooks/useTelegram';
 import { useVoting, type Action } from '@/hooks/useVoting';
 import AppShell from './layout/AppShell';
 import ElectionSelector, { ElectionDetail } from './elections/ElectionSelector';
@@ -63,6 +63,10 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
   const [sort, setSort] = useState('support');
   const [modal, setModal] = useState<Modal>(null);
   const [now, setNow] = useState(0);
+  useTelegramBackButton(telegram.launch, !actions.busy && (!!modal || tab !== 'Candidates'), () => {
+    if (modal) setModal(null);
+    else setTab('Candidates');
+  });
   useEffect(() => {
     const initial = setTimeout(() => {
       setNow(Date.now());
@@ -149,7 +153,9 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
     });
   }
   async function confirm(action: Action) {
-    if (await actions.execute(action)) {
+    const completed = await actions.execute(action);
+    telegramHaptic(completed ? 'success' : 'error');
+    if (completed) {
       close();
       if (action.path === 'vote') {
         setTab('My ballot');
@@ -167,7 +173,16 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
         onReady={telegram.onReady}
         onError={telegram.onError}
       />
-      <AppShell tab={tab} onTab={setTab} citizen={citizen} onPassport={openPassport}>
+      <AppShell
+        tab={tab}
+        onTab={(value) => {
+          if (value !== tab) telegramHaptic('selection');
+          setTab(value);
+        }}
+        citizen={citizen}
+        onPassport={openPassport}
+        inTelegram={telegram.launch === 'ready'}
+      >
         <div className="intro">
           <div>
             <p className="eyebrow">
@@ -258,7 +273,10 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
                         aria-selected={tab === value}
                         aria-controls="election-tab-panel"
                         className={tab === value ? 'selected' : ''}
-                        onClick={() => setTab(value)}
+                        onClick={() => {
+                          if (value !== tab) telegramHaptic('selection');
+                          setTab(value);
+                        }}
                       >
                         {value === 'Accountability' ? 'Promises' : value}
                       </button>

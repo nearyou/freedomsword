@@ -63,11 +63,11 @@ export default function ThemeControl() {
     };
     connectTelegram();
     media.addEventListener('change', update);
-    window.addEventListener('dd-telegram-ready', connectTelegram);
+    window.addEventListener('fs-telegram-ready', connectTelegram);
     return () => {
       media.removeEventListener('change', update);
       subscribed?.offEvent?.('themeChanged', update);
-      window.removeEventListener('dd-telegram-ready', connectTelegram);
+      window.removeEventListener('fs-telegram-ready', connectTelegram);
     };
   }, [loaded, preference]);
 

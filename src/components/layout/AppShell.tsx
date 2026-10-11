@@ -1,3 +1,4 @@
+import { openTelegramLink } from '@/hooks/useTelegram';
 import { ChevronRight, MessageCircle, ShieldCheck } from 'lucide-react';
 import BrandMark from '../ui/BrandMark';
 import Sidebar from './Sidebar';
@@ -10,16 +11,18 @@ export default function AppShell({
   onTab,
   citizen,
   onPassport,
+  inTelegram,
 }: {
   children: React.ReactNode;
   tab: AppTab;
   onTab: (tab: AppTab) => void;
   citizen: CitizenView;
   onPassport: () => void;
+  inTelegram: boolean;
 }) {
   return (
     <>
-      <div className="app-shell">
+      <div className="app-shell" data-telegram={inTelegram}>
         <Sidebar tab={tab} onTab={onTab} onPassport={onPassport} />
         <div className="main-shell">
           <header className="topbar">
@@ -38,6 +41,9 @@ export default function AppShell({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Open FreedomSword bot to send feedback"
+                onClick={(event) => {
+                  if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
+                }}
               >
                 <MessageCircle size={16} />
                 <span>Feedback</span>

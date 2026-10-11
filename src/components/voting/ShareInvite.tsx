@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Check, Copy, ExternalLink, Send } from 'lucide-react';
+import { openTelegramLink, telegramHaptic } from '@/hooks/useTelegram';
 
 const inviteUrl = 'https://t.me/freedomswordbot';
 const inviteText =
@@ -16,8 +17,10 @@ export default function ShareInvite() {
     try {
       await navigator.clipboard.writeText(inviteUrl);
       setCopyState('copied');
+      telegramHaptic('success');
     } catch {
       setCopyState('failed');
+      telegramHaptic('error');
     }
   }
 
@@ -42,6 +45,9 @@ export default function ShareInvite() {
           href={`https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={(event) => {
+            if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
+          }}
         >
           <Send size={16} /> Telegram contacts
         </a>
