@@ -1,11 +1,12 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 import { ArrowRight, CheckCircle2, FileText } from 'lucide-react';
 import type { CandidateView, CitizenView, ElectionView } from '@/lib/contracts';
 import { count, dateLabel, support, voteExplanation, type BallotView } from '@/lib/ui';
 import type { Action } from '@/hooks/useVoting';
 import Dialog from '../ui/Dialog';
-import Avatar from '../ui/Avatar';
+import Avatar, { candidatePortrait } from '../ui/Avatar';
 import IdeologyBadge from '../ui/IdeologyBadge';
 import ProgressBar from '../ui/ProgressBar';
 import PromiseTracker from '../PromiseTracker';
@@ -36,10 +37,16 @@ export default function CandidateProfile({
   const [consent, setConsent] = useState(false);
   const platform = candidate.platform;
   const reason = voteExplanation(election, ballot, busy);
+  const portrait = candidatePortrait(candidate.fullName);
   return (
     <Dialog titleId="profile-title" onClose={onClose} busy={busy} className="profile-modal">
+      {portrait && (
+        <div className="profile-photo">
+          <Image src={portrait} alt="" fill sizes="(max-width: 760px) 100vw, 640px" />
+        </div>
+      )}
       <div className="profile-header">
-        <Avatar name={candidate.fullName} color={candidate.color} large />
+        {!portrait && <Avatar name={candidate.fullName} color={candidate.color} large />}
         <div>
           <p className="eyebrow">CANDIDATE PROFILE</p>
           <h2 id="profile-title">{candidate.fullName}</h2>
@@ -205,7 +212,7 @@ export default function CandidateProfile({
           disabled={!!reason}
           onClick={() => onCast(candidate)}
         >
-          Cast 100-unit vote <ArrowRight size={17} />
+          Choose this candidate <ArrowRight size={17} />
         </button>
         {reason && <p className="disabled-reason">{reason}</p>}
       </div>

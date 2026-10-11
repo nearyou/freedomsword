@@ -39,16 +39,10 @@ type Modal =
   | { type: 'audit' }
   | null;
 const headings: Record<AppTab, [string, string]> = {
-  Candidates: ['Meet your candidates', 'People, platforms, and the future they stand for.'],
-  'Live results': ['Every unit counts', 'Follow participation, recalls, and active support.'],
-  'My ballot': [
-    'Your support, your control',
-    'One initial ballot. Accountability throughout the election.',
-  ],
-  Accountability: [
-    'Promises into progress',
-    'Explore reported milestones and the evidence behind them.',
-  ],
+  Candidates: ['Meet the candidates', 'Compare people, platforms and plans before you choose.'],
+  'Live results': ['Live results', 'Follow active support as recorded ballots change.'],
+  'My ballot': ['My ballot', 'See your choice and manage your support.'],
+  Accountability: ['Promises', 'Explore reported milestones and the evidence behind them.'],
 };
 export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean }) {
   const citizenState = useCitizen();
@@ -155,9 +149,16 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
     });
   }
   async function confirm(action: Action) {
-    if (await actions.execute(action)) close();
+    if (await actions.execute(action)) {
+      close();
+      if (action.path === 'vote') {
+        setTab('My ballot');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
   }
-  const stale = !!electionState.error;
+  const stale = source === 'database' && !!electionState.error;
+  const refreshError = (source === 'database' && electionState.error) || citizenState.error;
   return (
     <>
       <Script
@@ -171,16 +172,16 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
           <div>
             <p className="eyebrow">
               <Sparkles size={13} />
-              DEMOCRACY, IN MOTION
+              PEOPLE IN CONTROL
             </p>
             <h1>
               Your voice.
               <br className="mobile-break" /> <span>Your choice.</span>
             </h1>
             <p>
-              Vote with confidence. Recall with freedom.
+              Explore the candidates. Make your choice.
               <br />
-              Shape what comes next.
+              Follow what comes next.
             </p>
           </div>
           <span className={`network-status ${stale ? 'interrupted' : ''}`}>
@@ -206,12 +207,14 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
             <ArrowUpRight size={18} />
           </button>
         </div>
-        {(electionState.error || citizenState.error) && (
+        {refreshError && (
           <div className="refresh-banner" role="status">
             <div>
               <strong>Refresh interrupted</strong>
-              <p>{electionState.error || citizenState.error}</p>
-              {electionState.error && citizenState.error && <p>{citizenState.error}</p>}
+              <p>{refreshError}</p>
+              {source === 'database' && electionState.error && citizenState.error && (
+                <p>{citizenState.error}</p>
+              )}
             </div>
             <button className="button secondary" onClick={() => void refresh()}>
               <RefreshCw size={15} />

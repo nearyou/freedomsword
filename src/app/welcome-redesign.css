@@ -1,0 +1,504 @@
+.fs-welcome {
+  min-height: 100svh;
+  font-family: 'Inter Variable', Inter, sans-serif;
+}
+.fs-welcome.fs-light {
+  --civic-ink: #102541;
+  --civic-muted: #526575;
+  --civic-paper: #f8f3e8;
+  --civic-line: #d6c49c;
+  color: #102541;
+  background: #eee5d5;
+  color-scheme: light;
+}
+.fs-welcome.fs-dark {
+  --civic-ink: #f6f7f4;
+  --civic-muted: #a5b6c2;
+  --civic-paper: #071522;
+  --civic-line: #31506a;
+  color: #f6f7f4;
+  background: #071522;
+  color-scheme: dark;
+}
+.fs-welcome .fs-sheet {
+  width: min(100%, 560px);
+  min-height: 100svh;
+  background-size: cover;
+  box-shadow: 0 0 70px #0002;
+}
+.fs-welcome.fs-light .fs-sheet {
+  background-color: #f8f3e8;
+  background-image: radial-gradient(circle at 50% 18%, #fffdf8 0, #f8f3e8 48%, #efdfbd 140%);
+}
+.fs-welcome.fs-dark .fs-sheet {
+  background-color: #071522;
+  background-image: radial-gradient(circle at 50% -20%, #143956 0, #071522 56%);
+}
+.fs-welcome .fs-header {
+  height: 62px;
+  background: transparent;
+  border-color: transparent;
+}
+.fs-welcome.fs-dark .welcome-close,
+.fs-welcome.fs-dark .welcome-header-title strong,
+.fs-welcome.fs-dark .welcome-menu {
+  color: #f6f7f4;
+}
+.fs-welcome.fs-dark .welcome-header-title span {
+  color: #a5b6c2;
+}
+.fs-welcome.fs-dark .welcome-menu {
+  border-color: #8caabd;
+}
+.fs-welcome.fs-dark .welcome-language {
+  color: #d2e4ed;
+  background: #16364c;
+  border-color: #41637b;
+}
+.fs-welcome.fs-dark .welcome-language option {
+  background: #10273b;
+  color: #f6f7f4;
+}
+.fs-welcome .welcome-language-row {
+  z-index: 4;
+}
+.fs-welcome .fs-stage {
+  min-height: calc(100svh - 62px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 38px 24px 22px;
+}
+.fs-welcome[data-telegram='true'] .fs-stage {
+  min-height: 100svh;
+}
+.fs-stage h1 {
+  line-height: 1.13;
+}
+.fs-stage-bottom {
+  margin-top: auto;
+  padding-top: 26px;
+  display: grid;
+  gap: 10px;
+  text-align: center;
+}
+.fs-stage-bottom small {
+  color: var(--civic-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.fs-stage-bottom small a {
+  color: #9ed7ff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.fs-button {
+  width: 100%;
+  min-height: 49px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #fff;
+  background: linear-gradient(180deg, #2997f0, #0872d9);
+  font-size: 13px;
+  font-weight: 730;
+  box-shadow: 0 8px 17px #0566be40;
+}
+.fs-button:hover:not(:disabled) {
+  filter: brightness(1.09);
+}
+.fs-button.fs-gold {
+  color: #102541;
+  background: linear-gradient(180deg, #f4dfa9, #d8b56e);
+  box-shadow: 0 9px 20px #8c662338;
+}
+.fs-launch {
+  align-items: center;
+  text-align: center;
+}
+.fs-launch .fs-original-logo {
+  display: block;
+  width: min(60vw, 260px);
+  height: auto;
+  margin: 10vh auto 22px;
+  border-radius: 50%;
+  box-shadow: 0 13px 34px #8a65322b;
+}
+.fs-launch h1 {
+  font-family: var(--civic-heading);
+  font-size: clamp(31px, 9vw, 43px);
+  max-width: 320px;
+  margin-bottom: 12px;
+}
+.fs-launch > p {
+  max-width: 300px;
+  color: #526575;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.fs-launch-motto {
+  color: #a0773b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.19em;
+  margin-top: 35px;
+}
+.fs-launch .fs-stage-bottom {
+  align-self: stretch;
+}
+.fs-stage-kicker {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #a47b40;
+}
+.fs-mission {
+  padding-top: 70px !important;
+}
+.fs-mission h1 {
+  font-family: var(--civic-heading);
+  font-size: clamp(33px, 9.2vw, 47px);
+  margin: 15px 0 13px;
+  max-width: 330px;
+}
+.fs-stage-intro {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--civic-muted);
+}
+.fs-mission-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 32px;
+}
+.fs-mission-card {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px;
+  border: 1px solid #dcc9a3;
+  border-radius: 14px;
+  background: #fffdf9e3;
+  box-shadow: 0 8px 22px #5e492310;
+}
+.fs-mission-icon {
+  flex: none;
+  width: 39px;
+  height: 39px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: #e0ba6f;
+  background: #4a3929;
+}
+.fs-mission-card strong {
+  display: block;
+  font-size: 13px;
+  line-height: 1.35;
+}
+.fs-mission-card p {
+  color: #61717a;
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+.fs-dots {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+.fs-dots i {
+  width: 6px;
+  height: 6px;
+  background: #c4cad0;
+  border-radius: 10px;
+}
+.fs-dots i.active {
+  width: 20px;
+  background: #1685e8;
+}
+.fs-connect {
+  padding-top: 69px !important;
+}
+.fs-connect .fs-stage-kicker {
+  color: #8cbcd8;
+}
+.fs-progress {
+  height: 4px;
+  width: 100%;
+  margin: 12px 0 27px;
+  border-radius: 6px;
+  background: #2b485d;
+}
+.fs-progress span {
+  display: block;
+  width: 33%;
+  height: 100%;
+  background: #1685e8;
+  border-radius: 6px;
+}
+.fs-connect h1 {
+  font-family: 'Inter Variable', Inter, sans-serif;
+  font-size: clamp(29px, 8vw, 39px);
+  max-width: 350px;
+  margin-bottom: 12px;
+}
+.fs-connect .fs-stage-intro {
+  max-width: 350px;
+  margin-bottom: 24px;
+}
+.fs-connect-card {
+  display: flex;
+  gap: 13px;
+  padding: 15px;
+  margin-bottom: 12px;
+  border: 1px solid #31516a;
+  border-radius: 15px;
+  background: linear-gradient(150deg, #15364e, #10293e);
+}
+.fs-connect-icon {
+  flex: none;
+  width: 41px;
+  height: 41px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+}
+.fs-connect-icon.telegram {
+  background: #1b547c;
+  color: #b1e3ff;
+}
+.fs-connect-icon.wallet {
+  background: #4a3929;
+  color: #e5c17a;
+}
+.fs-connect-card strong {
+  display: block;
+  font-size: 14px;
+}
+.fs-connect-card p {
+  color: #b0c2cd;
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 3px 0 10px;
+}
+.fs-chip {
+  display: inline-flex;
+  padding: 4px 7px;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.fs-chip.success {
+  color: #87e5b3;
+  background: #174b3c;
+}
+.fs-chip.planned {
+  color: #efd086;
+  background: #493a29;
+}
+.fs-feedback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #31516a;
+  border-radius: 10px;
+  color: #a5dafe;
+  background: #123148;
+  font-size: 11px;
+}
+.fs-feedback svg:last-child {
+  margin-left: auto;
+}
+.fs-welcome .modal-backdrop {
+  background: #020a13d9;
+  backdrop-filter: blur(10px);
+}
+.fs-welcome .civic-modal {
+  background: #10273b;
+  background-image: radial-gradient(circle at 50% -20%, #1b4562, #10273b 55%);
+  border-color: #34536b;
+  box-shadow: 0 28px 80px #0009;
+  color: #f6f7f4;
+}
+.fs-welcome .civic-modal .close-modal {
+  background: #1b3a52;
+  border-color: #40617a;
+  color: #f6f7f4;
+}
+.fs-welcome .civic-modal-intro {
+  color: #bdd0dc;
+  font-family: 'Inter Variable', Inter, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+}
+.fs-welcome .civic-mode-label {
+  color: #e8cd91;
+  background: #463925;
+  border-color: #705b3b;
+}
+.fs-welcome .civic-input {
+  color: #f6f7f4;
+  background: #0d2538;
+  border-color: #45657b;
+}
+.fs-welcome .civic-input::placeholder {
+  color: #90a7b7;
+}
+.fs-welcome .civic-field-help {
+  color: #9db4c2;
+}
+.fs-welcome .civic-field-error {
+  color: #ff9f9f;
+}
+.fs-welcome .civic-checkbox-label {
+  color: #d4e0e7;
+}
+.fs-welcome .civic-checkbox-label input {
+  accent-color: #1685e8;
+}
+.fs-welcome .civic-agreement-version {
+  color: #e8c986;
+}
+.fs-welcome .civic-agreement-document {
+  background: #102c42;
+  border-color: #40617a;
+  color: #dce9ef;
+  font-family: 'Inter Variable', Inter, sans-serif;
+  font-size: 12px;
+}
+.fs-welcome .civic-prerequisite {
+  border-color: #40617a;
+}
+.fs-welcome .civic-prerequisite > p {
+  color: #e8c986;
+}
+.fs-welcome .civic-text-button {
+  color: #9ed7ff;
+}
+.fs-welcome .civic-gold-button {
+  background: linear-gradient(180deg, #2997f0, #0872d9);
+  border-color: #309af1;
+  color: #fff;
+  box-shadow: 0 8px 18px #0566be38;
+}
+.fs-welcome .civic-gold-button:hover {
+  filter: brightness(1.1);
+}
+.fs-welcome .civic-seal {
+  background: #1a4a68;
+  border-color: #4b7a96;
+  color: #9ed7ff;
+}
+.fs-provider {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #3c6078;
+  border-radius: 10px;
+  background: #16374f;
+  margin: 15px 0 !important;
+}
+.fs-provider svg {
+  color: #8ed1ff;
+}
+.fs-provider strong {
+  font-size: 13px;
+}
+.fs-provider span {
+  width: 100%;
+  padding-left: 28px;
+  color: #afc5d0;
+  font-size: 11px;
+}
+.fs-welcome .civic-lobby {
+  color: #f6f7f4;
+  min-height: calc(100svh - 62px);
+  padding-top: 34px;
+}
+.fs-welcome .civic-back-button {
+  color: #9fd7fc;
+  margin-bottom: 30px;
+}
+.fs-welcome .civic-lobby h1 {
+  font-family: 'Inter Variable', Inter, sans-serif;
+  font-size: 34px;
+}
+.fs-welcome .civic-readiness {
+  background: #15364e;
+  border-color: #3a5f78;
+  border-radius: 14px;
+}
+.fs-welcome .civic-readiness p {
+  color: #adc4d0;
+}
+.fs-welcome .civic-readiness p svg {
+  color: #47c995;
+}
+.fs-welcome .civic-election-preview {
+  background: linear-gradient(150deg, #183d56, #102c42);
+  border-color: #3a5f78;
+  border-radius: 15px;
+}
+.fs-welcome .civic-status-pill {
+  color: #ebc981;
+  border-color: #80643e;
+}
+.fs-welcome .civic-election-link {
+  background: linear-gradient(180deg, #2997f0, #0872d9);
+  min-height: 46px;
+  margin-top: 18px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 750;
+  text-decoration: none;
+}
+.fs-welcome .civic-demo-note {
+  color: #9aafbe;
+}
+@media (max-width: 520px) {
+  .fs-welcome .fs-stage {
+    padding-left: 21px;
+    padding-right: 21px;
+  }
+  .fs-launch .fs-original-logo {
+    margin-top: 9vh;
+  }
+  .fs-welcome .civic-modal {
+    max-width: none;
+    min-height: calc(100dvh - 24px);
+    max-height: calc(100dvh - 24px);
+    border-radius: 18px;
+    padding: 30px 21px;
+  }
+  .fs-welcome .modal-backdrop {
+    padding: 12px;
+  }
+}
+@media (max-height: 700px) {
+  .fs-launch .fs-original-logo {
+    width: min(48vw, 190px);
+    margin-top: 30px;
+  }
+  .fs-mission,
+  .fs-connect {
+    padding-top: 48px !important;
+  }
+  .fs-mission-list {
+    margin-top: 17px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fs-welcome .fs-stage,
+  .fs-welcome .civic-modal {
+    animation: none;
+    scroll-behavior: auto;
+  }
+}

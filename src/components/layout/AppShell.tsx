@@ -1,6 +1,5 @@
-import { ChevronRight, ShieldCheck } from 'lucide-react';
+import { ChevronRight, MessageCircle, ShieldCheck } from 'lucide-react';
 import BrandMark from '../ui/BrandMark';
-import ThemeControl from '../ThemeControl';
 import Sidebar from './Sidebar';
 import MobileNavigation from './MobileNavigation';
 import type { AppTab } from '@/lib/ui';
@@ -33,7 +32,16 @@ export default function AppShell({
               <strong>{tab === 'Candidates' ? 'Elections' : tab}</strong>
             </div>
             <div className="topbar-actions">
-              <ThemeControl />
+              <a
+                className="feedback-link"
+                href="https://t.me/freedomswordbot?start=feedback"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open FreedomSword bot to send feedback"
+              >
+                <MessageCircle size={16} />
+                <span>Feedback</span>
+              </a>
               <button className="connection" onClick={onPassport}>
                 <ShieldCheck size={15} />
                 <span>

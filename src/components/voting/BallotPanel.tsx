@@ -4,6 +4,7 @@ import type { BallotView } from '@/lib/ui';
 import { supportSegments } from '@/lib/ballot-ui';
 import Avatar from '../ui/Avatar';
 import RecallPanel from './RecallPanel';
+import ShareInvite from './ShareInvite';
 export default function BallotPanel({
   election,
   ballot,
@@ -87,6 +88,7 @@ export default function BallotPanel({
             privateError={privateError}
             onRecall={onRecall}
           />
+          <ShareInvite />
         </>
       ) : (
         <div className="empty-ballot">
@@ -95,8 +97,8 @@ export default function BallotPanel({
           </div>
           <h3>Your support starts here.</h3>
           <p>
-            Choose one candidate and allocate a 100-unit ballot. You can recall support later under
-            this election’s rules.
+            Choose one candidate and allocate a 100-unit ballot. Review the election rules before
+            confirming your choice.
           </p>
           <div className="balance">
             <strong>100</strong>

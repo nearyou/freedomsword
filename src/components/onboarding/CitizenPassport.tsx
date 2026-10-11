@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowRight, Check, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Check, ShieldCheck, Wallet } from 'lucide-react';
 import type { CitizenView } from '@/lib/contracts';
 import { api } from '@/lib/client-api';
 import type { Action } from '@/hooks/useVoting';
@@ -107,13 +107,23 @@ export default function CitizenPassport({
           )}
         </div>
       </div>
+      <div className="wallet-preview" aria-label="Wallet connection status">
+        <Wallet size={20} aria-hidden="true" />
+        <div>
+          <strong>Connect wallet</strong>
+          <p>Telegram Wallet or a compatible wallet · integration planned.</p>
+        </div>
+        <span>PLANNED</span>
+      </div>
       <div className={`onboard-step ${citizen.verified ? 'complete' : ''}`}>
         <span className="step-number">{citizen.verified ? <Check size={16} /> : 2}</span>
         <div>
           <h3>
-            Verify eligibility <span className="mock-badge">{citizen.provider}</span>
+            Verify eligibility <span className="mock-badge">MOCK</span>
           </h3>
-          <p>MOCK provider · demonstration only · valid for 30 days.</p>
+          <p>
+            Rarimo is the intended provider. Current verification is a mock check valid for 30 days.
+          </p>
           <button
             className="button secondary full"
             disabled={!citizen.connected || busy || citizen.verified}
@@ -157,6 +167,12 @@ export default function CitizenPassport({
       <p className="fine-print">
         Acceptance is an authenticated consent record with a private hash commitment. No user
         cryptographic signature is claimed.
+      </p>
+      <p className="powered-by">
+        Powered by{' '}
+        <a href="https://freedomtool.org/" target="_blank" rel="noopener noreferrer">
+          FreedomTool
+        </a>
       </p>
       {ready && (
         <button className="button primary full" onClick={onClose}>

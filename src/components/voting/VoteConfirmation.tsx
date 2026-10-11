@@ -45,8 +45,8 @@ export default function VoteConfirmation({
         <ul className="confirmation-rules">
           <li>100 units will be allocated to this candidate.</li>
           <li>Only one initial ballot is allowed in this election.</li>
-          <li>Support may later be recalled according to the election rules.</li>
-          <li>A full recall does not allow another initial ballot.</li>
+          <li>Further ballot actions follow this election’s published rules.</li>
+          <li>Your initial ballot cannot be replaced by another initial ballot.</li>
         </ul>
       ) : (
         <>

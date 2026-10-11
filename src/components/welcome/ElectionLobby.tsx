@@ -53,12 +53,10 @@ export default function ElectionLobby({
         <Ornament small />
         <p className="civic-placeholder-note">{t.placeholderNotice}</p>
       </article>
-      {!preview && (
-        <Link href="/elections" className="civic-election-link">
-          {t.existingElections}
-          <ArrowUpRight size={17} />
-        </Link>
-      )}
+      <Link href="/elections" className="civic-election-link">
+        {t.existingElections}
+        <ArrowUpRight size={17} />
+      </Link>
       <p className="civic-demo-note">
         {preview ? `${t.preview} · ` : ''}
         {t.demonstration}

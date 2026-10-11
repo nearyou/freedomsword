@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import type { Viewport } from 'next';
-import Script from 'next/script';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/playfair-display';
 import './globals.css';
 import './theme.css';
+import './redesign.css';
 export const metadata: Metadata = {
   title: 'FreedomSword',
   description: 'FreedomSword: your voice, continuously. A fictional Telegram democracy demo.',
@@ -12,30 +14,12 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#090f1d',
+  themeColor: '#071522',
 };
-const initializeTheme = `(function(){
-  var preference='system';
-  try { var stored=localStorage.getItem('dd-theme'); if(stored==='light'||stored==='dark') preference=stored; } catch(e) {}
-  var telegram=window.Telegram&&window.Telegram.WebApp;
-  var scheme=telegram&&telegram.initData&&(telegram.colorScheme==='light'||telegram.colorScheme==='dark')?telegram.colorScheme:
-    (window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
-  var theme=preference==='system'?scheme:preference;
-  document.documentElement.dataset.theme=theme;
-  var meta=document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute('content',theme==='light'?'#f4f7fc':'#090f1d');
-})();`;
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <Script
-          id="dd-initialize-theme"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: initializeTheme }}
-        />
-        {children}
-      </body>
+    <html lang="en" data-theme="dark">
+      <body>{children}</body>
     </html>
   );
 }

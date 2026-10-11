@@ -36,8 +36,8 @@ export default function Sidebar({
       </nav>
       <div className="sidebar-card">
         <ShieldCheck size={25} />
-        <h3>Your voice stays yours.</h3>
-        <p>Support can change. Keep your representatives accountable.</p>
+        <h3>People in control.</h3>
+        <p>Explore the choices and follow public progress.</p>
         <button onClick={onPassport}>
           Citizen Passport <ArrowUpRight size={15} />
         </button>

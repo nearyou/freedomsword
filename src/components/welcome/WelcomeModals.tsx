@@ -67,10 +67,15 @@ export function VerificationModal({
         <ShieldCheck size={32} strokeWidth={1.3} />
       </span>
       <p className="civic-eyebrow">
-        {t.step} 1 · {t.mock}
+        {t.step} 2 / 3 · {t.mock}
       </p>
       <h2 id="welcome-verify-title">{t.verify}</h2>
       <p className="civic-modal-intro">{t.verifyIntro}</p>
+      <div className="fs-provider">
+        <ShieldCheck size={20} />
+        <strong>Rarimo</strong>
+        <span>{t.providerDetail}</span>
+      </div>
       <Ornament small />
       {verified ? (
         <>
@@ -222,7 +227,7 @@ export function AgreementModal({
         <FileSignature size={31} strokeWidth={1.3} />
       </span>
       <p className="civic-eyebrow">
-        {t.step} 2 · {preview ? t.preview : t.mock}
+        {t.step} 3 / 3 · {preview ? t.preview : t.mock}
       </p>
       <h2 id="welcome-agreement-title">{t.agreement}</h2>
       <p className="civic-modal-intro">{t.agreementIntro}</p>
