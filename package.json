@@ -13,7 +13,6 @@
     "lint": "eslint .",
     "test": "vitest run",
     "check": "npm run typecheck && npm run lint && npm run test && npm run contract:test",
-    "phase": "node scripts/phase.mjs",
     "db:generate": "npm run db:generate -w @freedomsword/backend",
     "db:push": "npm run db:push -w @freedomsword/backend",
     "db:seed": "npm run db:seed -w @freedomsword/backend",
