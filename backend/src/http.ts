@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { ApiError } from './errors';
 import { enforceRateLimit, enforceRateLimitAsync } from './rate-limit';
@@ -39,7 +38,7 @@ export async function body<T>(request: Request, schema: z.ZodType<T>): Promise<T
   }
 }
 export function json(data: unknown, status = 200) {
-  return NextResponse.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
+  return Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
 }
 export async function handle(fn: () => Promise<Response>, request?: Request, action?: MetricAction) {
   const requestId = correlationId(request);

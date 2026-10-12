@@ -1,4 +1,4 @@
-import type { NextRequest } from 'next/server';
+import { parse, serialize } from 'cookie';
 import { db } from './db';
 import { ApiError } from './errors';
 import { readSession } from '@backend/security/session';
@@ -18,8 +18,11 @@ export function sessionCookieOptions(maxAge: number) {
     maxAge,
   };
 }
-export async function requireUser(request: NextRequest) {
-  const token = request.cookies.get(sessionCookieName())?.value;
+export function setSessionCookie(response: Response, token: string, maxAge: number) {
+  response.headers.append('Set-Cookie', serialize(sessionCookieName(), token, sessionCookieOptions(maxAge)));
+}
+export async function requireUser(request: Request) {
+  const token = parse(request.headers.get('cookie') ?? '')[sessionCookieName()];
   if (!token) throw new ApiError(401, 'Connect your Telegram account first', 'AUTH_REQUIRED');
   let data: ReturnType<typeof readSession>;
   try {

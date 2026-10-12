@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { sha256 } from '@backend/core/hash';
 import { db } from './db';
@@ -35,7 +34,7 @@ export const adminCommand = z.discriminatedUnion('action', [
 ]);
 export type AdminCommand = z.infer<typeof adminCommand>;
 
-export async function requireAdmin(request: NextRequest) {
+export async function requireAdmin(request: Request) {
   const user = await requireUser(request);
   const role = await db.adminGrant.findUnique({
     where: { userId_role: { userId: user.id, role: 'ELECTION_MANAGER' } },

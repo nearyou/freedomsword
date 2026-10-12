@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { db } from '../backend/src/db';
-import { GET as health } from '../backend/src/app/api/health/route';
-import { GET as ready } from '../backend/src/app/api/ready/route';
+import { GET as health } from '../backend/src/routes/health';
+import { GET as ready } from '../backend/src/routes/ready';
 
 afterEach(() => vi.restoreAllMocks());
 it('exposes only process liveness and database readiness', async () => {

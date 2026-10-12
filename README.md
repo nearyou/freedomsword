@@ -6,18 +6,18 @@ The interface uses an ivory launch and Citizen Passport, followed by a restraine
 
 ## Stack and local start
 
-Two independent Next.js 16 workspaces, TypeScript, Prisma 6, MongoDB Atlas, Ethereum Sepolia via viem, Tailwind CSS, and Vitest. Use Node.js 22.12 or newer. MongoDB must be a replica set (Atlas satisfies this) for multi-document transactions. `frontend` contains pages and browser UI; `backend` contains API routes, database and contract code. No source module is imported across the apps.
+Independent Next.js 16 frontend and Express 5 backend workspaces, TypeScript, Prisma 6, MongoDB Atlas, Ethereum Sepolia via viem, Tailwind CSS, and Vitest. Use Node.js 22.12 or newer. MongoDB must be a replica set (Atlas satisfies this) for multi-document transactions. `frontend` contains pages and browser UI; `backend` contains Express routes, database and contract code. No source module is imported across the apps.
 
 1. Run `npm ci`. Copy `backend/.env.example` to `backend/.env` and `frontend/.env.example` to `frontend/.env`. Supply the backend with a MongoDB Atlas URI containing a database name and three **different** random server secrets: `SESSION_SECRET`, `BALLOT_SECRET`, and `ELIGIBILITY_COMMITMENT_SECRET`. The frontend needs only `BACKEND_URL` and its non-secret UI settings.
 2. Run `npm run db:push` to create collections and indexes, then `npm run db:seed` for fictional fixtures.
-3. Run `npm run dev` to start the backend at `http://localhost:3001` and frontend at `http://localhost:3000`. Frontend requests to `/api/*` are proxied to the backend. Set backend `APP_ORIGIN=http://localhost:3000`; the browser keeps a same-origin session cookie. `npm run check` typechecks both apps, lints, and runs unit and contract tests. `npm run test:integration` creates a uniquely named temporary Atlas database, runs real transaction tests, and drops only that test database. The Atlas user needs permissions for these operations.
-4. Run `npm run build` to build each app separately. The `postinstall` hook generates Prisma Client. Individual commands such as `npm run build -w @freedomsword/frontend` are also available.
+3. Run `npm run dev` to start Express at `http://localhost:3001` and Next.js at `http://localhost:3000`. Frontend requests to `/api/*` are proxied to Express. Set backend `APP_ORIGIN=http://localhost:3000`; the browser keeps a same-origin session cookie. `npm run check` typechecks both apps, lints, and runs unit and contract tests. `npm run test:integration` creates a uniquely named temporary Atlas database, runs real transaction tests, and drops only that test database. The Atlas user needs permissions for these operations.
+4. Run `npm run build` to bundle the Express server and build the Next.js frontend. Start the built API with `npm run start:backend`; `PORT` defaults to 3001. The `postinstall` hook generates Prisma Client. Individual commands such as `npm run build -w @freedomsword/frontend` are also available.
 
 `/api/health` checks process liveness and `/api/ready` checks MongoDB. The configured database is not seeded by `db:push`; use `db:seed` only where the fictional demo elections should appear.
 
 ## Vercel and Telegram release
 
-Deploy two Vercel projects from this repository with root directories `backend` and `frontend`. Deploy the backend first and set the frontend's `BACKEND_URL` to the backend's HTTPS origin without a trailing slash. The frontend rewrites same-origin `/api/*` to that URL. Set backend `APP_ORIGIN` to the frontend's exact public HTTPS origin. Keep backend credentials entirely out of the frontend project. Configure these variables for the intended environment, including at build time:
+Deploy two Vercel projects from this repository with root directories `backend` and `frontend`. Vercel detects the Express app exported from `backend/src/app.ts`; `backend/vercel.json` retains the outbox cron. Deploy the backend first and set the frontend's `BACKEND_URL` to the backend's HTTPS origin without a trailing slash. The frontend rewrites same-origin `/api/*` to that URL. Set backend `APP_ORIGIN` to the frontend's exact public HTTPS origin. Keep backend credentials entirely out of the frontend project. Configure these variables for the intended environment, including at build time:
 
 | Project | Variable | Value |
 | --- | --- | --- |

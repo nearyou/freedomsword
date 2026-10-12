@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
@@ -18,7 +18,21 @@ if (!/^fs_test_[a-f0-9]{24}$/.test(testUrl.pathname.slice(1)))
   throw new Error('Refusing to use a non-test database');
 const npmCli = process.env.npm_execpath;
 if (!npmCli) throw new Error('Run integration tests with npm run test:integration');
-const env = { ...process.env, DATABASE_URL: testUrl.toString(), INTEGRATION_TEST: 'true' };
+const env = {
+  ...process.env,
+  APP_ENV: 'test',
+  APP_ORIGIN: 'http://127.0.0.1:3000',
+  DATABASE_URL: testUrl.toString(),
+  SESSION_SECRET: randomBytes(32).toString('hex'),
+  BALLOT_SECRET: randomBytes(32).toString('hex'),
+  ELIGIBILITY_COMMITMENT_SECRET: randomBytes(32).toString('hex'),
+  TELEGRAM_AUTH_ENABLED: 'false',
+  ELIGIBILITY_PROVIDER: 'mock',
+  RATE_LIMIT_BACKEND: 'memory',
+  BLOCKCHAIN_ADAPTER: 'mock',
+  ALLOW_DEMO_AUTH: 'false',
+  INTEGRATION_TEST: 'true',
+};
 let created = false;
 try {
   for (const args of [

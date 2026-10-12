@@ -1,7 +1,7 @@
 import { expect, it, vi } from 'vitest';
 
 vi.mock('@backend/blockchain', () => ({ processOutbox: vi.fn(async () => ({ processed: 0 })) }));
-import { GET } from '../backend/src/app/api/cron/outbox/route';
+import { GET } from '../backend/src/routes/cron-outbox';
 
 it('requires the configured cron bearer token before processing outbox work', async () => {
   vi.stubEnv('CRON_SECRET', 'a-private-schedule-secret');

@@ -6,7 +6,7 @@ import a11y from 'eslint-plugin-jsx-a11y';
 import globals from 'globals';
 const config = ts.config(
   {
-    ignores: ['**/.next/**', '**/.next-staging/**', '**/node_modules/**', '**/next-env.d.ts', '**/artifacts/**', '.local-*/**', '**/cache/**'],
+    ignores: ['**/.next/**', '**/.next-staging/**', '**/dist/**', '**/node_modules/**', '**/next-env.d.ts', '**/artifacts/**', '.local-*/**', '**/cache/**'],
   },
   js.configs.recommended,
   ...ts.configs.recommended,

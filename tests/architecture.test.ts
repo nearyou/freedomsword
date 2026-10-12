@@ -27,4 +27,7 @@ it('keeps frontend and backend source and dependencies separate', () => {
   expect(frontendPackage.dependencies).not.toHaveProperty('viem');
   expect(backendPackage.dependencies).not.toHaveProperty('recharts');
   expect(backendPackage.dependencies).not.toHaveProperty('lucide-react');
+  expect(backendPackage.dependencies).toHaveProperty('express');
+  expect(backendPackage.dependencies).not.toHaveProperty('next');
+  expect(backend).not.toMatch(/next\/server|NextRequest|NextResponse/);
 });

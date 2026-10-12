@@ -12,22 +12,21 @@ import { AGREEMENT_TEXT } from '../backend/src/core/agreement';
 import { verifyAuditSegment } from '../backend/src/core/audit-chain';
 import { secret } from '../backend/src/secrets';
 import { credentialPseudonym, privateBallotPseudonyms } from '../backend/src/credentials';
-import { POST as authenticate } from '../backend/src/app/api/auth/route';
-import { GET as privateMe } from '../backend/src/app/api/me/route';
+import { POST as authenticate } from '../backend/src/routes/auth';
+import { GET as privateMe } from '../backend/src/routes/me';
 import { createSession } from '../backend/src/security/session';
-import { NextRequest } from 'next/server';
-import { GET as ready } from '../backend/src/app/api/ready/route';
-import { GET as publicAudit } from '../backend/src/app/api/audit/route';
-import { GET as adminList, POST as adminPost } from '../backend/src/app/api/admin/elections/route';
+import { GET as ready } from '../backend/src/routes/ready';
+import { GET as publicAudit } from '../backend/src/routes/audit';
+import { GET as adminList, POST as adminPost } from '../backend/src/routes/admin-elections';
 import { administer } from '../backend/src/admin';
 import { sessionCookieName } from '../backend/src/auth';
-import { GET as publicTransparency } from '../backend/src/app/api/elections/[id]/transparency/route';
-import { GET as publicExport } from '../backend/src/app/api/elections/[id]/audit-export/route';
+import { GET as publicTransparency } from '../backend/src/routes/election-transparency';
+import { GET as publicExport } from '../backend/src/routes/election-audit-export';
 import { verifyAuditExport } from '../backend/src/core/audit-export';
 import { MongoRateLimitStore } from '../backend/src/rate-limit';
 import { MongoCommitmentOutboxStore } from '../backend/src/outbox-store';
 import { appendAudit } from '../backend/src/audit';
-import { GET as adminMetrics } from '../backend/src/app/api/admin/metrics/route';
+import { GET as adminMetrics } from '../backend/src/routes/admin-metrics';
 import { verifyDatabaseEvidence } from '../backend/src/integrity-check';
 if (process.env.INTEGRATION_TEST !== 'true')
   throw new Error('Run npm run test:integration to use an isolated temporary database');
@@ -61,7 +60,7 @@ afterAll(async () => {
 
 it('requires an explicit election manager grant and audits each management action', async () => {
   const manager = await db.user.create({ data: { telegramId: `test:manager:${randomUUID()}` } });
-  const request = () => new NextRequest('http://127.0.0.1:3000/api/admin/elections', {
+  const request = () => new Request('http://127.0.0.1:3000/api/admin/elections', {
     headers: { cookie: `${sessionCookieName()}=${createSession(manager.id, manager.sessionVersion, secret('SESSION_SECRET'))}` },
   });
   expect((await adminList(request())).status).toBe(403);
@@ -112,18 +111,18 @@ it('requires an explicit election manager grant and audits each management actio
   const publicResult = JSON.stringify(await response.json());
   expect(publicResult).toContain('Revised test election');
   expect(publicResult).not.toContain(manager.telegramId);
-  const unauthorizedPost = await adminPost(new NextRequest('http://127.0.0.1:3000/api/admin/elections', {
+  const unauthorizedPost = await adminPost(new Request('http://127.0.0.1:3000/api/admin/elections', {
     method: 'POST', headers: { 'content-type': 'application/json', origin: 'http://127.0.0.1:3000' },
     body: JSON.stringify({ action: 'close', electionId }),
   }));
   expect(unauthorizedPost.status).toBe(401);
-  const citizenPost = await adminPost(new NextRequest('http://127.0.0.1:3000/api/admin/elections', {
+  const citizenPost = await adminPost(new Request('http://127.0.0.1:3000/api/admin/elections', {
     method: 'POST', headers: { 'content-type': 'application/json', origin: 'http://127.0.0.1:3000',
       cookie: `${sessionCookieName()}=${createSession(citizen.id, citizen.sessionVersion, secret('SESSION_SECRET'))}` },
     body: JSON.stringify({ action: 'close', electionId }),
   }));
   expect(citizenPost.status).toBe(403);
-  const forgedRole = await adminPost(new NextRequest('http://127.0.0.1:3000/api/admin/elections', {
+  const forgedRole = await adminPost(new Request('http://127.0.0.1:3000/api/admin/elections', {
     method: 'POST', headers: { 'content-type': 'application/json', origin: 'http://127.0.0.1:3000',
       cookie: `${sessionCookieName()}=${createSession(citizen.id, citizen.sessionVersion, secret('SESSION_SECRET'))}` },
     body: JSON.stringify({ action: 'close', electionId, role: 'ELECTION_MANAGER', userId: citizen.id }),
@@ -247,7 +246,7 @@ it('publishes election aggregates and commitments without private ballot or iden
   await castVote(user, { electionId, candidateId: candidate.id, requestId });
   await recallVote(user, { electionId, mode: 'partial', requestId: randomUUID() });
   const response = await publicTransparency(new Request(`http://127.0.0.1:3000/api/elections/${electionId}/transparency`),
-    { params: Promise.resolve({ id: electionId }) });
+    electionId);
   expect(response.status).toBe(200);
   const data = await response.json();
   expect(data.totals).toMatchObject({ voteUnitsCast: 100, recalledUnits: 25, activeUnits: 75, participation: 1 });
@@ -262,7 +261,7 @@ it('publishes election aggregates and commitments without private ballot or iden
     expect(serialized).not.toContain(`"${forbiddenKey}"`);
   }
   const exportResponse = await publicExport(new Request(`http://127.0.0.1:3000/api/elections/${electionId}/audit-export`),
-    { params: Promise.resolve({ id: electionId }) });
+    electionId);
   expect(exportResponse.status).toBe(200);
   const auditBundle = await exportResponse.json();
   expect(auditBundle.bundle.schemaVersion).toBe('freedomsword-audit-bundle/v1');
@@ -536,7 +535,7 @@ it('rejects replayed Telegram initData, including reordered fields', async () =>
   }
 });
 it('serves private ballot state without emitting Telegram IDs or credential material', async () => {
-  const request = new NextRequest('http://localhost:3000/api/me', {
+  const request = new Request('http://localhost:3000/api/me', {
     headers: {
       cookie: `dd_session=${createSession(citizen.id, citizen.sessionVersion, secret('SESSION_SECRET'))}`,
     },

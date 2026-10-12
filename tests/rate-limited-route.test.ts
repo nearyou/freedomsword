@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import { NextRequest } from 'next/server';
 import { afterEach, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -10,14 +9,14 @@ vi.mock('@backend/auth', () => ({ requireUser: async () => ({ id: mocks.subject 
 vi.mock('@backend/voting', () => ({ castVote: mocks.cast }));
 vi.mock('@backend/blockchain', () => ({ settleOutbox: async () => {} }));
 
-import { POST } from '../backend/src/app/api/vote/route';
+import { POST } from '../backend/src/routes/vote';
 afterEach(() => vi.unstubAllEnvs());
 
 it('returns 429 for a protected vote route without performing the denied vote', async () => {
   const origin = 'http://localhost:3000';
   vi.stubEnv('APP_ORIGIN', origin);
   const request = () =>
-    new NextRequest(`${origin}/api/vote`, {
+    new Request(`${origin}/api/vote`, {
       method: 'POST',
       headers: { origin, 'content-type': 'application/json' },
       body: JSON.stringify({ electionId: 'e', candidateId: 'c', requestId: randomUUID() }),

@@ -1,13 +1,12 @@
 import { createHmac } from 'node:crypto';
 import { afterEach, expect, it, vi } from 'vitest';
-import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { body, handle, json, rateLimit } from '../backend/src/http';
 import { requireUser, sessionCookieOptions } from '../backend/src/auth';
 import { createSession } from '../backend/src/security/session';
 import { db } from '../backend/src/db';
-import { POST as authenticate } from '../backend/src/app/api/auth/route';
-import { POST as logout } from '../backend/src/app/api/logout/route';
+import { POST as authenticate } from '../backend/src/routes/auth';
+import { POST as logout } from '../backend/src/routes/logout';
 const origin = 'http://localhost:3000';
 const sessionSecret = 'a'.repeat(64);
 afterEach(() => {
@@ -97,7 +96,7 @@ it('rejects existing demo sessions and honors session revocation in production',
     createdAt: new Date(),
   };
   const lookup = vi.spyOn(db.user, 'findUnique').mockResolvedValue(user);
-  const request = new NextRequest(origin, {
+  const request = new Request(origin, {
     headers: { cookie: `__Host-dd_session=${createSession(user.id, 1, sessionSecret)}` },
   });
   await expect(requireUser(request)).rejects.toThrow('Demo sessions');
@@ -128,7 +127,7 @@ it('uses secure production cookies and revokes a valid session on logout', async
   vi.spyOn(db.user, 'findUnique').mockResolvedValue(user);
   const update = vi.spyOn(db.user, 'updateMany').mockResolvedValue({ count: 1 });
   const response = await logout(
-    new NextRequest(`${origin}/api/logout`, {
+    new Request(`${origin}/api/logout`, {
       method: 'POST',
       headers: {
         origin,
@@ -144,7 +143,7 @@ it('uses secure production cookies and revokes a valid session on logout', async
   expect(response.headers.get('set-cookie')).toContain('HttpOnly');
   expect(response.headers.get('set-cookie')).toContain('Max-Age=0');
   const expired = await logout(
-    new NextRequest(`${origin}/api/logout`, {
+    new Request(`${origin}/api/logout`, {
       method: 'POST',
       headers: { origin, 'content-type': 'application/json' },
       body: '{}',

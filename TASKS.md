@@ -2,7 +2,7 @@
 
 ## Current architecture
 
-- Independent `frontend` and `backend` Next.js workspaces. UI and browser hooks live only in the frontend; API routes, server services, Prisma, and Ethereum logic live only in the backend. JSON over HTTP is the boundary.
+- Independent Next.js `frontend` and Express `backend` workspaces. UI and browser hooks live only in the frontend; API routes, server services, Prisma, and Ethereum logic live only in the backend. JSON over HTTP is the boundary.
 - MongoDB Atlas and Prisma 6 provide persistence, indexes and multi-document transactions.
 - `backend/contracts/FreedomSwordVoting.sol` enforces one 100-unit ballot per opaque nullifier, recall limits, cooldowns and election windows. The Sepolia adapter submits and reconciles contract actions through the MongoDB outbox.
 - Telegram authorization, fictional eligibility, citizen agreement, candidate management, audit exports, idempotency and rate limiting remain server-side.
