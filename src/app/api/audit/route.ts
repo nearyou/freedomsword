@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { db } from '@/server/db';
-import { handle, json } from '@/server/http';
-import { ApiError } from '@/server/errors';
-import { verifyAuditSegment } from '@/lib/audit-chain';
+import { db } from '@/backend/db';
+import { handle, json } from '@/backend/http';
+import { ApiError } from '@/backend/errors';
+import { verifyAuditSegment } from '@/shared/audit-chain';
 export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   return handle(async () => {

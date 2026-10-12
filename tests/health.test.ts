@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { db } from '../src/server/db';
+import { db } from '../src/backend/db';
 import { GET as health } from '../src/app/api/health/route';
 import { GET as ready } from '../src/app/api/ready/route';
 

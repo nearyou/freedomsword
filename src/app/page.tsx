@@ -1,4 +1,4 @@
-import WelcomeScreen from '@/components/welcome/WelcomeScreen';
+import WelcomeScreen from '@/frontend/components/welcome/WelcomeScreen';
 import './welcome.css';
 import './welcome-redesign.css';
 import './welcome-clarity.css';

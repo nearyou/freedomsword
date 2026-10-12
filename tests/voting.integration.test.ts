@@ -1,34 +1,34 @@
 import { createHmac, randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { User } from '@prisma/client';
-import { db } from '../src/server/db';
-import { castVote, recallVote } from '../src/server/voting';
-import { verifyCitizen, signCitizenAgreement } from '../src/server/verification';
-import { signPlatform } from '../src/server/platforms';
-import { flushOutbox } from '../src/server/blockchain';
-import { listElections } from '../src/server/elections';
-import { sha256, ballotPseudonym } from '../src/lib/hash';
-import { AGREEMENT_TEXT } from '../src/lib/agreement';
-import { verifyAuditSegment } from '../src/lib/audit-chain';
-import { secret } from '../src/server/secrets';
-import { credentialPseudonym, privateBallotPseudonyms } from '../src/server/credentials';
+import { db } from '../src/backend/db';
+import { castVote, recallVote } from '../src/backend/voting';
+import { verifyCitizen, signCitizenAgreement } from '../src/backend/verification';
+import { signPlatform } from '../src/backend/platforms';
+import { flushOutbox } from '../src/backend/blockchain';
+import { listElections } from '../src/backend/elections';
+import { sha256, ballotPseudonym } from '../src/shared/hash';
+import { AGREEMENT_TEXT } from '../src/shared/agreement';
+import { verifyAuditSegment } from '../src/shared/audit-chain';
+import { secret } from '../src/backend/secrets';
+import { credentialPseudonym, privateBallotPseudonyms } from '../src/backend/credentials';
 import { POST as authenticate } from '../src/app/api/auth/route';
 import { GET as privateMe } from '../src/app/api/me/route';
-import { createSession } from '../src/lib/session';
+import { createSession } from '../src/backend/security/session';
 import { NextRequest } from 'next/server';
 import { GET as ready } from '../src/app/api/ready/route';
 import { GET as publicAudit } from '../src/app/api/audit/route';
 import { GET as adminList, POST as adminPost } from '../src/app/api/admin/elections/route';
-import { administer } from '../src/server/admin';
-import { sessionCookieName } from '../src/server/auth';
+import { administer } from '../src/backend/admin';
+import { sessionCookieName } from '../src/backend/auth';
 import { GET as publicTransparency } from '../src/app/api/elections/[id]/transparency/route';
 import { GET as publicExport } from '../src/app/api/elections/[id]/audit-export/route';
-import { verifyAuditExport } from '../src/lib/audit-export';
-import { MongoRateLimitStore } from '../src/server/rate-limit';
-import { MongoCommitmentOutboxStore } from '../src/server/outbox-store';
-import { appendAudit } from '../src/server/audit';
+import { verifyAuditExport } from '../src/shared/audit-export';
+import { MongoRateLimitStore } from '../src/backend/rate-limit';
+import { MongoCommitmentOutboxStore } from '../src/backend/outbox-store';
+import { appendAudit } from '../src/backend/audit';
 import { GET as adminMetrics } from '../src/app/api/admin/metrics/route';
-import { verifyDatabaseEvidence } from '../src/server/integrity-check';
+import { verifyDatabaseEvidence } from '../src/backend/integrity-check';
 if (process.env.INTEGRATION_TEST !== 'true')
   throw new Error('Run npm run test:integration to use an isolated temporary database');
 const electionId = 'council-2026';
@@ -320,6 +320,13 @@ describe('MongoDB ballots', () => {
     expect((await cast(citizen, 'maya', requestId)).replayed).toBe(true);
     await expect(cast(citizen, 'alex')).rejects.toThrow('already cast');
     await expect(cast(citizen, 'alex', requestId)).rejects.toThrow('already cast');
+    const chainRecords = await db.blockchainRecord.findMany({ where: { actionJson: { not: null } } });
+    expect(chainRecords.every((record) => typeof record.actionSequence === 'number')).toBe(true);
+    const actions = chainRecords.map((record) => record.actionJson!);
+    const casts = actions.map((value) => JSON.parse(value) as { kind: string; nullifier?: string })
+      .filter((action) => action.kind === 'CAST');
+    expect(casts.some((action) => /^0x[a-f0-9]{64}$/.test(action.nullifier ?? ''))).toBe(true);
+    expect(actions.join(' ')).not.toContain(citizen.telegramId);
   });
   it('appends four recalls without negative balances or re-casting', async () => {
     const requestId = randomUUID();
@@ -342,6 +349,10 @@ describe('MongoDB ballots', () => {
       -25, -25, -25, -25, 100,
     ]);
     expect(vote.balance).toBe(0);
+    const recallActions = (await db.blockchainRecord.findMany({ where: { actionJson: { not: null } } }))
+      .map((record) => JSON.parse(record.actionJson!) as { kind: string })
+      .filter((action) => action.kind === 'RECALL');
+    expect(recallActions.length).toBeGreaterThanOrEqual(4);
   });
   it('allows only one winning cast in a race', async () => {
     const outcomes = await Promise.allSettled([cast(racing, 'maya'), cast(racing, 'alex')]);

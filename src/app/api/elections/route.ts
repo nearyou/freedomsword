@@ -1,5 +1,5 @@
-import { handle, json } from '@/server/http';
-import { listElections } from '@/server/elections';
+import { handle, json } from '@/backend/http';
+import { listElections } from '@/backend/elections';
 export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   return handle(async () => {

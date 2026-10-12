@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { nextWelcomeStep, validateMockVerification } from '../src/lib/welcome';
+import { nextWelcomeStep, validateMockVerification } from '../src/frontend/lib/welcome';
 
 describe('welcome participation gates', () => {
   it('requires verification even if an agreement flag exists', () => {

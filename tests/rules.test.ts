@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { recallUnits } from '../src/lib/rules';
+import { recallUnits } from '../src/shared/rules';
 describe('vote units', () => {
   it('recalls 100 → 75 → 50 → 25 → 0', () => {
     let balance = 100;

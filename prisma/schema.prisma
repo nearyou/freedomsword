@@ -244,6 +244,8 @@ model BlockchainRecord {
   auditId        String           @unique
   audit          AuditEvent       @relation(fields: [auditId], references: [id])
   commitment     String
+  actionJson     String?
+  actionSequence Int?
   adapter        String           @default("MOCK")
   status         BlockchainStatus @default(PENDING)
   receipt        String?
@@ -252,4 +254,6 @@ model BlockchainRecord {
   confirmedAt    DateTime?
   claimToken     String?
   leaseExpiresAt DateTime?
+
+  @@index([actionSequence])
 }

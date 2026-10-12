@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { canonicalJson, hashAuditBundle, verifyAuditExport } from '../src/lib/audit-export';
-import { chainHash } from '../src/lib/hash';
+import { canonicalJson, hashAuditBundle, verifyAuditExport } from '../src/shared/audit-export';
+import { chainHash } from '../src/shared/hash';
 
 describe('audit export verification', () => {
   const commitment = 'a'.repeat(64);

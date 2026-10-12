@@ -6,9 +6,9 @@ const mocks = vi.hoisted(() => ({
   subject: 'rate-limit-route-test-subject',
   cast: vi.fn(async () => ({ balance: 100, replayed: false })),
 }));
-vi.mock('@/server/auth', () => ({ requireUser: async () => ({ id: mocks.subject }) }));
-vi.mock('@/server/voting', () => ({ castVote: mocks.cast }));
-vi.mock('@/server/blockchain', () => ({ settleOutbox: async () => {} }));
+vi.mock('@/backend/auth', () => ({ requireUser: async () => ({ id: mocks.subject }) }));
+vi.mock('@/backend/voting', () => ({ castVote: mocks.cast }));
+vi.mock('@/backend/blockchain', () => ({ settleOutbox: async () => {} }));
 
 import { POST } from '../src/app/api/vote/route';
 afterEach(() => vi.unstubAllEnvs());

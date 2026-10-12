@@ -1,8 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { body, handle, json } from '@/server/http';
-import { requireUser, sessionCookieName, sessionCookieOptions } from '@/server/auth';
-import { db } from '@/server/db';
+import { body, handle, json } from '@/backend/http';
+import { requireUser, sessionCookieName, sessionCookieOptions } from '@/backend/auth';
+import { db } from '@/backend/db';
 
 export const runtime = 'nodejs';
 export async function POST(request: NextRequest) {

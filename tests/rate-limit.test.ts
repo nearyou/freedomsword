@@ -5,7 +5,7 @@ import {
   setRateLimitStore,
   enforceRateLimitAsync,
   setDistributedRateLimitStore,
-} from '../src/server/rate-limit';
+} from '../src/backend/rate-limit';
 
 it('limits independent users and resets the window', () => {
   const store = new MemoryRateLimitStore();
@@ -27,7 +27,7 @@ it('sends only a hashed subject to a distributed backend', async () => {
   } finally {
     if (original === undefined) delete process.env.RATE_LIMIT_BACKEND;
     else process.env.RATE_LIMIT_BACKEND = original;
-    setDistributedRateLimitStore(new (await import('../src/server/rate-limit')).MongoRateLimitStore());
+    setDistributedRateLimitStore(new (await import('../src/backend/rate-limit')).MongoRateLimitStore());
   }
 });
 it('logs only the action when a limit is exceeded', () => {

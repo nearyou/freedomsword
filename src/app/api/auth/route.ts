@@ -1,17 +1,17 @@
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
-import { body, handle, json } from '@/server/http';
-import { enforceRateLimitAsync } from '@/server/rate-limit';
-import { db } from '@/server/db';
-import { ApiError } from '@/server/errors';
-import { TelegramAuthError, validateInitData } from '@/lib/telegram';
-import { createSession } from '@/lib/session';
-import { sha256 } from '@/lib/hash';
-import { authMaxAgeSeconds, demoAuthEnabled, sessionMaxAgeSeconds, telegramAuthEnabled } from '@/server/config';
-import { secret } from '@/server/secrets';
-import { sessionCookieName, sessionCookieOptions } from '@/server/auth';
-import { logAuthOutcome } from '@/server/safe-log';
-import { telegramReplayStore } from '@/server/replay-store';
+import { body, handle, json } from '@/backend/http';
+import { enforceRateLimitAsync } from '@/backend/rate-limit';
+import { db } from '@/backend/db';
+import { ApiError } from '@/backend/errors';
+import { TelegramAuthError, validateInitData } from '@/backend/security/telegram';
+import { createSession } from '@/backend/security/session';
+import { sha256 } from '@/shared/hash';
+import { authMaxAgeSeconds, demoAuthEnabled, sessionMaxAgeSeconds, telegramAuthEnabled } from '@/backend/config';
+import { secret } from '@/backend/secrets';
+import { sessionCookieName, sessionCookieOptions } from '@/backend/auth';
+import { logAuthOutcome } from '@/backend/safe-log';
+import { telegramReplayStore } from '@/backend/replay-store';
 export const runtime = 'nodejs';
 export async function POST(request: Request) {
   return handle(async () => {

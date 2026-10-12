@@ -1,25 +1,25 @@
-# Architecture
+# FreedomSword architecture
 
-FreedomSword is a Next.js Telegram Mini App. Route handlers validate Telegram `initData`, issue signed HTTP-only sessions, validate requests, and call server services. The client reads aggregate election data and private session-specific ballot state from separate endpoints. Public pages never join identities to ballots.
+`src/app` contains Next.js pages and thin API route handlers. `src/frontend` contains React screens, components and client hooks. `src/backend` contains authentication, election services, MongoDB access, auditing and Ethereum adapters. `src/shared` contains transport types and pure rules used across the boundary. `contracts` contains the Solidity voting ledger and EVM tests. This layout keeps the Next.js App Router conventions while giving each layer a distinct home.
 
-MongoDB Atlas is the only application database. Prisma 6 defines collections and unique indexes; `prisma db push` applies them. Multi-document transactions group votes, recall events, audit commitments, and outbox entries. MongoDB write conflicts (`P2034`) are retried with a bounded backoff. An increment to a User and Election revision field serializes concurrent citizen and election operations. The final election-window check happens inside the transaction using the application server clock; Vercel instances must keep accurate time.
+The API validates Telegram `initData` on the server, issues signed HTTP-only sessions, validates requests, and calls backend services. Public election reads and private citizen reads have separate projections. The frontend does not import Prisma, signing keys, or the Ethereum relayer.
 
-A User has a private Telegram ID and random voter key. A VotingCredential holds an election-scoped random token on the identity side. A ballot pseudonym is HMAC-derived from that token. Vote and VoteEvent do not have a User foreign key, but the server and an operator with database/key access can reconnect them. This is separation of records, not anonymity.
+MongoDB Atlas is the application database. Prisma 6 defines collections and indexes, applied with `prisma db push`. Multi-document transactions combine cast or recall state, audit commitments and outbox records. Unique keys and revision increments serialize competing operations. A ballot has one initial 100-unit allocation; partial and full recalls follow the election's stored policy.
 
-`AuditEvent` forms a global hash chain. The shared `AuditCounter` serializes sequence allocation in transactions. The outbox records each opaque commitment. In development, a mock adapter confirms a deterministic receipt. In production, the Sepolia adapter sends the 32-byte commitment as input data of a zero-value self-transaction. The resulting hash has `SUBMITTED` status until a separate receipt check verifies mining, sender, recipient, and input, then sets `CONFIRMED`. A failed submission remains retryable up to the attempt limit. Only the commitment goes on chain; vote content and identity remain in MongoDB.
+`FreedomSwordVoting.sol` is an Ethereum Sepolia contract controlled by an owner and an authorized relayer. It stores an opaque election key and ballot nullifier, a salted candidate commitment, the remaining unit balance and recall timestamps/counts. It enforces one initial ballot, immutable policy after registration, election windows and recall restrictions. The first cast registers the election configuration if it has not been registered already. The application checks Telegram authentication, eligibility and candidate membership before creating the MongoDB ballot; the contract cannot verify those facts.
 
-The shared MongoDB rate limiter stores hashed subjects, counts, and reset times. Telegram replay digests and request IDs use unique indexes. The optional outbox worker polls the same claim/lease interface as the retry endpoint; `vercel.json` schedules a daily secret-authenticated reconciliation, and higher volume needs a more frequent external worker.
+Each successful MongoDB write creates a salted audit commitment. Cast and recall records include a contract action in the same transaction. The outbox processes one Sepolia action at a time in audit-sequence order, saves the transaction hash, then checks its mined receipt and exact calldata. Contract action commitments are unique, so a retry cannot apply the same action twice. A timed-out request may need to recover an already mined transaction from event logs. Set `BLOCKCHAIN_CONTRACT_DEPLOYMENT_BLOCK` to keep that lookup bounded.
 
-The current eligibility provider is mock-only. It does not establish civil identity or prevent multiple accounts for one person. Rarimo and Telegram wallet integration are future work. Fictional elections and demonstration labels must remain visible.
+MongoDB and Ethereum have no shared transaction. The API returns a successful database write before the contract confirms it. If the chain action fails, the ballot remains in MongoDB and the outbox marks it failed for investigation. Delayed submissions can miss the on-chain election window. Existing ballots created before contract integration have no matching on-chain cast; they require a reviewed migration before their recalls can be mirrored. Do not enable the Sepolia adapter for a populated election without reconciliation.
 
-## Main endpoints
+The on-chain nullifier links a cast to its recalls in public data. It does not contain a Telegram ID or raw candidate ID, but the server and signer can relate it to a MongoDB ballot. This is a fictional demonstration with a mock eligibility provider, not an anonymous or binding election system.
 
-- `POST /api/auth`, `/api/logout`: Telegram launch and session lifecycle.
-- `GET /api/elections`, `/api/me`: public aggregates and private voter state.
-- `POST /api/verify`, `/api/agreement`, `/api/vote`, `/api/recall`, `/api/platform/sign`: same-origin authenticated actions.
-- `GET /api/audit`, `/api/elections/[id]/transparency`, `/api/elections/[id]/audit-export`: public commitment evidence.
-- `POST /api/blockchain/retry`: authenticated bounded outbox processing.
-- `/api/admin/elections`, `/api/admin/metrics`: election-manager operations.
-- `GET /api/health`, `/api/ready`: process and MongoDB readiness.
+## API surface
 
-The historic SQL migrations remain in the repository as archival references for the old PostgreSQL deployment. They do not apply to MongoDB.
+- `POST /api/auth` and `/api/logout`: Telegram sign-in and session lifecycle.
+- `GET /api/elections` and `/api/me`: public aggregates and private ballot state.
+- `POST /api/verify`, `/api/agreement`, `/api/vote`, `/api/recall`, `/api/platform/sign`: authenticated actions.
+- `GET /api/audit`, `/api/elections/[id]/transparency`, `/api/elections/[id]/audit-export`: public evidence.
+- `POST /api/blockchain/retry` and `/api/cron/outbox`: bounded outbox processing.
+- `/api/admin/elections` and `/api/admin/metrics`: election management.
+- `GET /api/health` and `/api/ready`: process and MongoDB health.

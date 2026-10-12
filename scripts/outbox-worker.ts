@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import { processOutbox } from '../src/server/blockchain';
-import { db } from '../src/server/db';
-import { recordOperational } from '../src/server/observability';
+import { processOutbox } from '../src/backend/blockchain';
+import { db } from '../src/backend/db';
+import { recordOperational } from '../src/backend/observability';
 
 let stopping = false;
 process.on('SIGINT', () => { stopping = true; });

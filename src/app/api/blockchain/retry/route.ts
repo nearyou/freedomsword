@@ -1,8 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { body, handle, json, rateLimitAsync } from '@/server/http';
-import { requireUser } from '@/server/auth';
-import { processOutbox } from '@/server/blockchain';
+import { body, handle, json, rateLimitAsync } from '@/backend/http';
+import { requireUser } from '@/backend/auth';
+import { processOutbox } from '@/backend/blockchain';
 export async function POST(request: NextRequest) {
   return handle(async () => {
     await body(request, z.object({}).strict());

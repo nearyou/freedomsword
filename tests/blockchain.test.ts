@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
-import { MockBlockchainAdapter, flushOutbox, reconcileOutbox, type BlockchainAdapter } from '../src/server/blockchain';
-import type { ClaimedCommitment, CommitmentOutboxStore, SubmittedCommitment } from '../src/server/outbox-store';
+import { MockBlockchainAdapter, flushOutbox, reconcileOutbox, type BlockchainAdapter } from '../src/backend/blockchain';
+import type { ClaimedCommitment, CommitmentOutboxStore, SubmittedCommitment } from '../src/backend/outbox-store';
 it('accepts commitments only and returns idempotent mock receipts', async () => {
   const adapter = new MockBlockchainAdapter();
   const commitment = 'a'.repeat(64);

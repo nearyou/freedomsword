@@ -1,24 +1,19 @@
-# Database design
+# MongoDB data design
 
-MongoDB Atlas is the persistence engine. `prisma/schema.prisma` defines the collections and unique indexes; run `npm run db:push` against an Atlas replica set before using a new database. Prisma uses MongoDB transactions for multi-document writes. The old SQL migrations are historical and must not be run against Atlas.
+MongoDB Atlas is the only application database. A replica set is required for Prisma's multi-document transactions. `prisma/schema.prisma` defines collections and unique indexes; run `npm run db:push` before using a fresh database. `npm run db:seed` adds fictional candidates and elections without deleting ballots.
 
 | Collection | Purpose |
 | --- | --- |
-| User | Unique Telegram ID, random private voter key, session version and write-lock revision |
-| TelegramAuthReplay | One-time digest of a Telegram launch hash |
-| VoterVerification | Provider result and unique provider/subject commitment |
-| VotingCredential | Unique user/election token, kept private from public ballot reads |
-| VoterAgreement | Versioned agreement hash and consent commitment |
-| Election | Election dates, lifecycle, recall policy and write-lock revision |
-| Candidate, CandidatePlatform, PlatformPromise | Fictional choices, versioned platforms and progress |
-| Vote, VoteEvent | Unique election/pseudonym ballot and cast/recall ledger |
-| AuditCounter, AuditEvent | Serialized sequence and linked public commitment chain |
-| BlockchainRecord | Pending, processing, submitted, confirmed or failed commitment anchor |
-| RateLimitCounter | Shared hashed-subject action limits |
-| AdminGrant | Operator-assigned election manager role |
+| User, TelegramAuthReplay | Private Telegram account and launch replay defense |
+| VotingCredential, VoterVerification, VoterAgreement | Election-scoped credential, eligibility record and consent |
+| Election, Candidate, CandidatePlatform, PlatformPromise | Election lifecycle, candidates and accountability content |
+| Vote, VoteEvent | One ballot per election/pseudonym and cast/recall ledger |
+| AuditCounter, AuditEvent | Serialized public commitment chain |
+| BlockchainRecord | Outbox action, receipt and reconciliation state |
+| RateLimitCounter, AdminGrant | Shared request limits and operator authorization |
 
-A cast writes one ballot, its +100 event, audit event and outbox record in a single transaction. Recall updates the balance and appends a negative event and matching audit/outbox entries in a single transaction. Unique indexes prevent duplicate ballot pseudonyms, request IDs, Telegram IDs, and provider subject commitments. Application checks enforce election windows, candidate membership, recall policy, balance sums, agreement version, and manager lifecycle rules.
+A cast writes the ballot, a +100 event, an audit event and an outbox record in one MongoDB transaction. A recall updates the balance and appends a negative event, audit event and outbox action together. Unique indexes reject duplicate ballots and request IDs. Application checks enforce the current agreement, eligibility, candidate membership, election window, recall policy and ledger balance.
 
-MongoDB does not execute the PostgreSQL triggers that previously prevented direct edits to audit records, ballots, credentials, or active election configuration. An administrator with database write access can bypass application rules. `npm run audit:check` detects many alterations to the hash chain, ballot sums, and platform hashes; independently retained Sepolia commitments and encrypted backups are needed to compare against a compromised database. Database access should be limited to the application and trusted operators. The Sepolia record is an opaque commitment only, not the ballot database.
+The `BlockchainRecord.actionJson` field contains only an opaque election key, ballot nullifier, candidate commitment, public policy and requested recall mode. It contains no Telegram ID, session token or raw candidate choice. `actionSequence` carries the serialized audit order. The Sepolia contract receives these opaque values and enforces its own balance and timing rules. The outbox separately tracks `PENDING`, `PROCESSING`, `SUBMITTED`, `CONFIRMED` and `FAILED`; a MongoDB commit does not imply contract confirmation.
 
-The fictional seed adds three demo elections, ten candidates and platforms without deleting existing ballots. A PostgreSQL database is **not** migrated by `db:push`; import requires a separately reviewed mapping and reconciliation of every ballot and audit root. Back up Atlas before schema changes and verify `/api/ready` after each deployment.
+Application rules and indexes do not prevent a database administrator from changing records directly. `npm run audit:check` verifies the chain, ballot sums and platform hashes. Independently observed Ethereum events and encrypted backups can provide comparison points. Back up Atlas and review the outbox before schema changes or a new contract deployment.

@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { verifyAuditExport } from '../src/lib/audit-export';
+import { verifyAuditExport } from '../src/shared/audit-export';
 
 const path = process.argv[2];
 if (!path) throw new Error('Usage: npm run audit:verify -- <audit-export.json>');

@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { openTelegramLink, telegramHaptic } from '../src/hooks/useTelegram';
+import { openTelegramLink, telegramHaptic } from '../src/frontend/hooks/useTelegram';
 
 afterEach(() => vi.unstubAllGlobals());
 

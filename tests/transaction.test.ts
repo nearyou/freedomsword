@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { Prisma } from '@prisma/client';
-import { retryableConflict } from '../src/server/transaction';
+import { retryableConflict } from '../src/backend/transaction';
 it('retries MongoDB write conflicts, timeouts and labeled transient transaction errors', () => {
   const error = (code: string) =>
     new Prisma.PrismaClientKnownRequestError('conflict', {

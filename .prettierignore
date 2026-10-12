@@ -1,6 +1,6 @@
 node_modules
 .next
-.local-postgres
+.local-*
 artifacts
 package-lock.json
 AGENTS.md

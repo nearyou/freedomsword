@@ -1,12 +1,12 @@
-import { settleOutbox } from '@/server/blockchain';
+import { settleOutbox } from '@/backend/blockchain';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { AGREEMENT_TEXT, AGREEMENT_VERSION } from '@/lib/agreement';
-import { sha256 } from '@/lib/hash';
-import { requireUser } from '@/server/auth';
-import { body, handle, json } from '@/server/http';
-import { enforceRateLimitAsync } from '@/server/rate-limit';
-import { signCitizenAgreement } from '@/server/verification';
+import { AGREEMENT_TEXT, AGREEMENT_VERSION } from '@/shared/agreement';
+import { sha256 } from '@/shared/hash';
+import { requireUser } from '@/backend/auth';
+import { body, handle, json } from '@/backend/http';
+import { enforceRateLimitAsync } from '@/backend/rate-limit';
+import { signCitizenAgreement } from '@/backend/verification';
 export async function GET() {
   return json({
     text: AGREEMENT_TEXT,

@@ -6,7 +6,7 @@ This is a review concept based on Arsen's feedback of 10 October 2026 and the tw
 
 - Use a **dark navy interface after the first two screens**. The logo and opening message may remain light and patriotic. Keep later screens quiet and functional, with only occasional blue/gold accents and no repeated flag or landscape treatment.
 - Use **reference 9 as the main flow and layout source**. Use **reference 10 for live results**. The marked individual elements from otherwise rejected boards remain useful: the portrait-led candidate profile, the verification-in-progress visual, the ballot-box illustration, and the post-vote sharing card.
-- The opening message should lead with **“Your voice. Your choice.”**, **“Real people. Real influence.”**, or **“People in control. Always.”** Remove “Dynamic Democracy” from the introductory description. Do not reveal vote recall in introductory feature lists.
+- The opening message should lead with **“Your voice. Your choice.”**, **“Real people. Real influence.”**, or **“People in control. Always.”** Use FreedomSword consistently in the introductory description. Do not reveal vote recall in introductory feature lists.
 - Connect the Telegram account **and a compatible wallet** in onboarding. Show Rarimo as the **only identity-verification provider**. Add “Powered by [FreedomTool](https://freedomtool.org/)” as a live link.
 - Put the invitation/share card **after a citizen makes a choice**, with Telegram contacts, social networks, and copy-link actions. Use a more motivating invitation message. Place a simple **Send feedback** action in the persistent menu.
 - Keep the ballot screen's recall controls discoverable **after voting**. The client did not ask to remove recall from the product.

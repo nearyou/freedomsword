@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
-import { adminCommand, adminElections, administer, requireAdmin } from '@/server/admin';
-import { body, handle, json } from '@/server/http';
-import { settleOutbox } from '@/server/blockchain';
+import { adminCommand, adminElections, administer, requireAdmin } from '@/backend/admin';
+import { body, handle, json } from '@/backend/http';
+import { settleOutbox } from '@/backend/blockchain';
 export const runtime = 'nodejs';
 export async function GET(request: NextRequest) {
   return handle(async () => {

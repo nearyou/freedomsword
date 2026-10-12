@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { verifyDatabaseEvidence } from '../src/server/integrity-check';
-import { db } from '../src/server/db';
+import { verifyDatabaseEvidence } from '../src/backend/integrity-check';
+import { db } from '../src/backend/db';
 
 async function main() {
   const summary = await verifyDatabaseEvidence();

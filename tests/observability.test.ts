@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ApiError } from '../src/server/errors';
-import { handle } from '../src/server/http';
-import { categoryForStatus, metricsSnapshot, recordOperational } from '../src/server/observability';
+import { ApiError } from '../src/backend/errors';
+import { handle } from '../src/backend/http';
+import { categoryForStatus, metricsSnapshot, recordOperational } from '../src/backend/observability';
 
 describe('operational observability', () => {
   afterEach(() => { vi.restoreAllMocks(); vi.unstubAllEnvs(); });

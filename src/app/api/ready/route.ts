@@ -1,5 +1,5 @@
-import { db } from '@/server/db';
-import { handle, json } from '@/server/http';
+import { db } from '@/backend/db';
+import { handle, json } from '@/backend/http';
 export const runtime = 'nodejs';
 export async function GET() {
   return handle(async () => {

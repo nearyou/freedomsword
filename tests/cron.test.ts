@@ -1,6 +1,6 @@
 import { expect, it, vi } from 'vitest';
 
-vi.mock('@/server/blockchain', () => ({ processOutbox: vi.fn(async () => ({ processed: 0 })) }));
+vi.mock('@/backend/blockchain', () => ({ processOutbox: vi.fn(async () => ({ processed: 0 })) }));
 import { GET } from '../src/app/api/cron/outbox/route';
 
 it('requires the configured cron bearer token before processing outbox work', async () => {

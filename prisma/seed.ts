@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
-import { candidateDefinitions, electionDefinitions } from '../src/lib/demo';
-import { sha256 } from '../src/lib/hash';
+import { candidateDefinitions, electionDefinitions } from '../src/shared/demo';
+import { sha256 } from '../src/shared/hash';
 const db = new PrismaClient();
 async function main() {
   for (const election of electionDefinitions) {

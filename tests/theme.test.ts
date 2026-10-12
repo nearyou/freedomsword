@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { resolvedTheme } from '../src/components/ThemeControl';
+import { resolvedTheme } from '../src/frontend/components/ThemeControl';
 afterEach(() => vi.unstubAllGlobals());
 it('follows the device outside Telegram even when the SDK supplies a default scheme', () => {
   vi.stubGlobal('window', {

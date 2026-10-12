@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { db } from '../src/server/db';
-import { appendAudit } from '../src/server/audit';
+import { db } from '../src/backend/db';
+import { appendAudit } from '../src/backend/audit';
 
 async function main() {
   const telegramId = process.argv[2];

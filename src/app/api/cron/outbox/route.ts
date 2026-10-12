@@ -1,5 +1,5 @@
 import { timingSafeEqual } from 'node:crypto';
-import { processOutbox } from '@/server/blockchain';
+import { processOutbox } from '@/backend/blockchain';
 
 export const runtime = 'nodejs';
 

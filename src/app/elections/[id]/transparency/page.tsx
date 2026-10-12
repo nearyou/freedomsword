@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { electionTransparency } from '@/server/transparency';
-import { ApiError } from '@/server/errors';
-import ThemeControl from '@/components/ThemeControl';
-import BrandMark from '@/components/ui/BrandMark';
+import { electionTransparency } from '@/backend/transparency';
+import { ApiError } from '@/backend/errors';
+import ThemeControl from '@/frontend/components/ThemeControl';
+import BrandMark from '@/frontend/components/ui/BrandMark';
 export const dynamic = 'force-dynamic';
 export default async function TransparencyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

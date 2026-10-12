@@ -1,10 +1,10 @@
-import { settleOutbox } from '@/server/blockchain';
+import { settleOutbox } from '@/backend/blockchain';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { requireUser } from '@/server/auth';
-import { body, handle, json } from '@/server/http';
-import { enforceRateLimitAsync } from '@/server/rate-limit';
-import { verifyCitizen } from '@/server/verification';
+import { requireUser } from '@/backend/auth';
+import { body, handle, json } from '@/backend/http';
+import { enforceRateLimitAsync } from '@/backend/rate-limit';
+import { verifyCitizen } from '@/backend/verification';
 export async function POST(request: NextRequest) {
   return handle(async () => {
     const input = await body(

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { demoAuthEnabled, loadConfig } from '../src/server/config';
+import { demoAuthEnabled, loadConfig } from '../src/backend/config';
 
 const valid = {
   NODE_ENV: 'production',
@@ -19,6 +19,8 @@ const valid = {
   BLOCKCHAIN_ADAPTER: 'sepolia',
   BLOCKCHAIN_SEPOLIA_RPC_URL: 'https://sepolia.example/rpc',
   BLOCKCHAIN_SIGNER_PRIVATE_KEY: `0x${'a'.repeat(64)}`,
+  BLOCKCHAIN_CONTRACT_ADDRESS: `0x${'b'.repeat(40)}`,
+  BLOCKCHAIN_CONTRACT_DEPLOYMENT_BLOCK: '1',
   CRON_SECRET: 'independent-cron-secret-for-outbox',
   ALLOW_DEMO_AUTH: 'false',
 };
@@ -54,6 +56,7 @@ describe('startup configuration', () => {
     [{ ALLOW_DEMO_AUTH: 'true' }, 'demo authentication'],
     [{ TELEGRAM_AUTH_ENABLED: 'false' }, 'Telegram authentication'],
     [{ BLOCKCHAIN_ADAPTER: 'mock' }, 'Sepolia blockchain'],
+    [{ BLOCKCHAIN_CONTRACT_ADDRESS: '' }, 'voting contract'],
     [{ RATE_LIMIT_BACKEND: 'memory' }, 'MongoDB rate limits'],
     [{ CRON_SECRET: '' }, 'CRON_SECRET'],
   ])('rejects unsafe configuration %#', (change, pattern) => {

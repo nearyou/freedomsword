@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { promiseSummary } from '../src/lib/promises';
+import { promiseSummary } from '../src/shared/promises';
 it('summarizes milestones without treating partial progress as delivery', () => {
   expect(
     promiseSummary([

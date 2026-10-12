@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
-import { verifyAuditSegment } from '../src/lib/audit-chain';
-import { chainHash, saltedCommitment } from '../src/lib/hash';
+import { verifyAuditSegment } from '../src/shared/audit-chain';
+import { chainHash, saltedCommitment } from '../src/shared/hash';
 it('detects hash tampering, missing links and sequence reversals', () => {
   const commitment = saltedCommitment('private action');
   const first = {

@@ -1,5 +1,5 @@
-import FreedomSwordApp from '@/components/FreedomSwordApp';
-import { demoAuthEnabled } from '@/server/config';
+import FreedomSwordApp from '@/frontend/components/FreedomSwordApp';
+import { demoAuthEnabled } from '@/backend/config';
 
 export const dynamic = 'force-dynamic';
 

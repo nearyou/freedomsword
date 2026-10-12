@@ -1,11 +1,11 @@
 import type { NextRequest } from 'next/server';
-import { requireUser } from '@/server/auth';
-import { handle, json } from '@/server/http';
-import { db } from '@/server/db';
-import { AGREEMENT_TEXT, AGREEMENT_VERSION } from '@/lib/agreement';
-import { sha256 } from '@/lib/hash';
-import { privateBallotPseudonyms } from '@/server/credentials';
-import { activeVerificationProvider } from '@/server/verification';
+import { requireUser } from '@/backend/auth';
+import { handle, json } from '@/backend/http';
+import { db } from '@/backend/db';
+import { AGREEMENT_TEXT, AGREEMENT_VERSION } from '@/shared/agreement';
+import { sha256 } from '@/shared/hash';
+import { privateBallotPseudonyms } from '@/backend/credentials';
+import { activeVerificationProvider } from '@/backend/verification';
 export async function GET(request: NextRequest) {
   return handle(async () => {
     const user = await requireUser(request);
