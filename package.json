@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "postinstall": "npm run db:generate -w @freedomsword/backend",
     "dev": "concurrently -k -n backend,frontend \"npm run dev -w @freedomsword/backend\" \"npm run dev -w @freedomsword/frontend\"",
     "build": "npm run build -w @freedomsword/backend && npm run build -w @freedomsword/frontend",
     "start:backend": "npm run start -w @freedomsword/backend",
