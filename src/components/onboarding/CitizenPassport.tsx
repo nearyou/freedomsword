@@ -50,11 +50,8 @@ export default function CitizenPassport({
         <ShieldCheck size={27} />
       </div>
       <p className="eyebrow">CITIZEN PASSPORT</p>
-      <h2 id="citizen-title">A few steps. A lasting voice.</h2>
-      <p className="modal-copy">
-        Connect, verify, and accept the participation rules. Mock eligibility does not prove real
-        identity. The operator can correlate your account and ballot.
-      </p>
+      <h2 id="citizen-title">Get ready to vote</h2>
+      <p className="modal-copy">Mock verification. Your account and ballot can be linked.</p>
       <div className="passport-progress">
         {states.filter(Boolean).length} of 3 steps complete
         <div className="passport-progress-bar">
@@ -67,11 +64,6 @@ export default function CitizenPassport({
         <span className="step-number">{citizen.connected ? <Check size={16} /> : 1}</span>
         <div>
           <h3>Connect Telegram</h3>
-          <p>
-            {citizen.connected
-              ? 'Your account is connected.'
-              : 'Telegram provides signed launch data, checked by the server.'}
-          </p>
           {!citizen.connected && launch !== 'ready' && (
             <p className="launch-message" role={launch === 'failed' ? 'alert' : 'status'}>
               {launch === 'loading'
@@ -111,7 +103,7 @@ export default function CitizenPassport({
         <Wallet size={20} aria-hidden="true" />
         <div>
           <strong>Connect wallet</strong>
-          <p>Telegram Wallet or a compatible wallet · integration planned.</p>
+          <p>Integration planned</p>
         </div>
         <span>PLANNED</span>
       </div>
@@ -121,9 +113,7 @@ export default function CitizenPassport({
           <h3>
             Verify eligibility <span className="mock-badge">MOCK</span>
           </h3>
-          <p>
-            Rarimo is the intended provider. Current verification is a mock check valid for 30 days.
-          </p>
+          <p>Mock check · Rarimo planned</p>
           <button
             className="button secondary full"
             disabled={!citizen.connected || busy || citizen.verified}
@@ -164,10 +154,10 @@ export default function CitizenPassport({
           />
         </div>
       </div>
-      <p className="fine-print">
-        Acceptance is an authenticated consent record with a private hash commitment. No user
-        cryptographic signature is claimed.
-      </p>
+      <details className="passport-disclosure">
+        <summary>About this demo</summary>
+        <p>Mock eligibility does not prove legal identity. Agreement acceptance records consent, not a cryptographic signature.</p>
+      </details>
       <p className="powered-by">
         Powered by{' '}
         <a href="https://freedomtool.org/" target="_blank" rel="noopener noreferrer">

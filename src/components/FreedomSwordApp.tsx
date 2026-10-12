@@ -32,11 +32,11 @@ type Modal =
   | { type: 'confirm'; action: Action }
   | { type: 'audit' }
   | null;
-const headings: Record<AppTab, [string, string]> = {
-  Candidates: ['Elections', 'Explore candidates and their plans before choosing.'],
-  'Live results': ['Results', 'See how recorded support is distributed.'],
-  'My ballot': ['My ballot', 'Review your choice and manage your support.'],
-  Accountability: ['Promises', 'Follow reported progress and supporting evidence.'],
+const headings: Record<AppTab, string> = {
+  Candidates: 'Elections',
+  'Live results': 'Results',
+  'My ballot': 'My ballot',
+  Accountability: 'Promises',
 };
 export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean }) {
   const citizenState = useCitizen();
@@ -188,8 +188,7 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
                 <ArrowLeft size={16} aria-hidden="true" /> All elections
               </button>
             )}
-            <h1>{tab === 'Candidates' && !showElectionList ? election?.title : headings[tab][0]}</h1>
-            <p>{tab === 'Candidates' && !showElectionList ? 'Review candidates and their plans before choosing.' : headings[tab][1]}</p>
+            <h1>{tab === 'Candidates' && !showElectionList ? election?.title : headings[tab]}</h1>
           </div>
           <span className={`network-status ${stale ? 'interrupted' : ''}`}>
             <span className="mini-dot" />
@@ -197,8 +196,7 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
           </span>
         </div>
         <p className="elections-demo-note">
-          <strong>DEMO</strong> Fictional elections · mock eligibility and blockchain
-          {source === 'preview' && ' · sample figures'}
+          <strong>DEMO</strong> Fictional elections · mock identity and blockchain
         </p>
         {refreshError && (
           <div className="refresh-banner" role="status">
@@ -239,7 +237,7 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
                 }}
               />
             ) : null}
-            <div className="elections-content" aria-label={headings[tab][0]}>
+            <div className="elections-content" aria-label={headings[tab]}>
               {tab === 'Candidates' && !showElectionList && (
                 <CandidateList
                   election={election}

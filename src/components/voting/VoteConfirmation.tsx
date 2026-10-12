@@ -43,22 +43,14 @@ export default function VoteConfirmation({
       )}
       {cast ? (
         <ul className="confirmation-rules">
-          <li>100 units will be allocated to this candidate.</li>
-          <li>Only one initial ballot is allowed in this election.</li>
-          <li>Further ballot actions follow this election’s published rules.</li>
-          <li>Your initial ballot cannot be replaced by another initial ballot.</li>
+          <li>100 units will support this candidate.</li>
+          <li>One initial ballot per election. Recalled units cannot be reassigned.</li>
         </ul>
       ) : (
         <>
           <p className="modal-copy">
-            {amount} units will be permanently removed from your candidate’s support. This records
-            an immutable recall event. Recalled units cannot be reassigned.
+            {amount} units will be permanently removed. They cannot be reassigned.
           </p>
-          <div className="confirmation-policy">
-            <span>First delay: {election.recallPolicy?.firstDelaySeconds ?? 0}s</span>
-            <span>Cooldown: {election.recallPolicy?.cooldownSeconds ?? 0}s</span>
-            <span>Maximum recalls: {election.recallPolicy?.maxOperations ?? 'Unlimited'}</span>
-          </div>
         </>
       )}
       <div className="dialog-actions">

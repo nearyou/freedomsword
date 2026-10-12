@@ -16,7 +16,7 @@ export default function CandidateSearch({
         <Search size={18} />
         <input
           aria-label="Search candidates by full name"
-          placeholder="Search by full name…"
+          placeholder="Search candidates"
           value={query}
           onChange={(event) => onQuery(event.target.value)}
         />

@@ -32,16 +32,13 @@ type Stage = 'launch' | 'mission' | 'connect';
 const stageCopy = {
   en: {
     launchTitle: 'Your voice. Your choice.',
-    launchDetail: 'A place to explore candidates and make your choice.',
-    launchMotto: 'PEOPLE · VOICE · ACTION',
-    start: 'Continue in Telegram',
-    missionTitle: 'A new generation of democracy',
-    missionDetail:
-      'Explore the choices, make your own decision and follow what happens next.',
+    launchDetail: 'Explore candidates. Make your choice.',
+    start: 'Get started',
+    missionTitle: 'Explore. Choose. Track.',
     missionSteps: [
-      ['Verified citizens', 'One person, one voice in this demonstration.'],
-      ['Meaningful participation', 'Compare candidates and their plans.'],
-      ['Public accountability', 'Follow published promises and results.'],
+      'Verify eligibility',
+      'Explore candidates',
+      'Track promises',
     ],
     connectTitle: 'Connect to FreedomSword',
     connectDetail: 'Connect your Telegram account to continue. Wallet support is planned.',
@@ -59,14 +56,14 @@ const stageCopy = {
     aboutDemo: 'Fictional election · mock verification',
     back: 'Back',
     passportTitle: 'Citizen Passport',
-    passportDetail: 'Complete three steps to explore the election demo.',
+    passportDetail: 'Three steps to take part.',
     stepConnect: 'Connect Telegram',
     stepVerify: 'Verify your identity',
     stepAgreement: 'Accept civic agreement',
     stepConnectDetail: 'Your Mini App account',
     previewAccount: 'Browser preview; no Telegram account connected',
     stepVerifyDetail: 'Mock check · Rarimo planned',
-    stepAgreementDetail: 'Read and accept the participation rules',
+    stepAgreementDetail: 'Participation rules',
     done: 'Complete',
     next: 'Continue',
     viewElections: 'Explore elections',
@@ -74,16 +71,13 @@ const stageCopy = {
   },
   uk: {
     launchTitle: 'Ваш голос. Ваш вибір.',
-    launchDetail: 'Місце, де можна ознайомитися з кандидатами та зробити вибір.',
-    launchMotto: 'ЛЮДИ · ГОЛОС · ДІЯ',
-    start: 'Продовжити в Telegram',
-    missionTitle: 'Нове покоління демократії',
-    missionDetail:
-      'Знайомтеся з варіантами, робіть власний вибір і стежте за тим, що відбувається далі.',
+    launchDetail: 'Знайомтеся з кандидатами. Зробіть вибір.',
+    start: 'Почати',
+    missionTitle: 'Дізнайтеся. Оберіть. Стежте.',
     missionSteps: [
-      ['Перевірені громадяни', 'Одна людина — один голос у цій демонстрації.'],
-      ['Змістовна участь', 'Порівнюйте кандидатів та їхні плани.'],
-      ['Публічна відповідальність', 'Стежте за обіцянками та результатами.'],
+      'Підтвердьте право участі',
+      'Знайомтеся з кандидатами',
+      'Стежте за обіцянками',
     ],
     connectTitle: 'Підключіться до FreedomSword',
     connectDetail: 'Підключіть Telegram, щоб продовжити. Підтримку гаманця заплановано.',
@@ -101,14 +95,14 @@ const stageCopy = {
     aboutDemo: 'Вигадані вибори · демонстраційна перевірка',
     back: 'Назад',
     passportTitle: 'Паспорт громадянина',
-    passportDetail: 'Виконайте три кроки, щоб переглянути демонстрацію виборів.',
+    passportDetail: 'Три кроки до участі.',
     stepConnect: 'Підключіть Telegram',
     stepVerify: 'Підтвердьте особу',
     stepAgreement: 'Прийміть громадянську угоду',
     stepConnectDetail: 'Ваш обліковий запис міні застосунку',
     previewAccount: 'Перегляд у браузері; Telegram не підключено',
     stepVerifyDetail: 'Демонстраційна перевірка · Rarimo заплановано',
-    stepAgreementDetail: 'Прочитайте й прийміть правила участі',
+    stepAgreementDetail: 'Правила участі',
     done: 'Виконано',
     next: 'Продовжити',
     viewElections: 'Переглянути вибори',
@@ -242,7 +236,6 @@ export default function WelcomeScreen() {
             />
             <h1 id="fs-launch-title">{s.launchTitle}</h1>
             <p>{s.launchDetail}</p>
-            <span className="fs-launch-motto">{s.launchMotto}</span>
             <div className="fs-stage-bottom">
               <button type="button" className="fs-button" onClick={() => go('mission')}>
                 {s.start}
@@ -254,23 +247,19 @@ export default function WelcomeScreen() {
         ) : stage === 'mission' ? (
           <main className="fs-stage fs-mission" aria-labelledby="fs-mission-title">
             <h1 id="fs-mission-title">{s.missionTitle}</h1>
-            <p className="fs-stage-intro">{s.missionDetail}</p>
             <div className="fs-mission-list">
               {[Users, FileText, ShieldCheck].map((Icon, index) => (
-                <div className="fs-mission-card" key={s.missionSteps[index][0]}>
+                <div className="fs-mission-card" key={s.missionSteps[index]}>
                   <span className="fs-mission-icon">
                     <Icon size={21} />
                   </span>
-                  <div>
-                    <strong>{s.missionSteps[index][0]}</strong>
-                    <p>{s.missionSteps[index][1]}</p>
-                  </div>
+                  <strong>{s.missionSteps[index]}</strong>
                 </div>
               ))}
             </div>
             <div className="fs-stage-bottom">
               <button type="button" className="fs-button fs-gold" onClick={() => go('connect')}>
-                {t.continueReady}
+                {s.next}
                 <ArrowRight size={18} />
               </button>
               <span className="fs-dots">

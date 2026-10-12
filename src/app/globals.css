@@ -1087,6 +1087,20 @@ html[data-theme='light'] .balance strong {
   margin: 0;
   overflow-wrap: anywhere;
 }
+.recall-policy-details {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.recall-policy-details summary {
+  width: fit-content;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 700;
+}
+.recall-policy-details .recall-rules {
+  margin-top: 12px;
+}
 .empty-ballot {
   text-align: center;
   padding: 14px 0;
@@ -1512,6 +1526,21 @@ html[data-theme='light'] .balance strong {
   color: var(--primary);
   cursor: pointer;
   font-size: 12px;
+}
+.passport-disclosure {
+  margin: 14px 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.passport-disclosure summary {
+  width: fit-content;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 700;
+}
+.passport-disclosure p {
+  margin-top: 9px;
+  line-height: 1.5;
 }
 .field-error {
   color: var(--danger) !important;

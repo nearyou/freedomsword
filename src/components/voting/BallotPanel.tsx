@@ -75,10 +75,6 @@ export default function BallotPanel({
               </span>
             ))}
           </div>
-          <div className="meter-label">
-            <span>{100 - ballot.balance} units recalled</span>
-            <span>100 original units</span>
-          </div>
           <RecallPanel
             election={election}
             ballot={ballot}

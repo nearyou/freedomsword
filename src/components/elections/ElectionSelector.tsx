@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import type { ElectionView } from '@/lib/contracts';
-import { dateLabel, electionLabels } from '@/lib/ui';
+import { dateLabel } from '@/lib/ui';
 
 export default function ElectionSelector({
   elections,
@@ -33,8 +33,6 @@ export default function ElectionSelector({
           <span className="mini-dot" />
           {election.status}
         </span>
-        <span>{electionLabels[election.type] ?? election.type}</span>
-        <span>{election.candidates.length} candidates</span>
         <span>Closes {dateLabel(election.closesAt)}</span>
       </div>
     </section>
@@ -58,24 +56,28 @@ export function ElectionGallery({
   onSelect: (id: string) => void;
 }) {
   const [filter, setFilter] = useState<ElectionFilter>('All');
+  const showFilters = new Set(elections.map((election) => election.status)).size > 1;
+  const activeFilter = showFilters ? filter : 'All';
   const visible = elections.filter(
-    (election) => filter === 'All' || election.status === filter.toUpperCase(),
+    (election) => activeFilter === 'All' || election.status === activeFilter.toUpperCase(),
   );
 
   return (
     <section className="election-gallery" aria-label="Browse elections">
-      <div className="election-gallery-filters" aria-label="Filter elections">
-        {filters.map((value) => (
-          <button
-            key={value}
-            type="button"
-            aria-pressed={filter === value}
-            onClick={() => setFilter(value)}
-          >
-            {value}
-          </button>
-        ))}
-      </div>
+      {showFilters && (
+        <div className="election-gallery-filters" aria-label="Filter elections">
+          {filters.map((value) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={activeFilter === value}
+              onClick={() => setFilter(value)}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="election-gallery-list">
         {visible.map((election) => (
           <button
@@ -96,9 +98,7 @@ export function ElectionGallery({
                 {election.status}
               </span>
               <strong>{election.title}</strong>
-              <span className="election-gallery-type">
-                {electionLabels[election.type] ?? election.type} · {election.candidates.length} candidates
-              </span>
+              <span className="election-gallery-type">{election.candidates.length} candidates</span>
               <span className="election-gallery-action">
                 View candidates <ArrowRight size={15} aria-hidden="true" />
               </span>
@@ -107,7 +107,7 @@ export function ElectionGallery({
         ))}
       </div>
       {!visible.length && (
-        <p className="election-gallery-empty">No {filter.toLowerCase()} elections to show.</p>
+        <p className="election-gallery-empty">No {activeFilter.toLowerCase()} elections to show.</p>
       )}
     </section>
   );

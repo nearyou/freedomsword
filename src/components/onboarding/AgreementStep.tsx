@@ -22,21 +22,13 @@ export default function AgreementStep({
 }) {
   return (
     <>
-      <p>
-        {signed
-          ? 'Your acceptance is recorded.'
-          : 'Review the participation rules and privacy explanation.'}
-      </p>
       {agreement ? (
         <>
-          <div className="agreement-meta">
-            <span>Agreement v{agreement.version}</span>
-            <span>SHA-256 document hash</span>
-          </div>
-          <code className="document-hash">{agreement.textHash}</code>
           <details className="agreement-text">
-            <summary>View agreement</summary>
+            <summary>Read agreement · v{agreement.version}</summary>
             <p>{agreement.text}</p>
+            <div className="agreement-meta">SHA-256 document hash</div>
+            <code className="document-hash">{agreement.textHash}</code>
           </details>
           {!signed && (
             <>

@@ -25,7 +25,7 @@ export default function CandidateCard({
         <ChevronRight className="candidate-row-arrow" size={18} aria-hidden="true" />
       </div>
       <div className="candidate-card-support">
-        <span>Current support</span>
+        <span>Support</span>
         <strong>{percentage.toFixed(1)}%</strong>
       </div>
       <div className="progress-track" role="progressbar" aria-label={`${candidate.fullName} support`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentage}>

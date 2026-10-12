@@ -26,9 +26,7 @@ export default function ShareInvite() {
 
   return (
     <section className="share-invite" aria-labelledby="share-invite-title">
-      <span className="share-invite-kicker">AFTER YOUR CHOICE</span>
-      <h3 id="share-invite-title">Invite someone to take part</h3>
-      <p>{inviteText}</p>
+      <h3 id="share-invite-title">Invite a friend</h3>
       <div className="share-invite-link">
         <span>t.me/freedomswordbot</span>
         <button type="button" onClick={() => void copyLink()} aria-label="Copy FreedomSword link">

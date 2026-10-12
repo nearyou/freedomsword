@@ -8,7 +8,6 @@ import type { Action } from '@/hooks/useVoting';
 import Dialog from '../ui/Dialog';
 import Avatar, { candidatePortrait } from '../ui/Avatar';
 import IdeologyBadge from '../ui/IdeologyBadge';
-import ProgressBar from '../ui/ProgressBar';
 import PromiseTracker from '../PromiseTracker';
 export default function CandidateProfile({
   candidate,
@@ -48,7 +47,6 @@ export default function CandidateProfile({
       <div className="profile-header">
         {!portrait && <Avatar name={candidate.fullName} color={candidate.color} large />}
         <div>
-          <p className="eyebrow">CANDIDATE PROFILE</p>
           <h2 id="profile-title">{candidate.fullName}</h2>
           <p className="party">{candidate.party}</p>
           <IdeologyBadge label={candidate.ideology} color={candidate.color} />
@@ -69,7 +67,7 @@ export default function CandidateProfile({
         </div>
       </div>
       <div className="tabs profile-tabs" role="tablist" aria-label="Candidate profile sections">
-        {['Overview', 'Platform', 'Promises', 'Updates'].map((value) => (
+        {['Overview', 'Platform', 'Promises'].map((value) => (
           <button
             key={value}
             role="tab"
@@ -90,13 +88,8 @@ export default function CandidateProfile({
       >
         {tab === 'Overview' && (
           <>
-            <h3>About {candidate.fullName.split(' ')[0]}</h3>
+            <h3>About</h3>
             <p className="modal-copy">{candidate.bio}</p>
-            <ProgressBar
-              value={support(candidate, election)}
-              color={candidate.color}
-              label="Current support"
-            />
             {platform && (
               <button className="platform-preview" onClick={() => setTab('Platform')}>
                 <FileText size={21} />
@@ -195,16 +188,6 @@ export default function CandidateProfile({
               <p>No promises published yet.</p>
             </div>
           ))}
-        {tab === 'Updates' && (
-          <div className="empty-state">
-            <FileText size={28} />
-            <h3>No update history available</h3>
-            <p>
-              Published milestones are available in Promises. Dated progress history is not
-              currently provided.
-            </p>
-          </div>
-        )}
       </div>
       <div className="profile-cta">
         <button

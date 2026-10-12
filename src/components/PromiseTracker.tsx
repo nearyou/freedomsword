@@ -12,9 +12,7 @@ export default function PromiseTracker({ promises }: { promises: PromiseView[] }
           {summary.delivered} of {summary.total} delivered · {percent}%
         </span>
       </div>
-      <p className="promise-disclaimer">
-        Reported progress · fictional milestones, not independently verified.
-      </p>
+      <p className="promise-disclaimer">Self-reported demo progress</p>
       {promises.map((promise) => (
         <PromiseCard key={promise.id} promise={promise} />
       ))}
