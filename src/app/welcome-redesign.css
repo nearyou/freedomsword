@@ -417,52 +417,6 @@
   color: #afc5d0;
   font-size: 11px;
 }
-.fs-welcome .civic-lobby {
-  color: #f6f7f4;
-  min-height: calc(100svh - 62px);
-  padding-top: 34px;
-}
-.fs-welcome .civic-back-button {
-  color: #9fd7fc;
-  margin-bottom: 30px;
-}
-.fs-welcome .civic-lobby h1 {
-  font-family: 'Inter Variable', Inter, sans-serif;
-  font-size: 34px;
-}
-.fs-welcome .civic-readiness {
-  background: #15364e;
-  border-color: #3a5f78;
-  border-radius: 14px;
-}
-.fs-welcome .civic-readiness p {
-  color: #adc4d0;
-}
-.fs-welcome .civic-readiness p svg {
-  color: #47c995;
-}
-.fs-welcome .civic-election-preview {
-  background: linear-gradient(150deg, #183d56, #102c42);
-  border-color: #3a5f78;
-  border-radius: 15px;
-}
-.fs-welcome .civic-status-pill {
-  color: #ebc981;
-  border-color: #80643e;
-}
-.fs-welcome .civic-election-link {
-  background: linear-gradient(180deg, #2997f0, #0872d9);
-  min-height: 46px;
-  margin-top: 18px;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 750;
-  text-decoration: none;
-}
-.fs-welcome .civic-demo-note {
-  color: #9aafbe;
-}
 @media (max-width: 520px) {
   .fs-welcome .fs-stage {
     padding-left: 21px;
