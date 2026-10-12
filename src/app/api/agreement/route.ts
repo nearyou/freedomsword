@@ -1,4 +1,4 @@
-import { settleMockOutbox } from '@/server/blockchain';
+import { settleOutbox } from '@/server/blockchain';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { AGREEMENT_TEXT, AGREEMENT_VERSION } from '@/lib/agreement';
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     const user = await requireUser(request);
     await enforceRateLimitAsync('agreement', user.id, 20);
     const result = await signCitizenAgreement(user, input.textHash);
-    await settleMockOutbox();
+    await settleOutbox();
     return json(result);
   });
 }

@@ -4,7 +4,7 @@ import { demoAuthEnabled, loadConfig } from '../src/server/config';
 const valid = {
   NODE_ENV: 'production',
   APP_ENV: 'production',
-  DATABASE_URL: 'postgresql://user:password@db.example/democracy',
+  DATABASE_URL: 'mongodb+srv://user:password@db.example/democracy',
   APP_ORIGIN: 'https://vote.example',
   NEXT_PUBLIC_APP_URL: 'https://vote.example',
   TELEGRAM_AUTH_ENABLED: 'true',
@@ -15,6 +15,11 @@ const valid = {
   BALLOT_SECRET: 'fedcba9876543210'.repeat(4),
   ELIGIBILITY_COMMITMENT_SECRET: '13579bdf2468ace0'.repeat(4),
   ELIGIBILITY_PROVIDER: 'mock',
+  RATE_LIMIT_BACKEND: 'mongo',
+  BLOCKCHAIN_ADAPTER: 'sepolia',
+  BLOCKCHAIN_SEPOLIA_RPC_URL: 'https://sepolia.example/rpc',
+  BLOCKCHAIN_SIGNER_PRIVATE_KEY: `0x${'a'.repeat(64)}`,
+  CRON_SECRET: 'independent-cron-secret-for-outbox',
   ALLOW_DEMO_AUTH: 'false',
 };
 
@@ -24,7 +29,7 @@ describe('startup configuration', () => {
     expect(config.mode).toBe('production');
     expect(config.authMaxAgeSeconds).toBe(300);
     expect(config.sessionMaxAgeSeconds).toBe(3600);
-    expect(loadConfig({ ...valid, RATE_LIMIT_BACKEND: 'postgres' }).rateLimitBackend).toBe('postgres');
+    expect(loadConfig({ ...valid, RATE_LIMIT_BACKEND: 'mongo' }).rateLimitBackend).toBe('mongo');
   });
   it.each([
     [{ DATABASE_URL: 'sqlite://x' }, 'DATABASE_URL'],
@@ -48,6 +53,9 @@ describe('startup configuration', () => {
     [{ APP_ENV: 'development' }, 'APP_ENV'],
     [{ ALLOW_DEMO_AUTH: 'true' }, 'demo authentication'],
     [{ TELEGRAM_AUTH_ENABLED: 'false' }, 'Telegram authentication'],
+    [{ BLOCKCHAIN_ADAPTER: 'mock' }, 'Sepolia blockchain'],
+    [{ RATE_LIMIT_BACKEND: 'memory' }, 'MongoDB rate limits'],
+    [{ CRON_SECRET: '' }, 'CRON_SECRET'],
   ])('rejects unsafe configuration %#', (change, pattern) => {
     expect(() => loadConfig({ ...valid, ...change })).toThrow(pattern);
   });
@@ -61,6 +69,7 @@ describe('startup configuration', () => {
         TELEGRAM_BOT_TOKEN: '',
         APP_ORIGIN: 'http://127.0.0.1:3000',
         NEXT_PUBLIC_APP_URL: 'http://127.0.0.1:3000',
+        BLOCKCHAIN_ADAPTER: 'mock',
       }).authEnabled,
     ).toBe(false);
     expect(
@@ -72,6 +81,7 @@ describe('startup configuration', () => {
         TELEGRAM_BOT_TOKEN: '',
         APP_ORIGIN: 'http://127.0.0.1:3000',
         NEXT_PUBLIC_APP_URL: 'http://127.0.0.1:3000',
+        BLOCKCHAIN_ADAPTER: 'mock',
       }).mode,
     ).toBe('test');
   });

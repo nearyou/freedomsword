@@ -1,4 +1,4 @@
-import { settleMockOutbox } from '@/server/blockchain';
+import { settleOutbox } from '@/server/blockchain';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { body, handle, json } from '@/server/http';
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const user = await requireUser(request);
     await enforceRateLimitAsync('platform-sign', user.id, 20);
     const result = await signPlatform(user, input);
-    await settleMockOutbox();
+    await settleOutbox();
     return json(result);
   });
 }

@@ -4,9 +4,9 @@ import type { Prisma, VoteEvent } from '@prisma/client';
 export interface VoteIdempotencyStore {
   find(tx: Prisma.TransactionClient, voteId: string, requestId: string): Promise<VoteEvent | null>;
 }
-export class PostgresVoteIdempotencyStore implements VoteIdempotencyStore {
+export class MongoVoteIdempotencyStore implements VoteIdempotencyStore {
   find(tx: Prisma.TransactionClient, voteId: string, requestId: string) {
     return tx.voteEvent.findUnique({ where: { voteId_requestId: { voteId, requestId } } });
   }
 }
-export const voteIdempotencyStore: VoteIdempotencyStore = new PostgresVoteIdempotencyStore();
+export const voteIdempotencyStore: VoteIdempotencyStore = new MongoVoteIdempotencyStore();

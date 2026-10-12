@@ -93,6 +93,7 @@ it('rejects existing demo sessions and honors session revocation in production',
     telegramId: 'demo:local',
     voterKey: 'private-key',
     sessionVersion: 1,
+    revision: 0,
     createdAt: new Date(),
   };
   const lookup = vi.spyOn(db.user, 'findUnique').mockResolvedValue(user);
@@ -121,6 +122,7 @@ it('uses secure production cookies and revokes a valid session on logout', async
     telegramId: '123',
     voterKey: 'private-key',
     sessionVersion: 1,
+    revision: 0,
     createdAt: new Date(),
   };
   vi.spyOn(db.user, 'findUnique').mockResolvedValue(user);

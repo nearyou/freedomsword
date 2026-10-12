@@ -8,7 +8,7 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock('@/server/auth', () => ({ requireUser: async () => ({ id: mocks.subject }) }));
 vi.mock('@/server/voting', () => ({ castVote: mocks.cast }));
-vi.mock('@/server/blockchain', () => ({ settleMockOutbox: async () => {} }));
+vi.mock('@/server/blockchain', () => ({ settleOutbox: async () => {} }));
 
 import { POST } from '../src/app/api/vote/route';
 afterEach(() => vi.unstubAllEnvs());

@@ -43,7 +43,8 @@ export default function AuditExplorer({ onClose }: { onClose: () => void }) {
       <h2 id="audit-title">A record you can inspect.</h2>
       <p className="modal-copy">
         Append-only, salted SHA-256 commitments. No identities or individual ballot details are
-        published. Mock receipts provide no independent blockchain evidence.
+        published. Sepolia transactions prove that a commitment was recorded; mock and pending
+        receipts do not.
       </p>
       {page && (
         <div className="audit-summary">
@@ -67,8 +68,19 @@ export default function AuditExplorer({ onClose }: { onClose: () => void }) {
             <dd>{event.previousHash}</dd>
             <dt>Chain hash</dt>
             <dd>{event.hash}</dd>
-            <dt>Mock receipt</dt>
-            <dd>{event.blockchain?.receipt ?? 'Awaiting mock adapter'}</dd>
+            <dt>Proof</dt>
+            <dd>
+              {event.blockchain?.adapter === 'SEPOLIA' &&
+              /^sepolia:0x[a-f0-9]{64}$/.test(event.blockchain.receipt ?? '') ? (
+                <a href={`https://sepolia.etherscan.io/tx/${event.blockchain.receipt?.slice(8)}`}
+                  target="_blank" rel="noreferrer">
+                  {event.blockchain.status === 'CONFIRMED'
+                    ? 'View confirmed Sepolia transaction' : 'View pending Sepolia transaction'}
+                </a>
+              ) : event.blockchain?.adapter === 'MOCK'
+                ? 'Mock receipt · demonstration only'
+                : 'Awaiting blockchain proof'}
+            </dd>
           </dl>
         </details>
       ))}

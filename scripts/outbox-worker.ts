@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { flushOutbox } from '../src/server/blockchain';
+import { processOutbox } from '../src/server/blockchain';
 import { db } from '../src/server/db';
 import { recordOperational } from '../src/server/observability';
 
@@ -9,7 +9,7 @@ process.on('SIGTERM', () => { stopping = true; });
 const delayMs = Math.min(Math.max(Number(process.env.OUTBOX_POLL_MS ?? 5000) || 5000, 1000), 60000);
 async function main() {
   while (!stopping) {
-    try { await flushOutbox(); }
+    try { await processOutbox(); }
     catch { recordOperational('outbox', 'failure', 'dependency'); }
     if (!stopping) await new Promise((resolve) => setTimeout(resolve, delayMs));
   }

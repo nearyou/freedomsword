@@ -30,7 +30,8 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     env.ELIGIBILITY_PROVIDER ?? (strict ? undefined : 'mock'),
   );
   const logLevel = z.enum(['error', 'warn', 'info', 'debug']).parse(env.LOG_LEVEL ?? 'info');
-  const rateLimitBackend = z.enum(['memory', 'postgres']).parse(env.RATE_LIMIT_BACKEND ?? 'memory');
+  const rateLimitBackend = z.enum(['memory', 'mongo']).parse(env.RATE_LIMIT_BACKEND ?? 'memory');
+  const blockchainAdapter = z.enum(['mock', 'sepolia']).parse(env.BLOCKCHAIN_ADAPTER ?? 'mock');
 
   let database: URL;
   let app: URL;
@@ -41,7 +42,7 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     throw new Error('Invalid server configuration: URL');
   }
   if (
-    !['postgres:', 'postgresql:'].includes(database.protocol) ||
+    !['mongodb:', 'mongodb+srv:'].includes(database.protocol) ||
     !database.hostname ||
     !database.pathname.slice(1)
   )
@@ -95,6 +96,18 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     throw new Error('Invalid server configuration: Telegram authentication required');
   if (strict && env.ALLOW_DEMO_AUTH === 'true')
     throw new Error('Invalid server configuration: demo authentication');
+  if (strict && rateLimitBackend !== 'mongo')
+    throw new Error('Invalid server configuration: MongoDB rate limits required');
+  if (mode === 'production' && blockchainAdapter !== 'sepolia')
+    throw new Error('Invalid server configuration: Sepolia blockchain adapter required');
+  if (blockchainAdapter === 'sepolia' &&
+    (!env.BLOCKCHAIN_SEPOLIA_RPC_URL?.startsWith('https://') ||
+      !/^0x[a-fA-F0-9]{64}$/.test(env.BLOCKCHAIN_SIGNER_PRIVATE_KEY ?? '')))
+    throw new Error('Invalid server configuration: Sepolia RPC and signer required');
+  if (mode === 'production' &&
+    (!env.CRON_SECRET || env.CRON_SECRET.length < 16 ||
+      /^(replace-|GENERATE_|YOUR_)/i.test(env.CRON_SECRET)))
+    throw new Error('Invalid server configuration: CRON_SECRET');
   return {
     mode,
     databaseUrl: database.toString(),
@@ -109,6 +122,7 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     eligibilityProvider,
     logLevel,
     rateLimitBackend,
+    blockchainAdapter,
   };
 }
 

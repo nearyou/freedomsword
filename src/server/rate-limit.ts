@@ -1,6 +1,6 @@
 import { sha256 } from '@/lib/hash';
 import { ApiError } from './errors';
-import { db } from './db';
+import { serializable } from './transaction';
 
 export interface RateLimitStore {
   consume(key: string, max: number, windowMs: number, now: number): boolean;
@@ -22,22 +22,29 @@ let backend: RateLimitStore = new MemoryRateLimitStore();
 export interface DistributedRateLimitStore {
   consume(key: string, max: number, windowMs: number): Promise<boolean>;
 }
-export class PostgresRateLimitStore implements DistributedRateLimitStore {
+export class MongoRateLimitStore implements DistributedRateLimitStore {
   async consume(key: string, max: number, windowMs: number) {
-    const [row] = await db.$queryRaw<{ allowed: boolean }[]>`
-      INSERT INTO "RateLimitCounter" ("key", "count", "resetAt")
-      VALUES (${key}, 1, (clock_timestamp() AT TIME ZONE 'UTC') + (${windowMs} * INTERVAL '1 millisecond'))
-      ON CONFLICT ("key") DO UPDATE SET
-        "count" = CASE WHEN "RateLimitCounter"."resetAt" <= (clock_timestamp() AT TIME ZONE 'UTC')
-          THEN 1 ELSE "RateLimitCounter"."count" + 1 END,
-        "resetAt" = CASE WHEN "RateLimitCounter"."resetAt" <= (clock_timestamp() AT TIME ZONE 'UTC')
-          THEN (clock_timestamp() AT TIME ZONE 'UTC') + (${windowMs} * INTERVAL '1 millisecond')
-          ELSE "RateLimitCounter"."resetAt" END
-      RETURNING "count" <= ${max} AS allowed`;
-    return row.allowed;
+    return serializable(async (tx) => {
+      const now = new Date();
+      const current = await tx.rateLimitCounter.findUnique({ where: { key } });
+      if (!current) {
+        await tx.rateLimitCounter.create({
+          data: { key, count: 1, resetAt: new Date(now.getTime() + windowMs) },
+        });
+        return true;
+      }
+      const expired = current.resetAt <= now;
+      const updated = await tx.rateLimitCounter.update({
+        where: { key },
+        data: expired
+          ? { count: 1, resetAt: new Date(now.getTime() + windowMs) }
+          : { count: { increment: 1 } },
+      });
+      return updated.count <= max;
+    });
   }
 }
-let distributedBackend: DistributedRateLimitStore = new PostgresRateLimitStore();
+let distributedBackend: DistributedRateLimitStore = new MongoRateLimitStore();
 export function setDistributedRateLimitStore(store: DistributedRateLimitStore) {
   distributedBackend = store;
 }
@@ -53,7 +60,7 @@ export function enforceRateLimit(action: string, subject: string, max = 40, now 
   }
 }
 export async function enforceRateLimitAsync(action: string, subject: string, max = 40) {
-  if (process.env.RATE_LIMIT_BACKEND !== 'postgres') return enforceRateLimit(action, subject, max);
+  if (process.env.RATE_LIMIT_BACKEND !== 'mongo') return enforceRateLimit(action, subject, max);
   const allowed = await distributedBackend.consume(`${action}:${sha256(subject)}`, max, 60_000);
   if (!allowed) {
     if (process.env.NODE_ENV !== 'test' && process.env.LOG_LEVEL !== 'error')

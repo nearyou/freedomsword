@@ -6,7 +6,9 @@ import { GET as ready } from '../src/app/api/ready/route';
 afterEach(() => vi.restoreAllMocks());
 it('exposes only process liveness and database readiness', async () => {
   expect(await (await health()).json()).toEqual({ status: 'ok' });
-  const query = vi.spyOn(db, '$queryRaw').mockResolvedValueOnce([{ elections: true, rateLimits: true }]);
+  const query = vi.spyOn(db, '$runCommandRaw').mockResolvedValueOnce({ ok: 1 });
+  vi.spyOn(db.election, 'count').mockResolvedValue(0);
+  vi.spyOn(db.rateLimitCounter, 'count').mockResolvedValue(0);
   expect((await ready()).status).toBe(200);
   query.mockRejectedValueOnce(new Error('secret database URL'));
   const unavailable = await ready();

@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 import type { Prisma as PrismaTypes } from '@prisma/client';
 import { db } from './db';
 import { ApiError } from './errors';
@@ -69,8 +68,5 @@ export async function electionTransparencySnapshot(tx: PrismaTypes.TransactionCl
 }
 
 export async function electionTransparency(electionId: string) {
-  return db.$transaction(
-    (tx) => electionTransparencySnapshot(tx, electionId),
-    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
-  );
+  return db.$transaction((tx) => electionTransparencySnapshot(tx, electionId));
 }

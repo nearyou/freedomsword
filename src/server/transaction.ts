@@ -1,13 +1,13 @@
 import { Prisma } from '@prisma/client';
 import { db } from './db';
 export function retryableConflict(error: unknown) {
-  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return false;
-  const adapter = error.meta?.driverAdapterError as
-    { cause?: { originalCode?: string } } | undefined;
-  const sqlState = String(error.meta?.code ?? adapter?.cause?.originalCode);
-  return (
-    error.code === 'P2034' || (error.code === 'P2010' && ['40001', '40P01'].includes(sqlState))
-  );
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === 'P2034' || error.code === 'P2002' || error.code === 'P2028') return true;
+    return error.code === 'P2010' &&
+      /TransientTransactionError/.test(JSON.stringify(error.meta ?? {}));
+  }
+  return error instanceof Prisma.PrismaClientUnknownRequestError &&
+    /TransientTransactionError/.test(error.message);
 }
 export async function serializable<T>(
   fn: (tx: Prisma.TransactionClient) => Promise<T>,
@@ -15,16 +15,15 @@ export async function serializable<T>(
   for (let attempt = 0; ; attempt++) {
     try {
       return await db.$transaction(fn, {
-        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-        maxWait: 10000,
-        timeout: 15000,
+        maxWait: 20000,
+        timeout: 30000,
       });
     } catch (error) {
-      if (!retryableConflict(error) || attempt >= 4) throw error;
-      await new Promise((resolve) => setTimeout(resolve, 20 * (attempt + 1) + Math.random() * 30));
+      if (!retryableConflict(error) || attempt >= 31) throw error;
+      await new Promise((resolve) => setTimeout(resolve, Math.min(50 * 2 ** attempt, 900) + Math.random() * 150));
     }
   }
 }
 export async function lockCitizen(tx: Prisma.TransactionClient, userId: string) {
-  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`;
+  await tx.user.update({ where: { id: userId }, data: { revision: { increment: 1 } } });
 }

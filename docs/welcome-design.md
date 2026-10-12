@@ -1,5 +1,7 @@
 # FreedomSword welcome experience
 
+Historical design record from the PostgreSQL prototype. Current deployment instructions are in the root README.
+
 `/` is the Mini App entry screen. The existing election tools remain at `/elections`.
 
 The reference is implemented with parchment `#F8F3E8`, navy `#102541`, antique gold `#D4AD62`, locally served Playfair Display and Inter, fine borders, seal icons, and engraved laurel/landscape scenery. The original `logo.jpg` and served `public/brand/logo.jpg` are unchanged and displayed in full, without cropping, filters, masking, or retouching. Their SHA-256 is `16714742ea6eb77ee3cfdfda4eabf0a10a8bbdc737a40519fdb11b3cf9ac554b`.

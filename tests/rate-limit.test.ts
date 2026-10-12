@@ -17,7 +17,7 @@ it('limits independent users and resets the window', () => {
 });
 it('sends only a hashed subject to a distributed backend', async () => {
   const original = process.env.RATE_LIMIT_BACKEND;
-  process.env.RATE_LIMIT_BACKEND = 'postgres';
+  process.env.RATE_LIMIT_BACKEND = 'mongo';
   const seen: string[] = [];
   setDistributedRateLimitStore({ consume: async (key) => { seen.push(key); return false; } });
   try {
@@ -27,7 +27,7 @@ it('sends only a hashed subject to a distributed backend', async () => {
   } finally {
     if (original === undefined) delete process.env.RATE_LIMIT_BACKEND;
     else process.env.RATE_LIMIT_BACKEND = original;
-    setDistributedRateLimitStore(new (await import('../src/server/rate-limit')).PostgresRateLimitStore());
+    setDistributedRateLimitStore(new (await import('../src/server/rate-limit')).MongoRateLimitStore());
   }
 });
 it('logs only the action when a limit is exceeded', () => {

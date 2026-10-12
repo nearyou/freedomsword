@@ -1,4 +1,4 @@
-import { settleMockOutbox } from '@/server/blockchain';
+import { settleOutbox } from '@/server/blockchain';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { requireUser } from '@/server/auth';
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     const user = await requireUser(request);
     await enforceRateLimitAsync('verify', user.id, 10);
     const result = await verifyCitizen(user, undefined, input.proof);
-    await settleMockOutbox();
+    await settleOutbox();
     return json(result);
   });
 }

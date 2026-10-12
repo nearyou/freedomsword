@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 import { db } from './db';
 import type { ElectionView } from '@/lib/contracts';
 import { effectiveElectionStatus } from '@/lib/lifecycle';
@@ -123,6 +122,5 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
         };
       });
     },
-    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
   );
 }

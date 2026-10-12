@@ -1,9 +1,8 @@
-import { Prisma } from '@prisma/client';
 import { db } from './db';
 import { verifyAuditSegment } from '@/lib/audit-chain';
 import { sha256 } from '@/lib/hash';
 
-/** Read-only consistent evidence check for a restored or running PostgreSQL database. */
+/** Read-only consistent evidence check for the MongoDB ledger. */
 export async function verifyDatabaseEvidence() {
   return db.$transaction(async (tx) => {
     const events = await tx.auditEvent.findMany({ orderBy: { sequence: 'asc' },
@@ -22,5 +21,5 @@ export async function verifyDatabaseEvidence() {
       throw new Error('Platform version integrity failed');
     return { auditEvents: events.length, ballots: ballots.length, platforms: platforms.length,
       rootHash: events.at(-1)?.hash ?? '0'.repeat(64) };
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
+  });
 }

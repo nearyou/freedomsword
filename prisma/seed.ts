@@ -1,11 +1,8 @@
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
 import { candidateDefinitions, electionDefinitions } from '../src/lib/demo';
 import { sha256 } from '../src/lib/hash';
-const db = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
-});
+const db = new PrismaClient();
 async function main() {
   for (const election of electionDefinitions) {
     await db.election.upsert({

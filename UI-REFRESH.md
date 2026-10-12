@@ -1,5 +1,7 @@
 # FreedomSword UI refresh
 
+Historical UI and test report from the PostgreSQL prototype. Current deployment instructions are in the root README.
+
 Implemented and validated on October 8, 2026 (Asia/Tokyo).
 
 ## Scope

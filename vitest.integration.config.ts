@@ -7,7 +7,7 @@ export default defineConfig({
     pool: 'threads',
     include: ['tests/**/*.integration.test.ts'],
     fileParallelism: false,
-    testTimeout: 30000,
-    hookTimeout: 30000,
+    testTimeout: 120000,
+    hookTimeout: 120000,
   },
 });

@@ -2,9 +2,11 @@ import { z } from 'zod';
 import { sha256 } from '@/lib/hash';
 import { commitmentOutboxStore, type CommitmentOutboxStore } from './outbox-store';
 import { recordOperational } from './observability';
+import { SepoliaBlockchainAdapter } from './sepolia';
 export interface BlockchainAdapter {
   readonly name: string;
   submit(commitment: string): Promise<{ receipt: string }>;
+  confirm?(receipt: string, commitment: string): Promise<'pending' | 'confirmed' | 'failed'>;
 }
 export class MockBlockchainAdapter implements BlockchainAdapter {
   readonly name = 'MOCK';
@@ -15,20 +17,29 @@ export class MockBlockchainAdapter implements BlockchainAdapter {
     return { receipt: `mock:${sha256(`mock-receipt-v1:${commitment}`)}` };
   }
 }
+export function configuredBlockchainAdapter(): BlockchainAdapter {
+  return process.env.BLOCKCHAIN_ADAPTER === 'sepolia'
+    ? new SepoliaBlockchainAdapter()
+    : new MockBlockchainAdapter();
+}
 export async function flushOutbox(
-  adapter: BlockchainAdapter = new MockBlockchainAdapter(),
+  adapter: BlockchainAdapter = configuredBlockchainAdapter(),
   limit = 10,
   store: CommitmentOutboxStore = commitmentOutboxStore,
 ) {
-  if (adapter.name !== 'MOCK') throw new Error('Only the mock blockchain adapter is enabled');
   const records = await store.claimBatch(Math.min(Math.max(limit, 1), 10), 60_000);
   let confirmed = 0;
+  let submitted = 0;
   for (const record of records) {
     try {
       const result = await adapter.submit(record.commitment);
-      if (!/^mock:[a-f0-9]{64}$/.test(result.receipt)) throw new Error('Invalid mock receipt');
-      if (await store.complete(record, result.receipt)) {
-        confirmed++;
+      const mined = adapter.name === 'MOCK';
+      if (mined ? !/^mock:[a-f0-9]{64}$/.test(result.receipt)
+        : !/^sepolia:0x[a-f0-9]{64}$/.test(result.receipt))
+        throw new Error('Invalid blockchain receipt');
+      if (await store.complete(record, result.receipt, mined, adapter.name)) {
+        if (mined) confirmed++;
+        else submitted++;
         recordOperational('outbox', 'success', 'none');
       }
     } catch {
@@ -36,11 +47,36 @@ export async function flushOutbox(
       recordOperational('outbox', 'failure', 'dependency');
     }
   }
-  return { processed: records.length, confirmed, adapter: 'MOCK' };
+  return { processed: records.length, confirmed, submitted, adapter: adapter.name };
 }
-export async function settleMockOutbox() {
+export async function reconcileOutbox(
+  adapter: BlockchainAdapter = configuredBlockchainAdapter(),
+  limit = 10,
+  store: CommitmentOutboxStore = commitmentOutboxStore,
+) {
+  if (!adapter.confirm) return { checked: 0, confirmed: 0 };
+  const records = await store.submittedBatch(Math.min(Math.max(limit, 1), 10));
+  let confirmed = 0;
+  for (const record of records) {
+    try {
+      const status = await adapter.confirm(record.receipt, record.commitment);
+      if (status === 'pending') continue;
+      if (await store.finalizeSubmitted(record, status === 'confirmed') && status === 'confirmed')
+        confirmed++;
+    } catch {
+      recordOperational('outbox', 'failure', 'dependency');
+    }
+  }
+  return { checked: records.length, confirmed };
+}
+export async function processOutbox(adapter: BlockchainAdapter = configuredBlockchainAdapter()) {
+  const sent = await flushOutbox(adapter, adapter.name === 'MOCK' ? 10 : 1);
+  const mined = await reconcileOutbox(adapter);
+  return { ...sent, mined };
+}
+export async function settleOutbox() {
   try {
-    await flushOutbox();
+    await processOutbox();
   } catch {
     /* The committed action remains valid; retry the outbox separately. */
   }

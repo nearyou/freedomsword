@@ -11,7 +11,10 @@ import { databaseNow } from './database-time';
 import { permittedRecallAmount } from './recall-policy';
 import { voteIdempotencyStore } from './idempotency-store';
 export async function requireOpenElection(tx: Prisma.TransactionClient, electionId: string) {
-  await tx.$queryRaw`SELECT "id" FROM "Election" WHERE "id" = ${electionId} FOR UPDATE`;
+  const locked = await tx.election.updateMany({
+    where: { id: electionId }, data: { revision: { increment: 1 } },
+  });
+  if (locked.count !== 1) throw new ApiError(409, 'This election is not open');
   const election = await tx.election.findUnique({ where: { id: electionId } });
   if (!election) throw new ApiError(409, 'This election is not open');
   const now = await databaseNow(tx);
@@ -23,11 +26,12 @@ export async function requireOpenElection(tx: Prisma.TransactionClient, election
   return election;
 }
 async function assertWindowAtFinalCheck(tx: Prisma.TransactionClient, electionId: string) {
-  const [{ allowed }] = await tx.$queryRaw<{ allowed: boolean }[]>`
-    SELECT "status" = 'ACTIVE' AND (clock_timestamp() AT TIME ZONE 'UTC') >= "opensAt"
-      AND (clock_timestamp() AT TIME ZONE 'UTC') < "closesAt" AS allowed
-    FROM "Election" WHERE "id" = ${electionId}`;
-  if (!allowed) throw new ApiError(409, 'Election window ended during this request');
+  const election = await tx.election.findUnique({
+    where: { id: electionId }, select: { status: true, opensAt: true, closesAt: true },
+  });
+  const now = await databaseNow(tx);
+  if (!election || election.status !== 'ACTIVE' || now < election.opensAt || now >= election.closesAt)
+    throw new ApiError(409, 'Election window ended during this request');
 }
 export async function castVote(
   user: User,
@@ -92,7 +96,6 @@ export async function recallVote(
       where: { electionId_pseudonym: { electionId: input.electionId, pseudonym } },
     });
     if (!vote) throw new ApiError(404, 'You have no ballot in this election');
-    await tx.$queryRaw`SELECT "id" FROM "Vote" WHERE "id" = ${vote.id} FOR UPDATE`;
     const replay = await voteIdempotencyStore.find(tx, vote.id, input.requestId);
     if (replay) {
       if (replay.requestHash !== requestHash)

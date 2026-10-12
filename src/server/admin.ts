@@ -75,7 +75,10 @@ export async function administer(userId: string, input: AdminCommand) {
       await appendAudit(tx, JSON.stringify({ action: 'ADMIN_CREATE_ELECTION', actor: userId, electionId: election.id }), election.id);
       return { electionId: election.id, status: election.status };
     }
-    await tx.$queryRaw`SELECT "id" FROM "Election" WHERE "id" = ${input.electionId} FOR UPDATE`;
+    const locked = await tx.election.updateMany({
+      where: { id: input.electionId }, data: { revision: { increment: 1 } },
+    });
+    if (locked.count !== 1) throw new ApiError(404, 'Election not found');
     const election = await tx.election.findUnique({ where: { id: input.electionId } });
     if (!election) throw new ApiError(404, 'Election not found');
     const now = await databaseNow(tx);

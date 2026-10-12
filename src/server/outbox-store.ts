@@ -2,12 +2,15 @@ import { randomUUID } from 'node:crypto';
 import { db } from './db';
 
 export interface ClaimedCommitment { id: string; commitment: string; claimToken: string; }
+export interface SubmittedCommitment { id: string; commitment: string; receipt: string; }
 export interface CommitmentOutboxStore {
   claimBatch(limit: number, leaseMs: number): Promise<ClaimedCommitment[]>;
-  complete(claim: ClaimedCommitment, receipt: string): Promise<boolean>;
+  complete(claim: ClaimedCommitment, receipt: string, confirmed?: boolean, adapterName?: string): Promise<boolean>;
   fail(claim: ClaimedCommitment): Promise<boolean>;
+  submittedBatch(limit: number): Promise<SubmittedCommitment[]>;
+  finalizeSubmitted(record: SubmittedCommitment, confirmed: boolean): Promise<boolean>;
 }
-export class PostgresCommitmentOutboxStore implements CommitmentOutboxStore {
+export class MongoCommitmentOutboxStore implements CommitmentOutboxStore {
   async claimBatch(limit: number, leaseMs: number) {
     const now = new Date();
     const rows = await db.blockchainRecord.findMany({
@@ -32,10 +35,11 @@ export class PostgresCommitmentOutboxStore implements CommitmentOutboxStore {
     }
     return claims;
   }
-  async complete(claim: ClaimedCommitment, receipt: string) {
+  async complete(claim: ClaimedCommitment, receipt: string, confirmed = true, adapterName = 'MOCK') {
     const changed = await db.blockchainRecord.updateMany({
       where: { id: claim.id, status: 'PROCESSING', claimToken: claim.claimToken },
-      data: { status: 'CONFIRMED', receipt, confirmedAt: new Date(), claimToken: null, leaseExpiresAt: null },
+      data: { status: confirmed ? 'CONFIRMED' : 'SUBMITTED', receipt, adapter: adapterName,
+        confirmedAt: confirmed ? new Date() : null, claimToken: null, leaseExpiresAt: null },
     });
     return changed.count === 1;
   }
@@ -46,5 +50,22 @@ export class PostgresCommitmentOutboxStore implements CommitmentOutboxStore {
     });
     return changed.count === 1;
   }
+  async submittedBatch(limit: number) {
+    const rows = await db.blockchainRecord.findMany({
+      where: { status: 'SUBMITTED', receipt: { not: null } },
+      orderBy: { createdAt: 'asc' }, take: limit,
+      select: { id: true, commitment: true, receipt: true },
+    });
+    return rows.filter((row): row is SubmittedCommitment => row.receipt !== null);
+  }
+  async finalizeSubmitted(record: SubmittedCommitment, confirmed: boolean) {
+    const changed = await db.blockchainRecord.updateMany({
+      where: { id: record.id, status: 'SUBMITTED', receipt: record.receipt },
+      data: confirmed
+        ? { status: 'CONFIRMED', confirmedAt: new Date() }
+        : { status: 'FAILED', receipt: null },
+    });
+    return changed.count === 1;
+  }
 }
-export const commitmentOutboxStore: CommitmentOutboxStore = new PostgresCommitmentOutboxStore();
+export const commitmentOutboxStore: CommitmentOutboxStore = new MongoCommitmentOutboxStore();

@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { db } from '@/server/db';
 import { handle, json } from '@/server/http';
@@ -45,7 +44,6 @@ export async function GET(request: Request) {
             nextAfter: events.at(-1)?.sequence ?? after,
           };
         },
-        { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
       ),
     );
   });
