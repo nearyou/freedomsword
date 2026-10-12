@@ -25,13 +25,7 @@ export default function CandidateList({
   );
   return (
     <>
-      <CandidateSearch
-        query={query}
-        onQuery={onQuery}
-        sort={sort}
-        onSort={onSort}
-        showSort={election.activeUnits > 0}
-      />
+      <CandidateSearch query={query} onQuery={onQuery} sort={sort} onSort={onSort} />
       <div className="candidate-grid">
         {candidates.map((candidate) => (
           <CandidateCard

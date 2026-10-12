@@ -22,34 +22,16 @@ export default function CandidateCard({
           <h3>{candidate.fullName}</h3>
           <p>{candidate.party}</p>
         </div>
-        <span className="candidate-row-action">
-          View profile <ChevronRight size={17} aria-hidden="true" />
-        </span>
+        <ChevronRight className="candidate-row-arrow" size={18} aria-hidden="true" />
       </div>
-      {election.activeUnits > 0 && (
-        <>
-          <div className="candidate-card-support">
-            <span>Support</span>
-            <strong>{percentage.toFixed(1)}%</strong>
-          </div>
-          <div
-            className="progress-track"
-            role="progressbar"
-            aria-label={`${candidate.fullName} support`}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={percentage}
-          >
-            <span style={{ width: `${percentage}%`, background: candidate.color }} />
-          </div>
-        </>
-      )}
-      <button
-        className="candidate-card-open"
-        type="button"
-        aria-label={`View ${candidate.fullName} profile`}
-        onClick={() => onProfile(candidate)}
-      >
+      <div className="candidate-card-support">
+        <span>Current support</span>
+        <strong>{percentage.toFixed(1)}%</strong>
+      </div>
+      <div className="progress-track" role="progressbar" aria-label={`${candidate.fullName} support`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentage}>
+        <span style={{ width: `${percentage}%`, background: candidate.color }} />
+      </div>
+      <button className="candidate-card-open" type="button" aria-label={`View ${candidate.fullName} profile`} onClick={() => onProfile(candidate)}>
         <span className="sr-only">View {candidate.fullName} profile</span>
       </button>
     </article>

@@ -4,13 +4,11 @@ export default function CandidateSearch({
   onQuery,
   sort,
   onSort,
-  showSort = true,
 }: {
   query: string;
   onQuery: (query: string) => void;
   sort: string;
   onSort: (sort: string) => void;
-  showSort?: boolean;
 }) {
   return (
     <div className="search-row">
@@ -28,16 +26,14 @@ export default function CandidateSearch({
           </button>
         )}
       </label>
-      {showSort && (
-        <select
-          aria-label="Sort candidates"
-          value={sort}
-          onChange={(event) => onSort(event.target.value)}
-        >
-          <option value="support">Most support</option>
-          <option value="name">Name A–Z</option>
-        </select>
-      )}
+      <select
+        aria-label="Sort candidates"
+        value={sort}
+        onChange={(event) => onSort(event.target.value)}
+      >
+        <option value="support">Most support</option>
+        <option value="name">Name A–Z</option>
+      </select>
     </div>
   );
 }

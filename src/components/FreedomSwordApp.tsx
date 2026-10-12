@@ -6,7 +6,6 @@ import {
   ArrowUpRight,
   CheckCircle2,
   Layers3,
-  MessageCircle,
   RefreshCw,
   X,
 } from 'lucide-react';
@@ -14,12 +13,7 @@ import type { CandidateView } from '@/lib/contracts';
 import type { AppTab } from '@/lib/ui';
 import { useCitizen } from '@/hooks/useCitizen';
 import { useElections } from '@/hooks/useElections';
-import {
-  openTelegramLink,
-  telegramHaptic,
-  useTelegram,
-  useTelegramBackButton,
-} from '@/hooks/useTelegram';
+import { telegramHaptic, useTelegram, useTelegramBackButton } from '@/hooks/useTelegram';
 import { useVoting, type Action } from '@/hooks/useVoting';
 import AppShell from './layout/AppShell';
 import ElectionSelector, { ElectionGallery } from './elections/ElectionSelector';
@@ -39,10 +33,10 @@ type Modal =
   | { type: 'audit' }
   | null;
 const headings: Record<AppTab, [string, string]> = {
-  Candidates: ['Elections', 'Choose an election to explore its candidates.'],
-  'Live results': ['Results', 'See the current support for each candidate.'],
-  'My ballot': ['My ballot', 'Review your choice and support.'],
-  Accountability: ['Promises', 'Track what candidates have pledged.'],
+  Candidates: ['Elections', 'Explore candidates and their plans before choosing.'],
+  'Live results': ['Results', 'See how recorded support is distributed.'],
+  'My ballot': ['My ballot', 'Review your choice and manage your support.'],
+  Accountability: ['Promises', 'Follow reported progress and supporting evidence.'],
 };
 export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean }) {
   const citizenState = useCitizen();
@@ -64,18 +58,11 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
   const [sort, setSort] = useState('support');
   const [modal, setModal] = useState<Modal>(null);
   const [now, setNow] = useState(0);
-  useTelegramBackButton(
-    telegram.launch,
-    !actions.busy && (!!modal || tab !== 'Candidates' || !showElectionList),
-    () => {
-      if (modal) setModal(null);
-      else if (tab === 'Candidates') setShowElectionList(true);
-      else {
-        setTab('Candidates');
-        setShowElectionList(true);
-      }
-    },
-  );
+  useTelegramBackButton(telegram.launch, !actions.busy && (!!modal || tab !== 'Candidates' || !showElectionList), () => {
+    if (modal) setModal(null);
+    else if (tab === 'Candidates') setShowElectionList(true);
+    else { setTab('Candidates'); setShowElectionList(true); }
+  });
   useEffect(() => {
     const initial = setTimeout(() => {
       setNow(Date.now());
@@ -197,22 +184,12 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
         <div className="elections-page-heading">
           <div>
             {tab === 'Candidates' && !showElectionList && (
-              <button
-                className="elections-back"
-                type="button"
-                onClick={() => setShowElectionList(true)}
-              >
+              <button className="elections-back" type="button" onClick={() => setShowElectionList(true)}>
                 <ArrowLeft size={16} aria-hidden="true" /> All elections
               </button>
             )}
-            <h1>
-              {tab === 'Candidates' && !showElectionList ? election?.title : headings[tab][0]}
-            </h1>
-            <p>
-              {tab === 'Candidates' && !showElectionList
-                ? 'Choose a candidate to view their profile.'
-                : headings[tab][1]}
-            </p>
+            <h1>{tab === 'Candidates' && !showElectionList ? election?.title : headings[tab][0]}</h1>
+            <p>{tab === 'Candidates' && !showElectionList ? 'Review candidates and their plans before choosing.' : headings[tab][1]}</p>
           </div>
           <span className={`network-status ${stale ? 'interrupted' : ''}`}>
             <span className="mini-dot" />
@@ -220,7 +197,8 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
           </span>
         </div>
         <p className="elections-demo-note">
-          <strong>DEMO</strong> Fictional elections · mock verification and blockchain
+          <strong>DEMO</strong> Fictional elections · mock eligibility and blockchain
+          {source === 'preview' && ' · sample figures'}
         </p>
         {refreshError && (
           <div className="refresh-banner" role="status">
@@ -287,14 +265,16 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
                     privateError={!!citizenState.error}
                     now={now}
                     onRecall={recall}
-                    onExplore={() => {
-                      setTab('Candidates');
-                      setShowElectionList(false);
-                    }}
+                    onExplore={() => { setTab('Candidates'); setShowElectionList(false); }}
                     onPassport={openPassport}
                   />
                 ))}
-              {tab === 'Accountability' && <AccountabilityPanel candidates={election.candidates} />}
+              {tab === 'Accountability' && (
+                <AccountabilityPanel
+                  candidates={election.candidates}
+                  onProfile={(candidate) => setModal({ type: 'profile', id: candidate.id })}
+                />
+              )}
             </div>
           </>
         ) : (
@@ -311,16 +291,6 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
           <button className="text-button" onClick={() => setModal({ type: 'audit' })}>
             Inspect public audit trail <ArrowUpRight size={14} />
           </button>
-          <a
-            href="https://t.me/freedomswordbot?start=feedback"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(event) => {
-              if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
-            }}
-          >
-            <MessageCircle size={14} aria-hidden="true" /> Send feedback
-          </a>
         </footer>
       </AppShell>
       {modal?.type === 'passport' && (
