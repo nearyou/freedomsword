@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
-import { previewElections } from '../src/frontend/lib/preview';
-import { searchCandidates } from '../src/shared/contracts';
+import { previewElections } from '../frontend/src/lib/preview';
+import { searchCandidates } from '../frontend/src/lib/contracts';
 it('includes three elections and ten fictional candidates', () => {
   expect(previewElections).toHaveLength(3);
   expect(previewElections.flatMap((e) => e.candidates)).toHaveLength(10);

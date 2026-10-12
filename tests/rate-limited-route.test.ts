@@ -6,11 +6,11 @@ const mocks = vi.hoisted(() => ({
   subject: 'rate-limit-route-test-subject',
   cast: vi.fn(async () => ({ balance: 100, replayed: false })),
 }));
-vi.mock('@/backend/auth', () => ({ requireUser: async () => ({ id: mocks.subject }) }));
-vi.mock('@/backend/voting', () => ({ castVote: mocks.cast }));
-vi.mock('@/backend/blockchain', () => ({ settleOutbox: async () => {} }));
+vi.mock('@backend/auth', () => ({ requireUser: async () => ({ id: mocks.subject }) }));
+vi.mock('@backend/voting', () => ({ castVote: mocks.cast }));
+vi.mock('@backend/blockchain', () => ({ settleOutbox: async () => {} }));
 
-import { POST } from '../src/app/api/vote/route';
+import { POST } from '../backend/src/app/api/vote/route';
 afterEach(() => vi.unstubAllEnvs());
 
 it('returns 429 for a protected vote route without performing the denied vote', async () => {

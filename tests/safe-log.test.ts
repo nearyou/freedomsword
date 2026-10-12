@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { logAuthOutcome } from '../src/backend/safe-log';
+import { logAuthOutcome } from '../backend/src/safe-log';
 
 describe('safe authentication logging', () => {
   afterEach(() => vi.restoreAllMocks());

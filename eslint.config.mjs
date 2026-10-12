@@ -6,7 +6,7 @@ import a11y from 'eslint-plugin-jsx-a11y';
 import globals from 'globals';
 const config = ts.config(
   {
-    ignores: ['.next/**', '.next-staging/**', 'node_modules/**', 'next-env.d.ts', 'artifacts/**', '.local-*/**', 'cache/**'],
+    ignores: ['**/.next/**', '**/.next-staging/**', '**/node_modules/**', '**/next-env.d.ts', '**/artifacts/**', '.local-*/**', '**/cache/**'],
   },
   js.configs.recommended,
   ...ts.configs.recommended,
@@ -23,20 +23,20 @@ const config = ts.config(
     },
   },
   {
-    files: ['**/*.tsx', 'src/frontend/**/*.ts'],
+    files: ['**/*.tsx', 'frontend/src/**/*.ts'],
     plugins: { 'react-hooks': hooks },
     rules: hooks.configs.recommended.rules,
   },
   {
-    files: ['src/frontend/**/*.{ts,tsx}', 'src/shared/**/*.{ts,tsx}'],
+    files: ['frontend/src/**/*.{ts,tsx}'],
     rules: { 'no-restricted-imports': ['error', { patterns: [
-      { group: ['@/backend/*', '**/backend/*'], message: 'Server services belong behind API routes.' },
+      { group: ['@backend/*', '**/backend/src/*', '**/backend/*'], message: 'Frontend must reach backend only through HTTP.' },
     ] }] },
   },
   {
-    files: ['src/backend/**/*.{ts,tsx}'],
+    files: ['backend/src/**/*.{ts,tsx}'],
     rules: { 'no-restricted-imports': ['error', { patterns: [
-      { group: ['@/frontend/*', '**/frontend/*'], message: 'Backend services cannot depend on UI code.' },
+      { group: ['@frontend/*', '**/frontend/src/*', '**/frontend/*'], message: 'Backend must not import UI code.' },
     ] }] },
   },
   { files: ['**/*.tsx'], ...a11y.flatConfigs.recommended },

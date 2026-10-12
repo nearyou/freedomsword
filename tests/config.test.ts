@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { demoAuthEnabled, loadConfig } from '../src/backend/config';
+import { demoAuthEnabled, loadConfig } from '../backend/src/config';
 
 const valid = {
   NODE_ENV: 'production',

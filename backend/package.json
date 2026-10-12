@@ -1,0 +1,40 @@
+{
+  "name": "@freedomsword/backend",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --webpack -p 3001",
+    "build": "prisma generate --schema prisma/schema.prisma && next build --webpack",
+    "start": "next start -p 3001",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "prisma generate --schema prisma/schema.prisma",
+    "db:push": "prisma db push --schema prisma/schema.prisma",
+    "db:seed": "tsx prisma/seed.ts",
+    "contract:build": "hardhat build && node scripts/sync-contract-abi.mjs",
+    "contract:test": "hardhat test solidity",
+    "contract:deploy:sepolia": "npm run contract:build && tsx scripts/deploy-contract.ts",
+    "admin:grant": "tsx scripts/grant-admin.ts",
+    "audit:verify": "tsx scripts/verify-audit-export.ts",
+    "audit:check": "tsx scripts/check-integrity.ts",
+    "outbox:worker": "tsx scripts/outbox-worker.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "next": "^16.4.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "viem": "^2.57.4",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.0",
+    "hardhat": "^3.19.0",
+    "tsx": "^4.20.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "dotenv": "^16.6.0",
+    "typescript": "^5.9.0"
+  }
+}

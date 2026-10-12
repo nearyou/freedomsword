@@ -1,6 +1,8 @@
 # FreedomSword architecture
 
-`src/app` contains Next.js pages and thin API route handlers. `src/frontend` contains React screens, components and client hooks. `src/backend` contains authentication, election services, MongoDB access, auditing and Ethereum adapters. `src/shared` contains transport types and pure rules used across the boundary. `contracts` contains the Solidity voting ledger and EVM tests. This layout keeps the Next.js App Router conventions while giving each layer a distinct home.
+`frontend` and `backend` are independent npm workspaces and Next.js applications. `frontend/src/app` contains only pages, React components and browser hooks. `backend/src/app` contains only API route handlers; backend services, MongoDB access, security rules, and Ethereum adapters live beside it. Prisma, Solidity contracts, operator scripts, and the outbox cron configuration belong to `backend`. There is no shared source package or cross-workspace import. Each side owns the types it needs; the HTTP JSON API is their boundary.
+
+The frontend proxies `/api/:path*` to `BACKEND_URL` with a Next.js rewrite. Browsers continue to use same-origin `/api` URLs, including session-cookie and origin-protected writes. The backend checks `APP_ORIGIN` against the frontend's public origin. The public transparency page fetches the backend API on the server; the citizen agreement text and hash always come from the backend's `/api/agreement` response. A frontend deployment requires a reachable backend URL, and both deployments must use matching origins. For local development, `npm run dev` starts the backend on port 3001 and frontend on port 3000.
 
 The API validates Telegram `initData` on the server, issues signed HTTP-only sessions, validates requests, and calls backend services. Public election reads and private citizen reads have separate projections. The frontend does not import Prisma, signing keys, or the Ethereum relayer.
 

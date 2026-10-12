@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { permittedRecallAmount } from '../src/backend/recall-policy';
+import { permittedRecallAmount } from '../backend/src/recall-policy';
 
 const policy = {
   recallEnabled: true, fullRecallEnabled: true, partialRecallEnabled: true,

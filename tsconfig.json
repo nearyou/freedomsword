@@ -17,25 +17,18 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@backend/*": ["./backend/src/*"],
+      "@frontend/*": ["./frontend/src/*"]
     }
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    ".next-staging/types/**/*.ts",
-    ".next-staging/dev/types/**/*.ts"
+    "tests/**/*.ts",
+    "scripts/**/*.ts",
+    "backend/prisma/**/*.ts",
+    "backend/hardhat.config.ts",
+    "vitest.config.ts",
+    "vitest.integration.config.ts"
   ],
   "exclude": [
     "node_modules"

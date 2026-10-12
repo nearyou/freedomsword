@@ -2,12 +2,12 @@ import { createHmac } from 'node:crypto';
 import { afterEach, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { body, handle, json, rateLimit } from '../src/backend/http';
-import { requireUser, sessionCookieOptions } from '../src/backend/auth';
-import { createSession } from '../src/backend/security/session';
-import { db } from '../src/backend/db';
-import { POST as authenticate } from '../src/app/api/auth/route';
-import { POST as logout } from '../src/app/api/logout/route';
+import { body, handle, json, rateLimit } from '../backend/src/http';
+import { requireUser, sessionCookieOptions } from '../backend/src/auth';
+import { createSession } from '../backend/src/security/session';
+import { db } from '../backend/src/db';
+import { POST as authenticate } from '../backend/src/app/api/auth/route';
+import { POST as logout } from '../backend/src/app/api/logout/route';
 const origin = 'http://localhost:3000';
 const sessionSecret = 'a'.repeat(64);
 afterEach(() => {

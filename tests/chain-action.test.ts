@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { decodeFunctionData, type Abi } from 'viem';
-import abiJson from '../src/backend/chain/abi.json';
-import { chainActionSchema, electionChainConfig } from '../src/backend/chain/action';
-import { encodeChainAction } from '../src/backend/sepolia';
+import abiJson from '../backend/src/chain/abi.json';
+import { chainActionSchema, electionChainConfig } from '../backend/src/chain/action';
+import { encodeChainAction } from '../backend/src/sepolia';
 
 const abi = abiJson as Abi;
 const key = `0x${'a'.repeat(64)}`;

@@ -1,7 +1,7 @@
 import { createHmac } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { validateInitData } from '../src/backend/security/telegram';
-import { createSession, readSession } from '../src/backend/security/session';
+import { validateInitData } from '../backend/src/security/telegram';
+import { createSession, readSession } from '../backend/src/security/session';
 const bot = '123:test-token';
 function signed(date = 1000, user = '{"id":123,"first_name":"Private"}') {
   const params = new URLSearchParams({ auth_date: String(date), query_id: 'query', user });

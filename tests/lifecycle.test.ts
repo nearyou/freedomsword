@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { effectiveElectionStatus } from '../src/shared/lifecycle';
+import { effectiveElectionStatus } from '../backend/src/core/lifecycle';
 const opensAt = new Date('2030-01-01T00:00:00.000Z');
 const closesAt = new Date('2030-01-02T00:00:00.000Z');
 describe('election lifecycle boundaries', () => {

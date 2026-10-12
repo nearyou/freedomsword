@@ -4,7 +4,7 @@ import {
   evaluateEligibility,
   MockEligibilityProvider,
   type EligibilityProvider,
-} from '../src/backend/eligibility';
+} from '../backend/src/eligibility';
 
 const provider = (verify: EligibilityProvider['verify']): EligibilityProvider => ({
   name: 'TEST',

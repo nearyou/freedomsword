@@ -1,6 +1,6 @@
 # MongoDB data design
 
-MongoDB Atlas is the only application database. A replica set is required for Prisma's multi-document transactions. `prisma/schema.prisma` defines collections and unique indexes; run `npm run db:push` before using a fresh database. `npm run db:seed` adds fictional candidates and elections without deleting ballots.
+MongoDB Atlas is the only application database. A replica set is required for Prisma's multi-document transactions. `backend/prisma/schema.prisma` defines collections and unique indexes; run `npm run db:push` before using a fresh database. `npm run db:seed` adds fictional candidates and elections without deleting ballots.
 
 | Collection | Purpose |
 | --- | --- |

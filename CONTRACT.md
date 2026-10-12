@@ -1,6 +1,6 @@
 # FreedomSword voting contract
 
-`contracts/FreedomSwordVoting.sol` is an operator-relayed Ethereum Sepolia ledger for fictional elections. The contract owner can rotate the relayer; only that relayer can register an election, cast, recall, close an election or anchor a generic audit commitment. No contract method accepts ETH.
+`backend/contracts/FreedomSwordVoting.sol` is an operator-relayed Ethereum Sepolia ledger for fictional elections. The contract owner can rotate the relayer; only that relayer can register an election, cast, recall, close an election or anchor a generic audit commitment. No contract method accepts ETH.
 
 The first cast registers an election's open and close times and recall policy. The configuration hash cannot change afterward. A cast creates one 100-unit ballot for an opaque election/nullifier pair. Partial recall removes the configured amount; full recall removes the balance. The contract enforces first-recall delay, cooldown, maximum operation count, nonnegative balance and the election window. Full recall consumes the original ballot permanently. A close action blocks any later cast or recall, including when no ballot was cast.
 
@@ -14,7 +14,7 @@ npm run contract:build
 npm run contract:test
 ```
 
-`contract:build` compiles Solidity and regenerates the checked-in ABI at `src/backend/chain/abi.json`. A contract change must include its matching ABI. `contract:test` runs EVM tests for duplicate ballots, partial/full recalls, policy immutability, timing, relayer permissions and close behavior.
+`contract:build` compiles Solidity and regenerates the checked-in ABI at `backend/src/chain/abi.json`. A contract change must include its matching ABI. `contract:test` runs EVM tests for duplicate ballots, partial/full recalls, policy immutability, timing, relayer permissions and close behavior.
 
 When explicitly deploying, set `BLOCKCHAIN_SEPOLIA_RPC_URL` and `BLOCKCHAIN_SIGNER_PRIVATE_KEY` only in the server environment, fund the signer with testnet ETH, then run `npm run contract:deploy:sepolia`. The command prints a contract address and deployment block. Set those as `BLOCKCHAIN_CONTRACT_ADDRESS` and `BLOCKCHAIN_CONTRACT_DEPLOYMENT_BLOCK` before selecting `BLOCKCHAIN_ADAPTER=sepolia`. The deployment script checks the chain ID and waits for two receipt confirmations; it does not update Vercel or Telegram settings.
 

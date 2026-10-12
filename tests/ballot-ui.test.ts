@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
-import { supportSegments, recallAvailability } from '../src/frontend/lib/ballot-ui';
-import { previewElections } from '../src/frontend/lib/preview';
+import { supportSegments, recallAvailability } from '../frontend/src/lib/ballot-ui';
+import { previewElections } from '../frontend/src/lib/preview';
 it('renders an exact 100-unit meter for non-divisor recall policies', () => {
   const segments = supportSegments(75, 30);
   expect(segments.map((segment) => segment.units)).toEqual([30, 30, 30, 10]);

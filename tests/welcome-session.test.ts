@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { api, ClientApiError } from '../src/frontend/lib/client-api';
-import type { CitizenView } from '../src/shared/contracts';
-import { createWelcomeSessionReader } from '../src/frontend/lib/welcome-session';
+import { api, ClientApiError } from '../frontend/src/lib/client-api';
+import type { CitizenView } from '../frontend/src/lib/contracts';
+import { createWelcomeSessionReader } from '../frontend/src/lib/welcome-session';
 
 const citizen: CitizenView = {
   connected: true,

@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { MockVerificationProvider } from '../src/backend/verification';
+import { MockVerificationProvider } from '../backend/src/verification';
 it('returns expiring mock receipts without echoing identity', async () => {
   const receipt = await new MockVerificationProvider().verify({ subjectKey: 'private-identity' });
   expect(receipt.verified).toBe(true);

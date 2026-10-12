@@ -6,39 +6,40 @@ The interface uses an ivory launch and Citizen Passport, followed by a restraine
 
 ## Stack and local start
 
-Next.js 16 App Router, TypeScript, Prisma 6, MongoDB Atlas, Ethereum Sepolia via viem, Tailwind CSS, and Vitest. Use Node.js 22.12 or newer. MongoDB must be a replica set (Atlas satisfies this) for multi-document transactions.
+Two independent Next.js 16 workspaces, TypeScript, Prisma 6, MongoDB Atlas, Ethereum Sepolia via viem, Tailwind CSS, and Vitest. Use Node.js 22.12 or newer. MongoDB must be a replica set (Atlas satisfies this) for multi-document transactions. `frontend` contains pages and browser UI; `backend` contains API routes, database and contract code. No source module is imported across the apps.
 
-1. Run `npm ci` and copy `.env.example` to an ignored `.env` file. Supply a MongoDB Atlas URI with a database name and three **different** random server secrets: `SESSION_SECRET`, `BALLOT_SECRET`, and `ELIGIBILITY_COMMITMENT_SECRET`.
+1. Run `npm ci`. Copy `backend/.env.example` to `backend/.env` and `frontend/.env.example` to `frontend/.env`. Supply the backend with a MongoDB Atlas URI containing a database name and three **different** random server secrets: `SESSION_SECRET`, `BALLOT_SECRET`, and `ELIGIBILITY_COMMITMENT_SECRET`. The frontend needs only `BACKEND_URL` and its non-secret UI settings.
 2. Run `npm run db:push` to create collections and indexes, then `npm run db:seed` for fictional fixtures.
-3. Run `npm run dev`. `npm run check` runs typecheck, lint, and unit tests. `npm run test:integration` creates a uniquely named temporary Atlas database, runs real transaction tests, and drops only that test database. The Atlas user needs permissions for these operations.
-4. Run `npm run contract:test` for the Solidity rules and `npm run build` for the web app. The `postinstall` hook generates Prisma Client.
+3. Run `npm run dev` to start the backend at `http://localhost:3001` and frontend at `http://localhost:3000`. Frontend requests to `/api/*` are proxied to the backend. Set backend `APP_ORIGIN=http://localhost:3000`; the browser keeps a same-origin session cookie. `npm run check` typechecks both apps, lints, and runs unit and contract tests. `npm run test:integration` creates a uniquely named temporary Atlas database, runs real transaction tests, and drops only that test database. The Atlas user needs permissions for these operations.
+4. Run `npm run build` to build each app separately. The `postinstall` hook generates Prisma Client. Individual commands such as `npm run build -w @freedomsword/frontend` are also available.
 
 `/api/health` checks process liveness and `/api/ready` checks MongoDB. The configured database is not seeded by `db:push`; use `db:seed` only where the fictional demo elections should appear.
 
 ## Vercel and Telegram release
 
-The user will create the Vercel deployment. Configure the following Vercel environment variables for the intended environment, including at build time:
+Deploy two Vercel projects from this repository with root directories `backend` and `frontend`. Deploy the backend first and set the frontend's `BACKEND_URL` to the backend's HTTPS origin without a trailing slash. The frontend rewrites same-origin `/api/*` to that URL. Set backend `APP_ORIGIN` to the frontend's exact public HTTPS origin. Keep backend credentials entirely out of the frontend project. Configure these variables for the intended environment, including at build time:
 
-| Variable | Value |
-| --- | --- |
-| `APP_ENV` | `production` for public deployment, `staging` for private testing |
-| `DATABASE_URL` | Atlas `mongodb+srv://.../<database>` URI, stored only as a secret |
-| `APP_ORIGIN`, `NEXT_PUBLIC_APP_URL` | The same exact production HTTPS origin, without a trailing slash |
-| `TELEGRAM_AUTH_ENABLED`, `TELEGRAM_BOT_TOKEN` | `true` and the server-only token for `@freedomswordbot` |
-| `TELEGRAM_AUTH_MAX_AGE_SECONDS`, `SESSION_MAX_AGE_SECONDS` | Explicit positive values such as `300` and `21600` |
-| `SESSION_SECRET`, `BALLOT_SECRET`, `ELIGIBILITY_COMMITMENT_SECRET` | Three independent secrets of at least 32 characters |
-| `ELIGIBILITY_PROVIDER`, `RATE_LIMIT_BACKEND` | `mock` and `mongo` |
-| `BLOCKCHAIN_ADAPTER` | `sepolia` in production; `mock` is allowed in staging |
-| `BLOCKCHAIN_SEPOLIA_RPC_URL`, `BLOCKCHAIN_SIGNER_PRIVATE_KEY` | Server-only HTTPS Sepolia RPC and funded testnet relayer key when using Sepolia |
-| `BLOCKCHAIN_CONTRACT_ADDRESS`, `BLOCKCHAIN_CONTRACT_DEPLOYMENT_BLOCK` | Deployed `FreedomSwordVoting` address and its creation block for receipt recovery |
-| `CRON_SECRET` | Independent random secret of at least 16 characters for scheduled outbox processing |
-| `ALLOW_DEMO_AUTH` | `false` |
+| Project | Variable | Value |
+| --- | --- | --- |
+| Frontend | `APP_ENV`, `BACKEND_URL` | `production` and the backend HTTPS origin |
+| Frontend | `ALLOW_DEMO_AUTH` | `false` |
+| Backend | `APP_ENV`, `APP_ORIGIN` | `production` and the frontend HTTPS origin |
+| Backend | `DATABASE_URL` | Atlas `mongodb+srv://.../<database>` URI, stored only as a secret |
+| Backend | `TELEGRAM_AUTH_ENABLED`, `TELEGRAM_BOT_TOKEN` | `true` and the server-only token for `@freedomswordbot` |
+| Backend | `TELEGRAM_AUTH_MAX_AGE_SECONDS`, `SESSION_MAX_AGE_SECONDS` | Explicit positive values such as `300` and `21600` |
+| Backend | `SESSION_SECRET`, `BALLOT_SECRET`, `ELIGIBILITY_COMMITMENT_SECRET` | Three independent secrets of at least 32 characters |
+| Backend | `ELIGIBILITY_PROVIDER`, `RATE_LIMIT_BACKEND` | `mock` and `mongo` |
+| Backend | `BLOCKCHAIN_ADAPTER` | `sepolia` in production; `mock` is allowed in staging |
+| Backend | `BLOCKCHAIN_SEPOLIA_RPC_URL`, `BLOCKCHAIN_SIGNER_PRIVATE_KEY` | Server-only HTTPS Sepolia RPC and funded testnet relayer key when using Sepolia |
+| Backend | `BLOCKCHAIN_CONTRACT_ADDRESS`, `BLOCKCHAIN_CONTRACT_DEPLOYMENT_BLOCK` | Deployed `FreedomSwordVoting` address and its creation block for receipt recovery |
+| Backend | `CRON_SECRET` | Independent random secret of at least 16 characters for scheduled outbox processing |
+| Backend | `ALLOW_DEMO_AUTH` | `false` |
 
 Before public release, rotate the Atlas password that was shared in chat and update the Vercel secret. Limit Atlas network and user access to what the deployment needs. Never put the URI, bot token, or signer key in a `NEXT_PUBLIC_` variable or Git.
 
-Deploy the contract first with `npm run contract:deploy:sepolia` using a funded testnet account. This command spends testnet ETH and prints its address and deployment block; set both in the app environment. Deploy the Node app, run `npm run db:push` and `npm run db:seed` against the chosen Atlas database once, then confirm `/api/ready`, `/elections`, and a fresh Telegram launch with a second account. Check cast, recall, and mined contract transactions before changing the bot's Mini App menu and Main Mini App settings. A temporary Cloudflare tunnel remains temporary and is not a public deployment.
+Deploy the contract first with `npm run contract:deploy:sepolia` using a funded testnet account. This command spends testnet ETH and prints its address and deployment block; set both in the backend environment. Deploy both apps, run `npm run db:push` and `npm run db:seed` against the chosen Atlas database once, then confirm the frontend's `/api/ready`, `/elections`, and a fresh Telegram launch with a second account. Check cast, recall, and mined contract transactions before changing the bot's Mini App menu and Main Mini App settings to the **frontend** URL. A temporary Cloudflare tunnel remains temporary and is not a public deployment.
 
-Vercel does not run `npm run outbox:worker` continuously. Each successful write attempts a bounded outbox flush and reconciliation; authenticated `POST /api/blockchain/retry` can process another batch. `vercel.json` also schedules an authenticated `/api/cron/outbox` run once per day, which is compatible with the [Vercel Hobby minimum interval](https://vercel.com/docs/cron-jobs/usage-and-pricing). Vercel adds the `CRON_SECRET` bearer header for scheduled calls as described in its [cron security guide](https://vercel.com/docs/cron-jobs/manage-cron-jobs). Pending, submitted, and confirmed are distinct states. Failed contract actions require investigation and reconciliation; a MongoDB commit and an Ethereum transaction are not atomic.
+Vercel does not run `npm run outbox:worker` continuously. Each successful backend write attempts a bounded outbox flush and reconciliation; authenticated `POST /api/blockchain/retry` can process another batch. `backend/vercel.json` schedules an authenticated backend `/api/cron/outbox` run once per day, which is compatible with the [Vercel Hobby minimum interval](https://vercel.com/docs/cron-jobs/usage-and-pricing). Vercel adds the `CRON_SECRET` bearer header for scheduled calls as described in its [cron security guide](https://vercel.com/docs/cron-jobs/manage-cron-jobs). Pending, submitted, and confirmed are distinct states. Failed contract actions require investigation and reconciliation; a MongoDB commit and an Ethereum transaction are not atomic.
 
 ## Data and trust boundaries
 
