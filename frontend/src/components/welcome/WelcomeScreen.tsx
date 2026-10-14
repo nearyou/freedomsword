@@ -7,10 +7,13 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ArrowRight,
+  BarChart3,
   Check,
   ChevronDown,
   FileText,
   Globe2,
+  History,
+  ListChecks,
   MoreHorizontal,
   Send,
   ShieldCheck,
@@ -36,9 +39,11 @@ const stageCopy = {
     start: 'Get started',
     missionTitle: 'Explore. Choose. Track.',
     missionSteps: [
-      'Verify eligibility',
       'Explore candidates',
-      'Track promises',
+      'Read their platforms',
+      'See live results',
+      'Track public promises',
+      'Inspect the audit trail',
     ],
     connectTitle: 'Connect to FreedomSword',
     connectDetail: 'Connect your Telegram account to continue. Wallet support is planned.',
@@ -75,9 +80,11 @@ const stageCopy = {
     start: 'Почати',
     missionTitle: 'Дізнайтеся. Оберіть. Стежте.',
     missionSteps: [
-      'Підтвердьте право участі',
       'Знайомтеся з кандидатами',
+      'Читайте їхні програми',
+      'Дивіться результати',
       'Стежте за обіцянками',
+      'Переглядайте журнал дій',
     ],
     connectTitle: 'Підключіться до FreedomSword',
     connectDetail: 'Підключіть Telegram, щоб продовжити. Підтримку гаманця заплановано.',
@@ -248,7 +255,7 @@ export default function WelcomeScreen() {
           <main className="fs-stage fs-mission" aria-labelledby="fs-mission-title">
             <h1 id="fs-mission-title">{s.missionTitle}</h1>
             <div className="fs-mission-list">
-              {[Users, FileText, ShieldCheck].map((Icon, index) => (
+              {[Users, FileText, BarChart3, ListChecks, History].map((Icon, index) => (
                 <div className="fs-mission-card" key={s.missionSteps[index]}>
                   <span className="fs-mission-icon">
                     <Icon size={21} />

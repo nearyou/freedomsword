@@ -446,7 +446,15 @@
     padding-top: 48px !important;
   }
   .fs-mission-list {
-    margin-top: 17px;
+    margin-top: 14px;
+    gap: 6px;
+  }
+  .fs-mission-card {
+    padding: 9px 11px;
+  }
+  .fs-mission-icon {
+    width: 34px;
+    height: 34px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
