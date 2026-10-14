@@ -5,6 +5,7 @@ Status: selected target architecture, not yet implemented. The deployed and loca
 ## Product rules
 
 - Rarimo is the only planned eligibility provider. A Telegram account is an app login, not proof that a person is unique or eligible.
+- The first private-election eligibility rule is Rarimo-proved Ukrainian citizenship (`UKR`) and age 18 or older on the registration date. Verify both constraints in the proof; do not infer them from Telegram profile data, accept a client assertion, or store a passport scan or birth date. Freeze the rule before registration opens.
 - New private elections use MACI for encrypted ballots and a verifiable final tally. A voter may replace a vote while the poll is open; the last valid message determines the counted choice under the selected MACI poll configuration.
 - Individual choices are private from the public and other voters. A trusted MACI coordinator may decrypt them to process the tally. The UI must explain this trust boundary instead of promising privacy from everyone.
 - Candidate totals for a private election appear only after the poll closes and the tally proof is verified. Participation counts may be shown earlier only if they cannot reveal individual choices.
