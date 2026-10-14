@@ -5,6 +5,7 @@ import {LocalMaciTestGate, MaciGateOnlyPolicy, IMaciSignup} from "./LocalMaciTes
 
 interface VmGate {
     function prank(address) external;
+    function chainId(uint256) external;
 }
 
 contract SignupTargetMock is IMaciSignup {
@@ -58,5 +59,27 @@ contract LocalMaciTestGateTest {
         try gate.setMaci(address(this)) {
             revert("MACI target changed");
         } catch {}
+    }
+
+    function testCannotDeployOnPublicChain() public {
+        vm.chainId(11155111);
+        bool blocked;
+        try new LocalMaciTestGate() {
+            blocked = false;
+        } catch {
+            blocked = true;
+        }
+        require(blocked, "public-chain deployment accepted");
+    }
+
+    function testRejectsNonContractTarget() public {
+        LocalMaciTestGate unconfigured = new LocalMaciTestGate();
+        bool blocked;
+        try unconfigured.setMaci(address(0xBEEF)) {
+            blocked = false;
+        } catch {
+            blocked = true;
+        }
+        require(blocked && address(unconfigured.maci()) == address(0), "EOA target accepted");
     }
 }

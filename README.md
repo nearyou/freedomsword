@@ -15,6 +15,12 @@ Independent Next.js 16 frontend and Express 5 backend workspaces, TypeScript, Pr
 
 `/api/health` checks process liveness and `/api/ready` checks MongoDB. The configured database is not seeded by `db:push`; use `db:seed` only where the fictional demo elections should appear.
 
+### Passport-free local testing
+
+Use the fictional demo flow while a Ukrainian passport tester is unavailable. Set `APP_ENV=development`, `ELIGIBILITY_PROVIDER=mock`, and `ALLOW_DEMO_AUTH=true` in `backend/.env`; set `ALLOW_DEMO_AUTH=true` in `frontend/.env`. Keep the backend `TELEGRAM_AUTH_ENABLED=false` only for this local browser test. After `npm run db:push`, `npm run db:seed`, and `npm run dev`, open `http://localhost:3000`, use the demo sign-in, complete the step explicitly marked **MOCK**, and test the legacy ballot and recall screens. This check proves no citizenship, age, or uniqueness, and the legacy ballot is visible to the operator.
+
+The separate `LocalMaciTestGate` contract allows a MACI signup without a Rarimo proof **only on chain ID 31337**. `npm run contract:test` checks that guard. It is a contract test aid, not an app-level private vote: `MACI_PRIVATE` elections still cannot activate or accept ballots until a real MACI poll, client join proof, coordinator, and proof-verified tally are integrated. Do not deploy this gate to a public chain or present the mock demo as a private election.
+
 ## Vercel and Telegram release
 
 Deploy two Vercel projects from this repository with root directories `backend` and `frontend`. Vercel detects the Express app exported from `backend/src/app.ts`; `backend/vercel.json` retains the outbox cron. Deploy the backend first and set the frontend's `BACKEND_URL` to the backend's HTTPS origin without a trailing slash. The frontend rewrites same-origin `/api/*` to that URL. Set backend `APP_ORIGIN` to the frontend's exact public HTTPS origin. Keep backend credentials entirely out of the frontend project. Configure these variables for the intended environment, including at build time:

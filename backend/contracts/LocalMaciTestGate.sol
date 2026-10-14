@@ -16,6 +16,7 @@ contract LocalMaciTestGate {
     error LocalChainOnly();
     error AlreadyRegistered();
     error MaciNotConfigured();
+    error InvalidTarget();
     error Unauthorized();
 
     address public immutable owner;
@@ -30,6 +31,7 @@ contract LocalMaciTestGate {
     function setMaci(address maci_) external {
         if (msg.sender != owner || address(maci) != address(0) || maci_ == address(0))
             revert Unauthorized();
+        if (maci_.code.length == 0) revert InvalidTarget();
         maci = IMaciSignup(maci_);
     }
 
@@ -58,6 +60,7 @@ contract MaciGateOnlyPolicy {
     function setTarget(address maci_) external {
         if (msg.sender != owner || guarded != address(0) || maci_ == address(0))
             revert Unauthorized();
+        if (maci_.code.length == 0) revert Unauthorized();
         guarded = maci_;
     }
 
