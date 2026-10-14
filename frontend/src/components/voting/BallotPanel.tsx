@@ -1,13 +1,17 @@
 import { ArrowRight, ShieldCheck } from 'lucide-react';
-import type { ElectionView } from '@frontend/lib/contracts';
+import dynamic from 'next/dynamic';
+import type { CitizenView, ElectionView } from '@frontend/lib/contracts';
 import type { BallotView } from '@frontend/lib/ui';
 import { supportSegments } from '@frontend/lib/ballot-ui';
 import Avatar from '../ui/Avatar';
 import RecallPanel from './RecallPanel';
 import ShareInvite from './ShareInvite';
+const PrivateBallotPanel = dynamic(() => import('./PrivateBallotPanel'), { ssr: false });
 export default function BallotPanel({
   election,
   ballot,
+  citizen,
+  onRefresh,
   ready,
   busy,
   privateError,
@@ -18,6 +22,8 @@ export default function BallotPanel({
 }: {
   election: ElectionView;
   ballot?: BallotView;
+  citizen: CitizenView;
+  onRefresh: () => Promise<void>;
   ready: boolean;
   busy: boolean;
   privateError: boolean;
@@ -27,12 +33,8 @@ export default function BallotPanel({
   onPassport: () => void;
 }) {
   if (election.protocol === 'MACI_PRIVATE') {
-    return (
-      <div className="panel ballot-panel empty-state">
-        <h3>Private ballot</h3>
-        <p>This poll is awaiting its Rarimo eligibility gate and MACI deployment. No private ballot has been submitted.</p>
-      </div>
-    );
+    return <PrivateBallotPanel key={election.id} election={election} citizen={citizen} ready={ready}
+      now={now} onPassport={onPassport} onRefresh={onRefresh} />;
   }
   const candidate = election.candidates.find((candidate) => candidate.id === ballot?.candidateId);
   const segments = supportSegments(

@@ -33,7 +33,7 @@ const sections: { name: string; icon: typeof Users; actions: AdminAction[] }[] =
   { name: 'Platforms', icon: FileText, actions: ['platform'] },
   { name: 'Promises', icon: CheckCheck, actions: ['promise'] },
   { name: 'Recall policy', icon: SlidersHorizontal, actions: ['recallPolicy'] },
-  { name: 'Private poll', icon: LockKeyhole, actions: ['configurePrivatePoll'] },
+  { name: 'Private poll', icon: LockKeyhole, actions: ['configurePrivatePoll', 'publishPrivateResults'] },
   { name: 'Lifecycle', icon: Play, actions: ['activate', 'close', 'archive'] },
 ];
 const input = (form: FormData, key: string) => String(form.get(key) ?? '').trim();
@@ -92,10 +92,16 @@ export default function AdminPanel() {
           ? 'Select a private-election draft.'
         : action === 'configurePrivatePoll' && selected.privatePoll
           ? 'This private poll has already been configured and frozen.'
+        : action === 'publishPrivateResults' && (selected.protocol !== 'MACI_PRIVATE' || !selected.privatePoll)
+          ? 'Select a configured private election.'
+        : action === 'publishPrivateResults' && selected.privatePoll?.resultsPublishedAt
+          ? 'Verified private results have already been published.'
+        : action === 'publishPrivateResults' && selectedStatus !== 'FINISHED'
+          ? 'Results can be published only after the poll finishes.'
         : action === 'recallPolicy' && selected.protocol === 'MACI_PRIVATE'
           ? 'Private MACI elections do not use recall policies.'
-        : action === 'activate' && selected.protocol === 'MACI_PRIVATE'
-          ? 'Private activation remains locked until the encrypted vote and verified tally flow is complete.'
+        : action === 'activate' && selected.protocol === 'MACI_PRIVATE' && !selected.privatePoll
+          ? 'Configure a local MACI test poll before activation.'
         : action === 'close'
           ? selectedStatus === 'ACTIVE'
             ? ''
@@ -370,6 +376,8 @@ export default function AdminPanel() {
               ? 'This publishes the election and locks its configuration. Voting starts at the scheduled opening time, or immediately if that time has passed.'
               : confirmation.action === 'removeCandidate'
                 ? 'This withdraws the selected candidate from the draft and retains their record.'
+                : confirmation.action === 'publishPrivateResults'
+                  ? 'This publishes the on-chain proof-verified aggregate only if at least three voters contributed. Individual choices remain hidden from the public.'
                 : confirmation.action === 'close'
                   ? 'This ends voting and recall immediately. Ballot and audit records are retained.'
                   : 'This archives the finished election and preserves its public evidence.'}

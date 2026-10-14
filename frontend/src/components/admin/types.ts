@@ -28,6 +28,10 @@ export type AdminElection = {
     coordinatorPublicKeyY: string;
     candidateIds: string[];
     registrationMode: 'LOCAL_TEST' | 'RARIMO';
+    candidateUnits: string[];
+    totalSpent: string | null;
+    tallyCommitment: string | null;
+    resultsPublishedAt: string | null;
   } | null;
   candidates: {
     id: string;
@@ -53,7 +57,8 @@ export type AdminAction =
   | 'close'
   | 'archive'
   | 'recallPolicy'
-  | 'configurePrivatePoll';
+  | 'configurePrivatePoll'
+  | 'publishPrivateResults';
 export const labels: Record<AdminAction, string> = {
   create: 'Create election',
   edit: 'Edit election',
@@ -66,9 +71,10 @@ export const labels: Record<AdminAction, string> = {
   archive: 'Archive election',
   recallPolicy: 'Set recall policy',
   configurePrivatePoll: 'Configure local MACI poll',
+  publishPrivateResults: 'Publish verified private results',
 };
 export const requiresConfirmation = (action: AdminAction) =>
-  ['activate', 'removeCandidate', 'close', 'archive'].includes(action);
+  ['activate', 'removeCandidate', 'close', 'archive', 'publishPrivateResults'].includes(action);
 export const destructive = (action: AdminAction) =>
   ['removeCandidate', 'close', 'archive'].includes(action);
 export function localInputDate(value?: string) {

@@ -28,6 +28,9 @@ import { MongoCommitmentOutboxStore } from '../backend/src/outbox-store';
 import { appendAudit } from '../backend/src/audit';
 import { GET as adminMetrics } from '../backend/src/routes/admin-metrics';
 import { POST as privateRegister } from '../backend/src/routes/private-register';
+import { POST as privateJoin } from '../backend/src/routes/private-join';
+import { GET as privateJoinData } from '../backend/src/routes/private-join-data';
+import { POST as privateMessage } from '../backend/src/routes/private-message';
 import { verifyDatabaseEvidence } from '../backend/src/integrity-check';
 if (process.env.INTEGRATION_TEST !== 'true')
   throw new Error('Run npm run test:integration to use an isolated temporary database');
@@ -88,13 +91,27 @@ it('isolates a private election from plaintext ballots and live transparency', a
     body: JSON.stringify({ electionId: id, publicKeyX: '1', publicKeyY: '2' }),
   });
   expect((await privateRegister(registerRequest)).status).toBe(409);
+  const session = `${sessionCookieName()}=${createSession(citizen.id, citizen.sessionVersion, secret('SESSION_SECRET'))}`;
+  const privateRequest = (path: string, payload: Record<string, unknown>) =>
+    new Request(`http://127.0.0.1:3000/api/private/${path}`, { method: 'POST',
+      headers: { origin: 'http://127.0.0.1:3000', 'content-type': 'application/json', cookie: session },
+      body: JSON.stringify(payload) });
+  expect((await privateJoin(privateRequest('join', { electionId: id, nullifier: '1',
+    stateRootIndex: 1, proof: Array(8).fill('1') }))).status).toBe(409);
+  expect((await privateMessage(privateRequest('message', { electionId: id,
+    data: Array(10).fill('1'), encryptionPublicKeyX: '1',
+    encryptionPublicKeyY: '2' }))).status).toBe(409);
+  expect((await privateJoinData(new Request(`http://127.0.0.1:3000/api/private/join-data?electionId=${id}`,
+    { headers: { cookie: session } }))).status).toBe(409);
   const draft = await administer(citizen.id, { action: 'create', title: 'Private draft',
     description: 'Test only', type: 'COUNCIL', protocol: 'MACI_PRIVATE',
     opensAt: '2032-01-01T00:00:00Z', closesAt: '2032-02-01T00:00:00Z' });
   const saved = await db.election.findUniqueOrThrow({ where: { id: draft.electionId } });
   expect(saved.recallEnabled).toBe(false);
   await expect(administer(citizen.id, { action: 'activate', electionId: draft.electionId }))
-    .rejects.toThrow('Private elections require');
+    .rejects.toThrow('Private election needs a configured local MACI test poll');
+  await expect(administer(citizen.id, { action: 'publishPrivateResults', electionId: draft.electionId }))
+    .rejects.toThrow('finished local MACI poll');
   await expect(administer(citizen.id, { action: 'recallPolicy', electionId: draft.electionId,
     recallEnabled: true, fullRecallEnabled: true, partialRecallEnabled: true,
     partialRecallAmount: 25, firstRecallDelaySeconds: 0,

@@ -24,7 +24,7 @@ export default function CandidateCard({
         </div>
         <ChevronRight className="candidate-row-arrow" size={18} aria-hidden="true" />
       </div>
-      {election.protocol === 'MACI_PRIVATE' ? (
+      {election.protocol === 'MACI_PRIVATE' && !election.privatePoll?.resultsPublishedAt ? (
         <p className="fine-print">Choices remain private until the verified final tally.</p>
       ) : (
         <>

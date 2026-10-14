@@ -25,7 +25,9 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
           maxRecallOperations: true,
           privatePoll: { select: { chainId: true, maciAddress: true, pollAddress: true,
             pollId: true, coordinatorPublicKeyX: true, coordinatorPublicKeyY: true,
-            deploymentBlock: true, candidateIds: true, registrationMode: true } },
+            deploymentBlock: true, candidateIds: true, registrationMode: true,
+            candidateUnits: true, totalSpent: true, tallyCommitment: true,
+            resultsPublishedAt: true } },
           candidates: {
             where: { withdrawn: false },
             orderBy: { id: 'asc' },
@@ -71,6 +73,9 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
         const tally = totals.filter((t) => t.electionId === e.id);
         const activeUnits = tally.reduce((sum, t) => sum + (t._sum.balance ?? 0), 0);
         const ballotCount = tally.reduce((sum, t) => sum + t._count, 0);
+        const privateUnits = e.protocol === 'MACI_PRIVATE' && e.privatePoll?.resultsPublishedAt
+          ? e.privatePoll.candidateUnits.map(Number) : [];
+        const privateActiveUnits = privateUnits.reduce((sum, units) => sum + units, 0);
         return {
           id: e.id,
           title: e.title,
@@ -90,7 +95,7 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
             cooldownSeconds: e.recallCooldownSeconds,
             maxOperations: e.maxRecallOperations,
           },
-          activeUnits: e.protocol === 'MACI_PRIVATE' ? 0 : activeUnits,
+          activeUnits: e.protocol === 'MACI_PRIVATE' ? privateActiveUnits : activeUnits,
           ballotCount: e.protocol === 'MACI_PRIVATE' ? 0 : ballotCount,
           recalledUnits: e.protocol === 'MACI_PRIVATE' ? 0 : ballotCount * 100 - activeUnits,
           candidates: e.candidates
@@ -107,7 +112,9 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
                 ideology: c.ideology,
                 bio: c.bio,
                 color: c.color,
-                units: e.protocol === 'MACI_PRIVATE' ? 0 : (tally.find((t) => t.candidateId === c.id)?._sum.balance ?? 0),
+                units: e.protocol === 'MACI_PRIVATE'
+                  ? (privateUnits[e.privatePoll?.candidateIds.indexOf(c.id) ?? -1] ?? 0)
+                  : (tally.find((t) => t.candidateId === c.id)?._sum.balance ?? 0),
                 platform: p
                   ? {
                       id: p.id,
@@ -128,5 +135,6 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
         };
       });
     },
+    { maxWait: 20_000, timeout: 30_000 },
   );
 }

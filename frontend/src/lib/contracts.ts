@@ -42,6 +42,10 @@ export interface ElectionView {
     deploymentBlock: string;
     candidateIds: string[];
     registrationMode: 'LOCAL_TEST' | 'RARIMO';
+    candidateUnits: string[];
+    totalSpent: string | null;
+    tallyCommitment: string | null;
+    resultsPublishedAt: string | null;
   } | null;
   status: string;
   recallPolicy?: {

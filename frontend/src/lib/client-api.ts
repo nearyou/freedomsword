@@ -9,7 +9,7 @@ export class ClientApiError extends Error {
 }
 export async function api<T>(path: string, payload?: Record<string, unknown>): Promise<T> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), payload ? 25_000 : 15_000);
+  const timeout = setTimeout(() => controller.abort(), path.startsWith('private/') ? 60_000 : payload ? 25_000 : 15_000);
   try {
     const response = await fetch(`/api/${path}`, {
       method: payload ? 'POST' : 'GET',

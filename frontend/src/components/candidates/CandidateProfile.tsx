@@ -52,7 +52,7 @@ export default function CandidateProfile({
           <IdeologyBadge label={candidate.ideology} color={candidate.color} />
         </div>
       </div>
-      {election.protocol !== 'MACI_PRIVATE' && <div className="profile-stats">
+      {(election.protocol !== 'MACI_PRIVATE' || election.privatePoll?.resultsPublishedAt) && <div className="profile-stats">
         <div>
           <strong>{support(candidate, election).toFixed(1)}%</strong>
           <span>Current support</span>
@@ -195,7 +195,7 @@ export default function CandidateProfile({
           disabled={!!reason}
           onClick={() => onCast(candidate)}
         >
-          Choose this candidate <ArrowRight size={17} />
+          {election.protocol === 'MACI_PRIVATE' ? 'Open private ballot' : 'Choose this candidate'} <ArrowRight size={17} />
         </button>
         {reason && <p className="disabled-reason">{reason}</p>}
       </div>

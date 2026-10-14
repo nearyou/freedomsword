@@ -1,8 +1,16 @@
 # FreedomSword private voting decision
 
-Status: implementation in progress. The deployed and local app still use mock eligibility and the legacy plaintext ballot workflow. No current election should be described as a MACI or Rarimo election.
+Status: implementation in progress. Existing demonstration elections still use mock eligibility and the legacy plaintext ballot workflow. A separate local MACI test path is available only on chain ID 31337; no deployed election should be described as Rarimo verified.
 
-The `MACI_PRIVATE` election protocol is now isolated from the legacy cast and recall APIs and from legacy transparency projections. Private elections cannot be activated until a deployed MACI poll and Rarimo gate can be verified. `LocalMaciTestGate.sol` is a local-chain-only signup gate for contract tests: it refuses deployment unless chain ID is 31337 and cannot satisfy production eligibility. Run `npm run contract:test` to exercise it. This is a test bypass, not a private-voting deployment.
+## What can be tested now
+
+The application can register a locally eligible citizen's MACI public key, build a poll-join proof in the browser, relay the join transaction, and submit signed encrypted vote messages. It does not hold the voter's private key or plaintext choice in Express or MongoDB. After the coordinator submits a proof-verified tally on-chain, an election manager can import the aggregate with **Publish private results**. This path is deliberately limited to a local chain and uses the mock citizen verification flow. A submitted encrypted message is not evidence that a vote was counted.
+
+To exercise the complete local flow, an operator must supply a MACI v3 deployment and its test proving artifacts. Follow the upstream [MACI quick start](https://maci.pse.dev/docs/quick-start/) for its own `localhost` deployment, non-quadratic poll, 100-credit proxy, coordinator key, join circuit artifacts, merge, prove, and submit-on-chain steps. The MACI contract, local gate, coordinator, vote options, dates, and candidate order must match the election before **Configure private poll** succeeds. Keep the coordinator private key and proving files outside this repository; the frontend join `.wasm` and `.zkey` must be served at the same-origin paths set in `frontend/.env.example`. The application cannot manufacture these artifacts or a trustworthy final tally from database rows.
+
+The full MACI deployment, on-device join proof, vote replacement, coordinator proof generation, and on-chain tally have **not** been exercised together yet. `npm run check`, `npm run test:integration`, and `npm run build` validate the application and its mocked chain boundaries, not that external end-to-end sequence. Real Rarimo proof verification and a production eligible-voter gate are still required before this can be used for Ukrainian citizens aged 18 or older.
+
+The `MACI_PRIVATE` election protocol is isolated from legacy cast and recall APIs and legacy transparency projections. A configured local MACI v3 poll can be activated for development/test with `LocalMaciTestGate.sol`, which refuses deployment unless chain ID is 31337. It cannot satisfy production eligibility. Poll joining, encrypted message submission, and importing on-chain proof-verified aggregate results are present. The coordinator must still be operated separately using MACI's proving tools, and Rarimo verification is not integrated. This is a test bypass, not a production election.
 
 ## Product rules
 

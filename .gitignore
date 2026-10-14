@@ -13,3 +13,4 @@ coverage/
 .local-*-password
 cache/
 artifacts/
+frontend/public/zk/

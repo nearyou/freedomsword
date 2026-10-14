@@ -114,6 +114,12 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
     }
   }
   function cast(candidate: CandidateView) {
+    if (election.protocol === 'MACI_PRIVATE') {
+      close();
+      setTab('My ballot');
+      window.scrollTo(0, 0);
+      return;
+    }
     if (!ready) {
       openPassport();
       return;
@@ -258,6 +264,8 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
                   <BallotPanel
                     election={election}
                     ballot={ballot}
+                    citizen={citizen}
+                    onRefresh={() => refreshCitizen(true)}
                     ready={ready}
                     busy={actions.busy}
                     privateError={!!citizenState.error}

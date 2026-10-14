@@ -9,7 +9,7 @@ import { appendAudit } from './audit';
 import { effectiveElectionStatus } from '@backend/core/lifecycle';
 import { databaseNow } from './database-time';
 import { chainElectionKey } from './chain/action';
-import { validateLocalPrivatePoll, type PrivatePollInput } from './private-poll-chain';
+import { validateLocalPrivatePoll, verifiedLocalPrivateTally, type PrivatePollInput } from './private-poll-chain';
 
 const id = z.string().min(1).max(100);
 const text = z.string().trim().min(1).max(2000);
@@ -39,6 +39,7 @@ export const adminCommand = z.discriminatedUnion('action', [
     messageProcessorAddress: z.string(), pollId: z.string(), gateAddress: z.string(),
     voiceCreditProxyAddress: z.string(), deploymentBlock: z.string(),
   }).strict(),
+  z.object({ action: z.literal('publishPrivateResults'), electionId: id }).strict(),
 ]);
 export type AdminCommand = z.infer<typeof adminCommand>;
 
@@ -64,7 +65,8 @@ export async function adminElections() {
         tallyAddress: true, messageProcessorAddress: true, pollId: true,
         gateAddress: true, voiceCreditProxyAddress: true, deploymentBlock: true,
         coordinatorPublicKeyX: true, coordinatorPublicKeyY: true, candidateIds: true,
-        registrationMode: true } },
+        registrationMode: true, candidateUnits: true, totalSpent: true,
+        tallyCommitment: true, resultsPublishedAt: true } },
       candidates: {
         select: {
           id: true, fullName: true, party: true, ideology: true, bio: true, color: true,
@@ -77,6 +79,20 @@ export async function adminElections() {
 }
 
 export async function administer(userId: string, input: AdminCommand) {
+  let validatedTally: { candidateUnits: string[]; totalSpent: string; tallyCommitment: string } | undefined;
+  if (input.action === 'publishPrivateResults') {
+    const election = await db.election.findUnique({
+      where: { id: input.electionId }, include: { privatePoll: true },
+    });
+    if (!election || election.protocol !== 'MACI_PRIVATE' ||
+      !election.privatePoll || election.privatePoll.registrationMode !== 'LOCAL_TEST' ||
+      effectiveElectionStatus(election, new Date()) !== 'FINISHED')
+      throw new ApiError(409, 'A finished local MACI poll is required', 'PRIVATE_TALLY_NOT_READY');
+    validatedTally = await verifiedLocalPrivateTally({
+      tallyAddress: election.privatePoll.tallyAddress,
+      candidateCount: election.privatePoll.candidateIds.length,
+    });
+  }
   let validatedPrivatePoll: { coordinatorPublicKeyX: string; coordinatorPublicKeyY: string; candidateIds: string[]; opensAt: number; closesAt: number } | undefined;
   if (input.action === 'configurePrivatePoll') {
     const draft = await db.election.findUnique({
@@ -90,6 +106,29 @@ export async function administer(userId: string, input: AdminCommand) {
     });
     validatedPrivatePoll = { ...keys, candidateIds: draft.candidates.map((c) => c.id),
       opensAt: draft.opensAt.getTime(), closesAt: draft.closesAt.getTime() };
+  }
+  let validatedPrivateActivation: { candidateIds: string[]; opensAt: number; closesAt: number } | undefined;
+  if (input.action === 'activate') {
+    const draft = await db.election.findUnique({
+      where: { id: input.electionId },
+      include: { privatePoll: true,
+        candidates: { where: { withdrawn: false }, orderBy: { id: 'asc' }, select: { id: true } } },
+    });
+    if (draft?.protocol === 'MACI_PRIVATE') {
+      const poll = draft.privatePoll;
+      if (!poll || poll.registrationMode !== 'LOCAL_TEST')
+        throw new ApiError(409, 'Private election needs a configured local MACI test poll', 'PRIVATE_ELECTION_NOT_CONFIGURED');
+      await validateLocalPrivatePoll({ chainId: poll.chainId, maciAddress: poll.maciAddress,
+        pollAddress: poll.pollAddress, tallyAddress: poll.tallyAddress,
+        messageProcessorAddress: poll.messageProcessorAddress, pollId: poll.pollId,
+        gateAddress: poll.gateAddress, voiceCreditProxyAddress: poll.voiceCreditProxyAddress,
+        deploymentBlock: poll.deploymentBlock }, {
+        opensAt: draft.opensAt, closesAt: draft.closesAt,
+        candidateCount: draft.candidates.length,
+      });
+      validatedPrivateActivation = { candidateIds: draft.candidates.map((c) => c.id),
+        opensAt: draft.opensAt.getTime(), closesAt: draft.closesAt.getTime() };
+    }
   }
   return serializable(async (tx) => {
     if (input.action === 'create') {
@@ -114,7 +153,17 @@ export async function administer(userId: string, input: AdminCommand) {
     const editable = current === 'DRAFT' &&
       (await tx.vote.count({ where: { electionId: election.id } })) === 0;
     const configured = await tx.privatePoll.findUnique({ where: { electionId: election.id } });
-    if (input.action === 'close') {
+    if (input.action === 'publishPrivateResults') {
+      if (!configured || !validatedTally || election.protocol !== 'MACI_PRIVATE' ||
+        current !== 'FINISHED' || configured.resultsPublishedAt)
+        throw new ApiError(409, 'Private results are not ready to publish');
+      await tx.privatePoll.update({ where: { electionId: election.id }, data: {
+        candidateUnits: validatedTally.candidateUnits,
+        totalSpent: validatedTally.totalSpent,
+        tallyCommitment: validatedTally.tallyCommitment,
+        resultsPublishedAt: now,
+      } });
+    } else if (input.action === 'close') {
       if (current !== 'ACTIVE') throw new ApiError(409, 'Only an active election can be closed');
       await tx.election.update({ where: { id: election.id }, data: { status: 'FINISHED' } });
     } else if (input.action === 'archive') {
@@ -166,8 +215,18 @@ export async function administer(userId: string, input: AdminCommand) {
           break;
         }
         case 'activate': {
-          if (election.protocol === 'MACI_PRIVATE')
-            throw new ApiError(409, 'Private elections require a deployed MACI poll and Rarimo gate before activation', 'PRIVATE_ELECTION_NOT_CONFIGURED');
+          if (election.protocol === 'MACI_PRIVATE') {
+            const candidates = await tx.candidate.findMany({
+              where: { electionId: election.id, withdrawn: false },
+              orderBy: { id: 'asc' }, select: { id: true },
+            });
+            if (!configured || !validatedPrivateActivation ||
+              election.opensAt.getTime() !== validatedPrivateActivation.opensAt ||
+              election.closesAt.getTime() !== validatedPrivateActivation.closesAt ||
+              candidates.map((c) => c.id).join(',') !== configured.candidateIds.join(',') ||
+              candidates.map((c) => c.id).join(',') !== validatedPrivateActivation.candidateIds.join(','))
+              throw new ApiError(409, 'Private poll configuration changed before activation', 'PRIVATE_DEPLOYMENT_MISMATCH');
+          }
           if (now >= election.closesAt)
             throw new ApiError(409, 'Reschedule this draft before activating it');
           const count = await tx.candidate.count({ where: { electionId: election.id, withdrawn: false } });

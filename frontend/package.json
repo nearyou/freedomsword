@@ -12,18 +12,23 @@
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/playfair-display": "^5.3.0",
+    "@maci-protocol/crypto": "^3.0.0",
+    "@maci-protocol/domainobjs": "^3.0.0",
+    "@zk-kit/lean-imt": "^2.2.4",
     "lucide-react": "^0.468.0",
     "next": "^16.4.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "recharts": "^3.3.0"
+    "recharts": "^3.3.0",
+    "snarkjs": "^0.7.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/snarkjs": "^0.7.9",
     "tailwindcss": "^4.1.0",
-    "@types/node": "^22.0.0",
     "typescript": "^5.9.0"
   }
 }

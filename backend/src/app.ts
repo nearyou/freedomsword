@@ -15,6 +15,9 @@ import { POST as logoutPost } from './routes/logout';
 import { GET as meGet } from './routes/me';
 import { POST as platformSignPost } from './routes/platform-sign';
 import { POST as privateRegisterPost } from './routes/private-register';
+import { POST as privateJoinPost } from './routes/private-join';
+import { GET as privateJoinDataGet } from './routes/private-join-data';
+import { POST as privateMessagePost } from './routes/private-message';
 import { GET as readyGet } from './routes/ready';
 import { POST as recallPost } from './routes/recall';
 import { POST as verifyPost } from './routes/verify';
@@ -94,6 +97,9 @@ const routes: Array<[string, Partial<Record<'get' | 'post', Handler | ParameterH
   ['/api/me', { get: meGet }],
   ['/api/platform/sign', { post: platformSignPost }],
   ['/api/private/register', { post: privateRegisterPost }],
+  ['/api/private/join', { post: privateJoinPost }],
+  ['/api/private/join-data', { get: privateJoinDataGet }],
+  ['/api/private/message', { post: privateMessagePost }],
   ['/api/ready', { get: readyGet }],
   ['/api/recall', { post: recallPost }],
   ['/api/verify', { post: verifyPost }],

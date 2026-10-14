@@ -179,6 +179,10 @@ model PrivatePoll {
   coordinatorPublicKeyY   String
   deploymentBlock         String
   candidateIds            String[]
+    candidateUnits          String[] @default([])
+    totalSpent              String?
+    tallyCommitment         String?
+    resultsPublishedAt      DateTime?
   createdAt               DateTime @default(now())
 
   @@unique([chainId, maciAddress, pollId])

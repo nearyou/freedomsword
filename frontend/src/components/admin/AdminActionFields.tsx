@@ -246,7 +246,7 @@ export default function AdminActionFields({
     return (
       <fieldset>
         <legend>Local MACI deployment</legend>
-        <p>Chain ID 31337 only. The server verifies the MACI poll, signup gate, candidate count, election dates, coordinator key, non-quadratic mode, and 100 voice credits before saving. Private voting stays disabled until the complete encrypted ballot flow is ready.</p>
+          <p>Chain ID 31337 only. The server verifies the MACI poll, signup gate, candidate count, election dates, coordinator key, non-quadratic mode, and 100 voice credits before saving. Activation permits local testing only; no final result is shown before proof verification.</p>
         {([['maciAddress', 'MACI contract'], ['pollAddress', 'Poll contract'],
           ['tallyAddress', 'Tally contract'], ['messageProcessorAddress', 'Message processor'],
           ['pollId', 'Poll ID'], ['gateAddress', 'Local test gate'],
@@ -259,6 +259,11 @@ export default function AdminActionFields({
         ))}
       </fieldset>
     );
+  if (action === 'publishPrivateResults')
+    return <div className="lifecycle-note">
+      <strong>Publish verified aggregate</strong>
+      <p>Run the MACI coordinator and submit its proofs and per-option results on-chain first. FreedomSword reads only verified contract values and requires at least three counted voters before publication.</p>
+    </div>;
   return (
     <div className="lifecycle-note">
       <strong>

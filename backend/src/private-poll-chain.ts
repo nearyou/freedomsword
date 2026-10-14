@@ -5,6 +5,10 @@ import { ApiError } from './errors';
 const maciAbi = [
   { type: 'function', name: 'getPoll', stateMutability: 'view', inputs: [{ name: 'pollId', type: 'uint256' }], outputs: [{ type: 'tuple', components: [{ name: 'poll', type: 'address' }, { name: 'messageProcessor', type: 'address' }, { name: 'tally', type: 'address' }] }] },
   { type: 'function', name: 'signUpPolicy', stateMutability: 'view', inputs: [], outputs: [{ type: 'address' }] },
+  { type: 'function', name: 'stateTreeDepth', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint8' }] },
+  { type: 'function', name: 'totalSignups', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
+  { type: 'function', name: 'getStateRootOnIndexedSignUp', stateMutability: 'view',
+    inputs: [{ type: 'uint256' }], outputs: [{ type: 'uint256' }] },
 ] as const;
 const pollAbi = [
   { type: 'function', name: 'getStartAndEndDate', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }, { type: 'uint256' }] },
@@ -25,6 +29,14 @@ const creditsAbi = [
 ] as const;
 const tallyAbi = [
   { type: 'function', name: 'mode', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint8' }] },
+  { type: 'function', name: 'isTallied', stateMutability: 'view', inputs: [], outputs: [{ type: 'bool' }] },
+  { type: 'function', name: 'totalTallyResults', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
+  { type: 'function', name: 'totalSpent', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
+  { type: 'function', name: 'tallyCommitment', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
+  { type: 'function', name: 'getTallyResults', stateMutability: 'view',
+    inputs: [{ type: 'uint256' }], outputs: [{ type: 'tuple', components: [
+      { name: 'value', type: 'uint256' }, { name: 'isSet', type: 'bool' },
+    ] }] },
 ] as const;
 const localSignupAbi = parseAbi([
   'function owner() view returns (address)',
@@ -34,6 +46,11 @@ const localSignupAbi = parseAbi([
 ]);
 const maciSignupAbi = parseAbi([
   'event SignUp(uint256 _stateIndex,uint256 _timestamp,uint256 indexed _userPublicKeyX,uint256 indexed _userPublicKeyY)',
+]);
+const pollVotingAbi = parseAbi([
+  'function joinPoll(uint256,(uint256 x,uint256 y),uint256,uint256[8],bytes,bytes)',
+  'function publishMessage((uint256[10] data),(uint256 x,uint256 y))',
+  'event PollJoined(uint256 indexed _pollPublicKeyX,uint256 indexed _pollPublicKeyY,uint256 _voiceCreditBalance,uint256 _nullifier,uint256 _pollStateIndex)',
 ]);
 
 export type PrivatePollInput = {
@@ -58,6 +75,24 @@ function localClient() {
   if (!rpc || !/^https?:\/\//.test(rpc))
     throw new ApiError(503, 'Local private-voting RPC is not configured', 'PRIVATE_RPC_MISSING');
   return createPublicClient({ transport: http(rpc, { timeout: 8_000 }) });
+}
+
+async function localRelayer() {
+  if (!localPrivateTestingEnabled())
+    throw new ApiError(403, 'Local private voting is disabled outside development', 'PRIVATE_TEST_ONLY');
+  const rpc = process.env.PRIVATE_VOTING_RPC_URL;
+  const signer = process.env.PRIVATE_VOTING_SIGNER_PRIVATE_KEY;
+  if (!rpc || !/^0x[a-fA-F0-9]{64}$/.test(signer ?? ''))
+    throw new ApiError(503, 'Local private-voting relayer is not configured', 'PRIVATE_RELAYER_MISSING');
+  const client = localClient();
+  if (await client.getChainId() !== 31337)
+    throw new ApiError(503, 'Local private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
+  const account = privateKeyToAccount(signer as Hex);
+  const chain = defineChain({ id: 31337, name: 'Local MACI test',
+    nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+    rpcUrls: { default: { http: [rpc] } } });
+  const wallet = createWalletClient({ account, chain, transport: http(rpc, { timeout: 8_000 }) });
+  return { client, account, wallet };
 }
 
 export async function validateLocalPrivatePoll(
@@ -114,16 +149,7 @@ export async function registerLocalTestPublicKey(input: {
   publicKeyX: bigint;
   publicKeyY: bigint;
 }) {
-  if (!localPrivateTestingEnabled())
-    throw new ApiError(403, 'Local registration is disabled outside development', 'PRIVATE_TEST_ONLY');
-  const rpc = process.env.PRIVATE_VOTING_RPC_URL;
-  const signer = process.env.PRIVATE_VOTING_SIGNER_PRIVATE_KEY;
-  if (!rpc || !/^0x[a-fA-F0-9]{64}$/.test(signer ?? ''))
-    throw new ApiError(503, 'Local private-voting relayer is not configured', 'PRIVATE_RELAYER_MISSING');
-  const account = privateKeyToAccount(signer as Hex);
-  const client = localClient();
-  if (await client.getChainId() !== 31337)
-    throw new ApiError(503, 'Local private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
+  const { client, account, wallet } = await localRelayer();
   const gateAddress = input.gateAddress as Address;
   const owner = await client.readContract({ address: gateAddress, abi: localSignupAbi, functionName: 'owner' });
   if (owner.toLowerCase() !== account.address.toLowerCase())
@@ -148,10 +174,6 @@ export async function registerLocalTestPublicKey(input: {
     if (existing) return existing;
     throw new ApiError(503, 'MACI signup is pending; retry after it is mined', 'PRIVATE_SIGNUP_PENDING');
   }
-  const chain = defineChain({ id: 31337, name: 'Local MACI test',
-    nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-    rpcUrls: { default: { http: [rpc] } } });
-  const wallet = createWalletClient({ account, chain, transport: http(rpc, { timeout: 8_000 }) });
   try {
     const simulation = await client.simulateContract({ account, address: gateAddress, abi: localSignupAbi,
       functionName: 'signUpFor', args: [input.testNullifier, { x: input.publicKeyX, y: input.publicKeyY }] });
@@ -166,4 +188,147 @@ export async function registerLocalTestPublicKey(input: {
   const recorded = await findRecordedSignup();
   if (!recorded) throw new ApiError(503, 'MACI signup receipt is unavailable; retry safely', 'PRIVATE_SIGNUP_RETRY');
   return recorded;
+}
+
+export async function findLocalPollJoin(input: {
+  pollAddress: string;
+  deploymentBlock: string;
+  publicKeyX: bigint;
+  publicKeyY: bigint;
+}) {
+  const client = localClient();
+  if (await client.getChainId() !== 31337)
+    throw new ApiError(503, 'Local private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
+  const logs = await client.getLogs({ address: input.pollAddress as Address, event: pollVotingAbi[2],
+    args: { _pollPublicKeyX: input.publicKeyX, _pollPublicKeyY: input.publicKeyY },
+    fromBlock: BigInt(input.deploymentBlock) });
+  const joined = logs.find((log) => log.args._voiceCreditBalance === 100n &&
+    log.args._pollStateIndex !== undefined && log.args._pollStateIndex <= BigInt(2_147_483_647));
+  return joined ? {
+    pollStateIndex: Number(joined.args._pollStateIndex), joinTxHash: joined.transactionHash,
+    nullifier: joined.args._nullifier,
+  } : null;
+}
+
+export async function localPollJoiningData(input: { maciAddress: string; deploymentBlock: string }) {
+  if (!localPrivateTestingEnabled())
+    throw new ApiError(403, 'Local private voting is disabled outside development', 'PRIVATE_TEST_ONLY');
+  const client = localClient();
+  if (await client.getChainId() !== 31337)
+    throw new ApiError(503, 'Local private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
+  const address = input.maciAddress as Address;
+  const [depth, totalSignups] = await Promise.all([
+    client.readContract({ address, abi: maciAbi, functionName: 'stateTreeDepth' }),
+    client.readContract({ address, abi: maciAbi, functionName: 'totalSignups' }),
+  ]);
+  if (totalSignups < 2n || totalSignups > 1024n || depth > 10)
+    throw new ApiError(409, 'Local test poll has an unsupported signup tree', 'PRIVATE_TREE_UNSUPPORTED');
+  const stateRootIndex = totalSignups - 1n;
+  const [root, logs] = await Promise.all([
+    client.readContract({ address, abi: maciAbi, functionName: 'getStateRootOnIndexedSignUp',
+      args: [stateRootIndex] }),
+    client.getLogs({ address, event: maciSignupAbi[0], fromBlock: BigInt(input.deploymentBlock) }),
+  ]);
+  if (BigInt(logs.length) !== stateRootIndex)
+    throw new ApiError(503, 'MACI signup events are incomplete', 'PRIVATE_TREE_INCOMPLETE');
+  return { stateTreeDepth: Number(depth), stateRootIndex: Number(stateRootIndex),
+    stateRoot: root.toString(), signups: logs.map((log) => ({
+      publicKeyX: log.args._userPublicKeyX!.toString(),
+      publicKeyY: log.args._userPublicKeyY!.toString(),
+    })) };
+}
+
+export async function joinLocalPrivatePoll(input: {
+  pollAddress: string;
+  deploymentBlock: string;
+  publicKeyX: bigint;
+  publicKeyY: bigint;
+  nullifier: bigint;
+  stateRootIndex: bigint;
+  proof: readonly [bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint];
+}) {
+  const { client, account, wallet } = await localRelayer();
+  const previous = await findLocalPollJoin(input);
+  if (previous) {
+    if (previous.nullifier !== input.nullifier)
+      throw new ApiError(409, 'This MACI key has already joined the poll', 'PRIVATE_ALREADY_JOINED');
+    return { pollStateIndex: previous.pollStateIndex, joinTxHash: previous.joinTxHash };
+  }
+  try {
+    const simulation = await client.simulateContract({ account, address: input.pollAddress as Address,
+      abi: pollVotingAbi, functionName: 'joinPoll', args: [input.nullifier,
+        { x: input.publicKeyX, y: input.publicKeyY }, input.stateRootIndex,
+        input.proof, '0x', '0x'] });
+    const hash = await wallet.writeContract(simulation.request);
+    const receipt = await client.waitForTransactionReceipt({ hash, timeout: 30_000 });
+    if (receipt.status !== 'success') throw new Error('Poll join reverted');
+  } catch {
+    const recovered = await findLocalPollJoin(input);
+    if (recovered && recovered.nullifier === input.nullifier)
+      return { pollStateIndex: recovered.pollStateIndex, joinTxHash: recovered.joinTxHash };
+    throw new ApiError(503, 'MACI poll join failed or is pending; retry safely', 'PRIVATE_JOIN_RETRY');
+  }
+  const joined = await findLocalPollJoin(input);
+  if (!joined || joined.nullifier !== input.nullifier)
+    throw new ApiError(503, 'MACI poll join receipt is unavailable; retry safely', 'PRIVATE_JOIN_RETRY');
+  return { pollStateIndex: joined.pollStateIndex, joinTxHash: joined.joinTxHash };
+}
+
+export async function publishLocalPrivateMessage(input: {
+  pollAddress: string;
+  data: readonly [bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint];
+  encryptionPublicKeyX: bigint;
+  encryptionPublicKeyY: bigint;
+}) {
+  const { client, account, wallet } = await localRelayer();
+  try {
+    const simulation = await client.simulateContract({ account, address: input.pollAddress as Address,
+      abi: pollVotingAbi, functionName: 'publishMessage', args: [
+        { data: input.data },
+        { x: input.encryptionPublicKeyX, y: input.encryptionPublicKeyY },
+      ] });
+    const hash = await wallet.writeContract(simulation.request);
+    const receipt = await client.waitForTransactionReceipt({ hash, timeout: 30_000 });
+    if (receipt.status !== 'success') throw new Error('Message reverted');
+    return { txHash: hash };
+  } catch {
+    throw new ApiError(503, 'Encrypted MACI message was not confirmed; inspect the chain before retrying',
+      'PRIVATE_MESSAGE_UNCERTAIN');
+  }
+}
+
+export function checkedPrivateTotals(results: readonly { value: bigint; isSet: boolean }[], spent: bigint) {
+  const sum = results.reduce((total, result) => total + result.value, 0n);
+  if (results.some((result) => !result.isSet) || sum !== spent ||
+    spent > BigInt(Number.MAX_SAFE_INTEGER) ||
+    results.some((result) => result.value > BigInt(Number.MAX_SAFE_INTEGER)))
+    throw new ApiError(409, 'On-chain MACI tally is incomplete or inconsistent', 'PRIVATE_TALLY_MISMATCH');
+  // With 100 non-quadratic credits per person, 300 counted units require at least 3 voters.
+  if (spent < 300n)
+    throw new ApiError(409, 'At least three counted voters are required before publishing results',
+      'PRIVATE_SMALL_POLL');
+  return results.map((result) => result.value.toString());
+}
+
+/** Only values MACI has verified and stored on-chain may become public results. */
+export async function verifiedLocalPrivateTally(input: { tallyAddress: string; candidateCount: number }) {
+  if (!localPrivateTestingEnabled())
+    throw new ApiError(403, 'Local private voting is disabled outside development', 'PRIVATE_TEST_ONLY');
+  const client = localClient();
+  if (await client.getChainId() !== 31337)
+    throw new ApiError(503, 'Local private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
+  const address = input.tallyAddress as Address;
+  const [tallied, mode, resultCount, spent, commitment] = await Promise.all([
+    client.readContract({ address, abi: tallyAbi, functionName: 'isTallied' }),
+    client.readContract({ address, abi: tallyAbi, functionName: 'mode' }),
+    client.readContract({ address, abi: tallyAbi, functionName: 'totalTallyResults' }),
+    client.readContract({ address, abi: tallyAbi, functionName: 'totalSpent' }),
+    client.readContract({ address, abi: tallyAbi, functionName: 'tallyCommitment' }),
+  ]);
+  if (!tallied || BigInt(mode) !== 1n || resultCount !== BigInt(input.candidateCount) || commitment === 0n)
+    throw new ApiError(409, 'MACI tally and per-option proofs are not finalized on-chain', 'PRIVATE_TALLY_PENDING');
+  const results = await Promise.all(Array.from({ length: input.candidateCount }, (_, index) =>
+    client.readContract({ address, abi: tallyAbi, functionName: 'getTallyResults', args: [BigInt(index)] })));
+  return { candidateUnits: checkedPrivateTotals(results, spent),
+    totalSpent: spent.toString(), tallyCommitment: commitment.toString() };
 }
