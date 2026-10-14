@@ -41,7 +41,7 @@ const stageCopy = {
     missionSteps: [
       'Explore candidates',
       'Read their platforms',
-      'See live results',
+      'See election results',
       'Track public promises',
       'Inspect the audit trail',
     ],
@@ -82,7 +82,7 @@ const stageCopy = {
     missionSteps: [
       'Знайомтеся з кандидатами',
       'Читайте їхні програми',
-      'Дивіться результати',
+      'Дивіться результати виборів',
       'Стежте за обіцянками',
       'Переглядайте журнал дій',
     ],

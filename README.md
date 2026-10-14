@@ -47,4 +47,6 @@ MongoDB stores accounts, sessions, eligibility records, ballots, audit events, a
 
 The current `ELIGIBILITY_PROVIDER=mock` verifies no real person and does not prevent one person from using multiple Telegram accounts. Rarimo and a Telegram wallet are **not** integrated. The contract does not change that limitation. Keep fictional/demo labeling visible.
 
+The selected future architecture is Rarimo-only eligibility and MACI encrypted voting with a trusted coordinator. It is not implemented or deployed. New private elections will require separate registration and tally paths; existing ballots and live aggregates must not be relabeled as private. See [the private voting decision](docs/PRIVATE_VOTING_DECISION.md).
+
 See [ARCHITECTURE.md](ARCHITECTURE.md), [DATABASE.md](DATABASE.md), [CONTRACT.md](CONTRACT.md), [SECURITY.md](SECURITY.md), and [RECOVERY.md](RECOVERY.md) for implementation and operations. Telegram Mini App validation follows the [official Telegram specification](https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app); MongoDB transaction setup follows [Prisma's MongoDB guide](https://www.prisma.io/docs/orm/v6/overview/databases/mongodb).
