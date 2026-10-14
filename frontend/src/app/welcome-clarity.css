@@ -6,7 +6,36 @@
 }
 
 .fs-launch .fs-original-logo {
+  width: min(55vw, 24svh, 220px);
+  margin: clamp(18px, 4vh, 38px) auto 18px;
   box-shadow: 0 12px 32px #6b502322;
+}
+
+.fs-launch .fs-stage-bottom small {
+  order: -1;
+  justify-self: center;
+  max-width: 100%;
+  padding: 9px 14px;
+  border: 1px solid #c6aa72;
+  border-radius: 10px;
+  color: #17314d;
+  background: #fffdf4f2;
+  box-shadow: 0 4px 14px #2c2a2240;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.fs-welcome.fs-dark .fs-launch .fs-stage-bottom small {
+  color: #f6f7f4;
+  background: #102940f2;
+  border-color: #b9924f;
+}
+
+@media (min-width: 760px) {
+  .fs-welcome .fs-launch {
+    min-height: calc(100svh - 122px);
+  }
 }
 
 .fs-launch-motto {
