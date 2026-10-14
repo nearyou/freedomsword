@@ -10,6 +10,7 @@ import { effectiveElectionStatus } from '@backend/core/lifecycle';
 import { databaseNow } from './database-time';
 import { chainElectionKey } from './chain/action';
 import { validateLocalPrivatePoll, verifiedLocalPrivateTally, type PrivatePollInput } from './private-poll-chain';
+import { validateRarimoPrivatePoll } from './rarimo-private-chain';
 
 const id = z.string().min(1).max(100);
 const text = z.string().trim().min(1).max(2000);
@@ -85,15 +86,16 @@ export async function administer(userId: string, input: AdminCommand) {
       where: { id: input.electionId }, include: { privatePoll: true },
     });
     if (!election || election.protocol !== 'MACI_PRIVATE' ||
-      !election.privatePoll || election.privatePoll.registrationMode !== 'LOCAL_TEST' ||
+      !election.privatePoll ||
       effectiveElectionStatus(election, new Date()) !== 'FINISHED')
-      throw new ApiError(409, 'A finished local MACI poll is required', 'PRIVATE_TALLY_NOT_READY');
+      throw new ApiError(409, 'A finished MACI poll is required', 'PRIVATE_TALLY_NOT_READY');
     validatedTally = await verifiedLocalPrivateTally({
+      chainId: election.privatePoll.chainId,
       tallyAddress: election.privatePoll.tallyAddress,
       candidateCount: election.privatePoll.candidateIds.length,
     });
   }
-  let validatedPrivatePoll: { coordinatorPublicKeyX: string; coordinatorPublicKeyY: string; candidateIds: string[]; opensAt: number; closesAt: number } | undefined;
+  let validatedPrivatePoll: { coordinatorPublicKeyX: string; coordinatorPublicKeyY: string; candidateIds: string[]; opensAt: number; closesAt: number; registrationMode: 'LOCAL_TEST' | 'RARIMO' } | undefined;
   if (input.action === 'configurePrivatePoll') {
     const draft = await db.election.findUnique({
       where: { id: input.electionId },
@@ -101,11 +103,18 @@ export async function administer(userId: string, input: AdminCommand) {
     });
     if (!draft || draft.protocol !== 'MACI_PRIVATE' || draft.status !== 'DRAFT' || draft.candidates.length < 2)
       throw new ApiError(409, 'Configure a draft private election with at least two candidates');
-    const keys = await validateLocalPrivatePoll(input as PrivatePollInput, {
-      opensAt: draft.opensAt, closesAt: draft.closesAt, candidateCount: draft.candidates.length,
-    });
+    const keys = input.chainId === 7368
+      ? await validateRarimoPrivatePoll(input as PrivatePollInput, {
+          electionId: draft.id, opensAt: draft.opensAt, closesAt: draft.closesAt,
+          candidateCount: draft.candidates.length,
+        })
+      : await validateLocalPrivatePoll(input as PrivatePollInput, {
+          opensAt: draft.opensAt, closesAt: draft.closesAt,
+          candidateCount: draft.candidates.length,
+        });
     validatedPrivatePoll = { ...keys, candidateIds: draft.candidates.map((c) => c.id),
-      opensAt: draft.opensAt.getTime(), closesAt: draft.closesAt.getTime() };
+      opensAt: draft.opensAt.getTime(), closesAt: draft.closesAt.getTime(),
+      registrationMode: input.chainId === 7368 ? 'RARIMO' : 'LOCAL_TEST' };
   }
   let validatedPrivateActivation: { candidateIds: string[]; opensAt: number; closesAt: number } | undefined;
   if (input.action === 'activate') {
@@ -116,16 +125,19 @@ export async function administer(userId: string, input: AdminCommand) {
     });
     if (draft?.protocol === 'MACI_PRIVATE') {
       const poll = draft.privatePoll;
-      if (!poll || poll.registrationMode !== 'LOCAL_TEST')
-        throw new ApiError(409, 'Private election needs a configured local MACI test poll', 'PRIVATE_ELECTION_NOT_CONFIGURED');
-      await validateLocalPrivatePoll({ chainId: poll.chainId, maciAddress: poll.maciAddress,
+      if (!poll)
+        throw new ApiError(409, 'Private election needs a configured MACI poll', 'PRIVATE_ELECTION_NOT_CONFIGURED');
+      const deployed = { chainId: poll.chainId, maciAddress: poll.maciAddress,
         pollAddress: poll.pollAddress, tallyAddress: poll.tallyAddress,
         messageProcessorAddress: poll.messageProcessorAddress, pollId: poll.pollId,
         gateAddress: poll.gateAddress, voiceCreditProxyAddress: poll.voiceCreditProxyAddress,
-        deploymentBlock: poll.deploymentBlock }, {
-        opensAt: draft.opensAt, closesAt: draft.closesAt,
-        candidateCount: draft.candidates.length,
-      });
+        deploymentBlock: poll.deploymentBlock };
+      if (poll.registrationMode === 'RARIMO')
+        await validateRarimoPrivatePoll(deployed, { electionId: draft.id,
+          opensAt: draft.opensAt, closesAt: draft.closesAt,
+          candidateCount: draft.candidates.length });
+      else await validateLocalPrivatePoll(deployed, { opensAt: draft.opensAt,
+        closesAt: draft.closesAt, candidateCount: draft.candidates.length });
       validatedPrivateActivation = { candidateIds: draft.candidates.map((c) => c.id),
         opensAt: draft.opensAt.getTime(), closesAt: draft.closesAt.getTime() };
     }
@@ -254,7 +266,7 @@ export async function administer(userId: string, input: AdminCommand) {
             candidates.map((c) => c.id).join(',') !== validatedPrivatePoll.candidateIds.join(','))
             throw new ApiError(409, 'Election changed while its private poll was being verified');
           await tx.privatePoll.create({ data: {
-            electionId: election.id, registrationMode: 'LOCAL_TEST',
+            electionId: election.id, registrationMode: validatedPrivatePoll.registrationMode,
             chainId: input.chainId, maciAddress: input.maciAddress, pollAddress: input.pollAddress,
             tallyAddress: input.tallyAddress, messageProcessorAddress: input.messageProcessorAddress,
             pollId: input.pollId, gateAddress: input.gateAddress,

@@ -20,10 +20,11 @@ export async function GET(request: Request) {
     });
     if (!election || election.protocol !== 'MACI_PRIVATE' ||
       !['UPCOMING', 'ACTIVE'].includes(election.status) || !election.privatePoll ||
-      election.privatePoll.registrationMode !== 'LOCAL_TEST' ||
+      !['LOCAL_TEST', 'RARIMO'].includes(election.privatePoll.registrationMode) ||
       !registration?.signupTxHash || registration.stateIndex === null)
-      throw new ApiError(409, 'Register for the local MACI poll first', 'PRIVATE_NOT_REGISTERED');
+      throw new ApiError(409, 'Register for the MACI poll first', 'PRIVATE_NOT_REGISTERED');
     const data = await localPollJoiningData({
+      chainId: election.privatePoll.chainId,
       maciAddress: election.privatePoll.maciAddress,
       deploymentBlock: election.privatePoll.deploymentBlock,
     });

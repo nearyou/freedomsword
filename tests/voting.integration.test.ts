@@ -109,7 +109,7 @@ it('isolates a private election from plaintext ballots and live transparency', a
   const saved = await db.election.findUniqueOrThrow({ where: { id: draft.electionId } });
   expect(saved.recallEnabled).toBe(false);
   await expect(administer(citizen.id, { action: 'activate', electionId: draft.electionId }))
-    .rejects.toThrow('Private election needs a configured local MACI test poll');
+    .rejects.toThrow('Private election needs a configured MACI poll');
   await expect(administer(citizen.id, { action: 'publishPrivateResults', electionId: draft.electionId }))
     .rejects.toThrow('finished local MACI poll');
   await expect(administer(citizen.id, { action: 'recallPolicy', electionId: draft.electionId,

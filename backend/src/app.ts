@@ -18,6 +18,8 @@ import { POST as privateRegisterPost } from './routes/private-register';
 import { POST as privateJoinPost } from './routes/private-join';
 import { GET as privateJoinDataGet } from './routes/private-join-data';
 import { POST as privateMessagePost } from './routes/private-message';
+import { POST as privateRarimoRequestPost } from './routes/private-rarimo-request';
+import { POST as privateRarimoRegisterPost } from './routes/private-rarimo-register';
 import { GET as readyGet } from './routes/ready';
 import { POST as recallPost } from './routes/recall';
 import { POST as verifyPost } from './routes/verify';
@@ -100,6 +102,8 @@ const routes: Array<[string, Partial<Record<'get' | 'post', Handler | ParameterH
   ['/api/private/join', { post: privateJoinPost }],
   ['/api/private/join-data', { get: privateJoinDataGet }],
   ['/api/private/message', { post: privateMessagePost }],
+  ['/api/private/rarimo-request', { post: privateRarimoRequestPost }],
+  ['/api/private/rarimo-register', { post: privateRarimoRegisterPost }],
   ['/api/ready', { get: readyGet }],
   ['/api/recall', { post: recallPost }],
   ['/api/verify', { post: verifyPost }],

@@ -5,7 +5,7 @@ import { ApiError } from '@backend/errors';
 import { body, handle, json } from '@backend/http';
 import { joinLocalPrivatePoll } from '@backend/private-poll-chain';
 import { enforceRateLimitAsync } from '@backend/rate-limit';
-import { requireEligibility } from '@backend/verification';
+import { requireCurrentAgreement, requireEligibility } from '@backend/verification';
 
 const decimal = z.string().regex(/^(0|[1-9][0-9]{0,77})$/);
 const schema = z.object({
@@ -27,9 +27,10 @@ export async function POST(request: Request) {
     if (!election || election.protocol !== 'MACI_PRIVATE' ||
       !['UPCOMING', 'ACTIVE'].includes(election.status) ||
       new Date() >= election.closesAt || !election.privatePoll ||
-      election.privatePoll.registrationMode !== 'LOCAL_TEST')
-      throw new ApiError(409, 'Local private poll join is not open', 'PRIVATE_JOIN_CLOSED');
-    await db.$transaction(async (tx) => requireEligibility(tx, user.id));
+      !['LOCAL_TEST', 'RARIMO'].includes(election.privatePoll.registrationMode))
+      throw new ApiError(409, 'Private poll join is not open', 'PRIVATE_JOIN_CLOSED');
+    await db.$transaction(async (tx) => election.privatePoll!.registrationMode === 'RARIMO'
+      ? requireCurrentAgreement(tx, user.id) : requireEligibility(tx, user.id));
     const registration = await db.privateRegistration.findUnique({
       where: { userId_electionId: { userId: user.id, electionId: election.id } },
     });
@@ -37,6 +38,7 @@ export async function POST(request: Request) {
       input.stateRootIndex < registration.stateIndex)
       throw new ApiError(409, 'Register this MACI key before joining the poll', 'PRIVATE_NOT_REGISTERED');
     const result = await joinLocalPrivatePoll({
+      chainId: election.privatePoll.chainId,
       pollAddress: election.privatePoll.pollAddress,
       deploymentBlock: election.privatePoll.deploymentBlock,
       publicKeyX: BigInt(registration.publicKeyX),

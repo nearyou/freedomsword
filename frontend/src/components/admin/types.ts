@@ -70,7 +70,7 @@ export const labels: Record<AdminAction, string> = {
   close: 'Close election',
   archive: 'Archive election',
   recallPolicy: 'Set recall policy',
-  configurePrivatePoll: 'Configure local MACI poll',
+  configurePrivatePoll: 'Configure MACI poll',
   publishPrivateResults: 'Publish verified private results',
 };
 export const requiresConfirmation = (action: AdminAction) =>

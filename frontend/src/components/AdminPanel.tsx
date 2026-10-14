@@ -101,7 +101,7 @@ export default function AdminPanel() {
         : action === 'recallPolicy' && selected.protocol === 'MACI_PRIVATE'
           ? 'Private MACI elections do not use recall policies.'
         : action === 'activate' && selected.protocol === 'MACI_PRIVATE' && !selected.privatePoll
-          ? 'Configure a local MACI test poll before activation.'
+          ? 'Configure a MACI poll before activation.'
         : action === 'close'
           ? selectedStatus === 'ACTIVE'
             ? ''
@@ -173,7 +173,7 @@ export default function AdminPanel() {
         : null;
     }
     if (action === 'configurePrivatePoll') {
-      payload.chainId = 31337;
+      payload.chainId = Number(input(form, 'chainId'));
       for (const key of ['maciAddress', 'pollAddress', 'tallyAddress',
         'messageProcessorAddress', 'pollId', 'gateAddress',
         'voiceCreditProxyAddress', 'deploymentBlock']) payload[key] = input(form, key);

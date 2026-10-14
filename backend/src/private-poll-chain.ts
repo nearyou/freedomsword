@@ -70,30 +70,38 @@ export function localPrivateTestingEnabled(env: Record<string, string | undefine
   return (mode === 'development' || mode === 'test') && env.NODE_ENV !== 'production';
 }
 
-function localClient() {
-  const rpc = process.env.PRIVATE_VOTING_RPC_URL;
+export function privateClient(chainId: number = 31337) {
+  const rpc = chainId === 31337 ? process.env.PRIVATE_VOTING_RPC_URL
+    : chainId === 7368 ? process.env.RARIMO_RPC_URL : undefined;
   if (!rpc || !/^https?:\/\//.test(rpc))
-    throw new ApiError(503, 'Local private-voting RPC is not configured', 'PRIVATE_RPC_MISSING');
+    throw new ApiError(503, 'Private-voting RPC is not configured', 'PRIVATE_RPC_MISSING');
   return createPublicClient({ transport: http(rpc, { timeout: 8_000 }) });
 }
 
-async function localRelayer() {
-  if (!localPrivateTestingEnabled())
+function localClient() { return privateClient(31337); }
+
+export async function privateRelayer(chainId: number = 31337) {
+  if (chainId === 31337 && !localPrivateTestingEnabled())
     throw new ApiError(403, 'Local private voting is disabled outside development', 'PRIVATE_TEST_ONLY');
-  const rpc = process.env.PRIVATE_VOTING_RPC_URL;
-  const signer = process.env.PRIVATE_VOTING_SIGNER_PRIVATE_KEY;
+  if (chainId !== 31337 && chainId !== 7368)
+    throw new ApiError(409, 'Unsupported private-voting chain', 'PRIVATE_WRONG_CHAIN');
+  const rpc = chainId === 31337 ? process.env.PRIVATE_VOTING_RPC_URL : process.env.RARIMO_RPC_URL;
+  const signer = chainId === 31337 ? process.env.PRIVATE_VOTING_SIGNER_PRIVATE_KEY
+    : process.env.RARIMO_SIGNER_PRIVATE_KEY;
   if (!rpc || !/^0x[a-fA-F0-9]{64}$/.test(signer ?? ''))
-    throw new ApiError(503, 'Local private-voting relayer is not configured', 'PRIVATE_RELAYER_MISSING');
-  const client = localClient();
-  if (await client.getChainId() !== 31337)
-    throw new ApiError(503, 'Local private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
+    throw new ApiError(503, 'Private-voting relayer is not configured', 'PRIVATE_RELAYER_MISSING');
+  const client = privateClient(chainId);
+  if (await client.getChainId() !== chainId)
+    throw new ApiError(503, 'Private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
   const account = privateKeyToAccount(signer as Hex);
-  const chain = defineChain({ id: 31337, name: 'Local MACI test',
+  const chain = defineChain({ id: chainId, name: chainId === 31337 ? 'Local MACI test' : 'Rarimo L2',
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
     rpcUrls: { default: { http: [rpc] } } });
   const wallet = createWalletClient({ account, chain, transport: http(rpc, { timeout: 8_000 }) });
   return { client, account, wallet };
 }
+
+async function localRelayer() { return privateRelayer(31337); }
 
 export async function validateLocalPrivatePoll(
   input: PrivatePollInput,
@@ -191,14 +199,16 @@ export async function registerLocalTestPublicKey(input: {
 }
 
 export async function findLocalPollJoin(input: {
+  chainId?: number;
   pollAddress: string;
   deploymentBlock: string;
   publicKeyX: bigint;
   publicKeyY: bigint;
 }) {
-  const client = localClient();
-  if (await client.getChainId() !== 31337)
-    throw new ApiError(503, 'Local private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
+  const chainId = input.chainId ?? 31337;
+  const client = privateClient(chainId);
+  if (await client.getChainId() !== chainId)
+    throw new ApiError(503, 'Private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
   const logs = await client.getLogs({ address: input.pollAddress as Address, event: pollVotingAbi[2],
     args: { _pollPublicKeyX: input.publicKeyX, _pollPublicKeyY: input.publicKeyY },
     fromBlock: BigInt(input.deploymentBlock) });
@@ -210,12 +220,13 @@ export async function findLocalPollJoin(input: {
   } : null;
 }
 
-export async function localPollJoiningData(input: { maciAddress: string; deploymentBlock: string }) {
-  if (!localPrivateTestingEnabled())
+export async function localPollJoiningData(input: { chainId?: number; maciAddress: string; deploymentBlock: string }) {
+  const chainId = input.chainId ?? 31337;
+  if (chainId === 31337 && !localPrivateTestingEnabled())
     throw new ApiError(403, 'Local private voting is disabled outside development', 'PRIVATE_TEST_ONLY');
-  const client = localClient();
-  if (await client.getChainId() !== 31337)
-    throw new ApiError(503, 'Local private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
+  const client = privateClient(chainId);
+  if (await client.getChainId() !== chainId)
+    throw new ApiError(503, 'Private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
   const address = input.maciAddress as Address;
   const [depth, totalSignups] = await Promise.all([
     client.readContract({ address, abi: maciAbi, functionName: 'stateTreeDepth' }),
@@ -239,6 +250,7 @@ export async function localPollJoiningData(input: { maciAddress: string; deploym
 }
 
 export async function joinLocalPrivatePoll(input: {
+  chainId?: number;
   pollAddress: string;
   deploymentBlock: string;
   publicKeyX: bigint;
@@ -247,7 +259,7 @@ export async function joinLocalPrivatePoll(input: {
   stateRootIndex: bigint;
   proof: readonly [bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint];
 }) {
-  const { client, account, wallet } = await localRelayer();
+  const { client, account, wallet } = await privateRelayer(input.chainId ?? 31337);
   const previous = await findLocalPollJoin(input);
   if (previous) {
     if (previous.nullifier !== input.nullifier)
@@ -275,12 +287,13 @@ export async function joinLocalPrivatePoll(input: {
 }
 
 export async function publishLocalPrivateMessage(input: {
+  chainId?: number;
   pollAddress: string;
   data: readonly [bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint];
   encryptionPublicKeyX: bigint;
   encryptionPublicKeyY: bigint;
 }) {
-  const { client, account, wallet } = await localRelayer();
+  const { client, account, wallet } = await privateRelayer(input.chainId ?? 31337);
   try {
     const simulation = await client.simulateContract({ account, address: input.pollAddress as Address,
       abi: pollVotingAbi, functionName: 'publishMessage', args: [
@@ -311,12 +324,13 @@ export function checkedPrivateTotals(results: readonly { value: bigint; isSet: b
 }
 
 /** Only values MACI has verified and stored on-chain may become public results. */
-export async function verifiedLocalPrivateTally(input: { tallyAddress: string; candidateCount: number }) {
-  if (!localPrivateTestingEnabled())
+export async function verifiedLocalPrivateTally(input: { chainId?: number; tallyAddress: string; candidateCount: number }) {
+  const chainId = input.chainId ?? 31337;
+  if (chainId === 31337 && !localPrivateTestingEnabled())
     throw new ApiError(403, 'Local private voting is disabled outside development', 'PRIVATE_TEST_ONLY');
-  const client = localClient();
-  if (await client.getChainId() !== 31337)
-    throw new ApiError(503, 'Local private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
+  const client = privateClient(chainId);
+  if (await client.getChainId() !== chainId)
+    throw new ApiError(503, 'Private-voting RPC is on the wrong chain', 'PRIVATE_WRONG_CHAIN');
   const address = input.tallyAddress as Address;
   const [tallied, mode, resultCount, spent, commitment] = await Promise.all([
     client.readContract({ address, abi: tallyAbi, functionName: 'isTallied' }),

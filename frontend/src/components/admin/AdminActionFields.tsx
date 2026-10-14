@@ -245,11 +245,17 @@ export default function AdminActionFields({
   if (action === 'configurePrivatePoll')
     return (
       <fieldset>
-        <legend>Local MACI deployment</legend>
-          <p>Chain ID 31337 only. The server verifies the MACI poll, signup gate, candidate count, election dates, coordinator key, non-quadratic mode, and 100 voice credits before saving. Activation permits local testing only; no final result is shown before proof verification.</p>
+        <legend>MACI deployment</legend>
+        <p>Choose local mock testing or Rarimo L2 proof verification. The server checks the MACI poll, gate, dates, candidate count, non-quadratic mode, 100 voice credits, and Rarimo verifier bytecode before saving.</p>
+        <label>Verification chain
+          <select name="chainId" defaultValue={selected?.privatePoll?.chainId ?? 31337}>
+            <option value="31337">Local test · chain 31337</option>
+            <option value="7368">Rarimo L2 · chain 7368</option>
+          </select>
+        </label>
         {([['maciAddress', 'MACI contract'], ['pollAddress', 'Poll contract'],
           ['tallyAddress', 'Tally contract'], ['messageProcessorAddress', 'Message processor'],
-          ['pollId', 'Poll ID'], ['gateAddress', 'Local test gate'],
+          ['pollId', 'Poll ID'], ['gateAddress', 'Eligibility gate'],
           ['voiceCreditProxyAddress', 'Voice-credit proxy'],
           ['deploymentBlock', 'Deployment block']] as const).map(([name, label]) => (
           <label key={name}>

@@ -430,6 +430,10 @@
 }
 .private-step textarea { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; overflow-wrap: anywhere; }
 .private-step .button { justify-self: start; max-width: 100%; }
+.rarimo-registration { display: grid; gap: 12px; }
+.rarimo-registration > a { display: inline-flex; justify-self: start; padding: 10px; background: #fff; border-radius: 14px; }
+.rarimo-registration > a svg { max-width: min(210px, 62vw); height: auto; }
+.private-ballot-flow .agreement-text { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: .86rem; line-height: 1.6; max-height: 260px; overflow-y: auto; }
 
 .private-results { display: grid; gap: 18px; }
 .private-results-list { display: grid; gap: 14px; }

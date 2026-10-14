@@ -11,14 +11,14 @@ function commandField(value: number | string, name: string) {
 export function createMaciDeviceKey() {
   const pair = new Keypair();
   const publicKey = pair.publicKey.asContractParam();
-  return { privateKey: pair.privateKey.serialize(), publicKeyX: publicKey.x,
-    publicKeyY: publicKey.y };
+  return { privateKey: pair.privateKey.serialize(), publicKeyX: publicKey.x.toString(),
+    publicKeyY: publicKey.y.toString() };
 }
 
 export function publicKeyForPrivateKey(serialized: string) {
   const pair = new Keypair(PrivateKey.deserialize(serialized));
   const publicKey = pair.publicKey.asContractParam();
-  return { publicKeyX: publicKey.x, publicKeyY: publicKey.y };
+  return { publicKeyX: publicKey.x.toString(), publicKeyY: publicKey.y.toString() };
 }
 
 /** A signed MACI command is encrypted on the device. Only ciphertext leaves this function. */
@@ -45,6 +45,7 @@ export function encryptMaciVote(input: {
   const shared = Keypair.generateEcdhSharedKey(ephemeral.privateKey, coordinator);
   const message = command.encrypt(command.sign(voter.privateKey), shared);
   const encryptionPublicKey = ephemeral.publicKey.asContractParam();
-  return { data: message.asContractParam().data, encryptionPublicKeyX: encryptionPublicKey.x,
-    encryptionPublicKeyY: encryptionPublicKey.y };
+  return { data: message.asContractParam().data.map((value) => value.toString()),
+    encryptionPublicKeyX: encryptionPublicKey.x.toString(),
+    encryptionPublicKeyY: encryptionPublicKey.y.toString() };
 }

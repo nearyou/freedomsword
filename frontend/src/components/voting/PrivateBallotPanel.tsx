@@ -1,13 +1,17 @@
 'use client';
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import type { CitizenView, ElectionView } from '@frontend/lib/contracts';
 import { api, ClientApiError } from '@frontend/lib/client-api';
 import type { MaciJoiningData } from '@frontend/lib/maci-join';
+import { publicKeyForPrivateKey } from '@frontend/lib/maci-device';
 
 type DeviceBackup = { electionId: string; privateKey: string; pollStateIndex: number | null; nonce: number };
 type Registration = { registered: true; stateIndex: number; signupTxHash: string };
 type Join = { joined: true; pollStateIndex: number; joinTxHash: string };
 type Submission = { submitted: true; counted: false; txHash: string };
+const RarimoRegistration = dynamic(() => import('./RarimoRegistration'), { ssr: false });
+const RarimoAgreement = dynamic(() => import('./RarimoAgreement'), { ssr: false });
 
 function storageKey(electionId: string) { return `freedomsword:maci-local:${electionId}`; }
 function readBackup(electionId: string): DeviceBackup | null {
@@ -38,6 +42,11 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
   const [uncertain, setUncertain] = useState(false);
   const poll = election.privatePoll;
   const registration = citizen.privateRegistrations?.find((item) => item.electionId === election.id);
+  let devicePublicKey: { publicKeyX: string; publicKeyY: string } | null = null;
+  if (device) {
+    try { devicePublicKey = publicKeyForPrivateKey(device.privateKey); }
+    catch { /* A damaged backup cannot be used for Rarimo registration. */ }
+  }
 
   function save(next: DeviceBackup) {
     sessionStorage.setItem(storageKey(election.id), JSON.stringify(next));
@@ -56,12 +65,16 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
       <p>This election does not yet have a configured MACI poll. Private voting is unavailable.</p>
     </div>
   );
-  if (poll.registrationMode !== 'LOCAL_TEST' || poll.chainId !== 31337) return (
+  if (!((poll.registrationMode === 'LOCAL_TEST' && poll.chainId === 31337) ||
+    (poll.registrationMode === 'RARIMO' && poll.chainId === 7368))) return (
     <div className="panel ballot-panel empty-state">
       <h3>Private ballot</h3>
       <p>Rarimo eligibility and private voting are not yet available for this election.</p>
     </div>
   );
+  const rarimo = poll.registrationMode === 'RARIMO';
+  const connected = rarimo ? citizen.connected : ready;
+  const agreementReady = rarimo ? citizen.agreementSigned : ready;
   const wasmUrl = process.env.NEXT_PUBLIC_MACI_JOIN_WASM_URL;
   const zkeyUrl = process.env.NEXT_PUBLIC_MACI_JOIN_ZKEY_URL;
   const active = election.status === 'ACTIVE' &&
@@ -69,10 +82,12 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
     now < new Date(election.closesAt).getTime();
   return (
     <div className="panel ballot-panel private-ballot-flow">
-      <div className="panel-heading"><h3>Private ballot</h3><span className="status-badge">LOCAL TEST</span></div>
-      <p>Eligibility is bypassed for this local test. A trusted MACI coordinator can decrypt votes; the public cannot see your choice. A submitted message is not a counted vote until the final proof is verified.</p>
-      {!ready && <button className="button primary" onClick={onPassport}>Complete Citizen Passport</button>}
-      {ready && !device && <div className="private-step">
+      <div className="panel-heading"><h3>Private ballot</h3><span className="status-badge">{rarimo ? 'RARIMO' : 'LOCAL TEST'}</span></div>
+      <p>{rarimo ? 'Rarimo proves eligibility before MACI registration.' : 'Eligibility is bypassed for this local test.'} A trusted MACI coordinator can decrypt votes; the public cannot see your choice. A submitted message is not a counted vote until the final proof is verified.</p>
+      {!connected && <button className="button primary" onClick={onPassport}>
+        {rarimo ? 'Connect Telegram' : 'Complete Citizen Passport'}
+      </button>}
+      {connected && !device && <div className="private-step">
         <h4>1. Create or restore your MACI key</h4>
         <p>The private key stays in this browser session. Keep a backup to change your vote later.</p>
         <button className="button primary" disabled={busy} onClick={() => void run(async () => {
@@ -107,7 +122,7 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
             setImportText('');
           })}>Restore key</button>
       </div>}
-      {ready && device && <>
+      {connected && device && <>
         <div className="private-step">
           <h4>1. Back up your MACI key</h4>
           <button className="button secondary" onClick={() => setShowBackup((value) => !value)}>
@@ -119,16 +134,22 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
         </div>
         <div className="private-step">
           <h4>2. Register and join</h4>
-          <p>{registration ? 'MACI key registered on the local chain.' : 'Register your public key after mock eligibility and agreement.'}</p>
-          {!registration && <button className="button primary" disabled={busy} onClick={() => void run(async () => {
+          <p>{registration ? `MACI key registered on ${rarimo ? 'Rarimo L2' : 'the local chain'}.` : rarimo
+            ? 'Verify with Rarimo to register this public key.' : 'Register your public key after mock eligibility and agreement.'}</p>
+          {!registration && rarimo && devicePublicKey && <RarimoRegistration electionId={election.id}
+            publicKeyX={devicePublicKey.publicKeyX} publicKeyY={devicePublicKey.publicKeyY}
+            onRegistered={onRefresh} />}
+          {!devicePublicKey && <p role="alert">This MACI key backup is invalid. Restore a valid backup before registering.</p>}
+          {!registration && !rarimo && <button className="button primary" disabled={busy} onClick={() => void run(async () => {
             const { publicKeyForPrivateKey } = await import('@frontend/lib/maci-device');
             const publicKey = publicKeyForPrivateKey(device.privateKey);
             await api<Registration>('private/register', { electionId: election.id, ...publicKey });
             await onRefresh();
             setNotice('Public key registered. Your private key stayed on this device.');
           })}>Register public key</button>}
-          {registration && device.pollStateIndex === null && <>
-            {!wasmUrl || !zkeyUrl ? <p>Poll-join proof artifacts are not configured for this local test.</p> :
+          {registration && rarimo && !agreementReady && <RarimoAgreement onAccepted={onRefresh} />}
+          {registration && agreementReady && device.pollStateIndex === null && <>
+            {!wasmUrl || !zkeyUrl ? <p>Poll-join proof artifacts are not configured for this election.</p> :
               <button className="button primary" disabled={busy}
                 onClick={() => void run(async () => {
                   const { publicKeyForPrivateKey } = await import('@frontend/lib/maci-device');
@@ -157,7 +178,7 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
               })}
             </select>
           </label>
-          <button className="button primary" disabled={busy || !active || !candidateId ||
+          <button className="button primary" disabled={busy || !agreementReady || !active || !candidateId ||
             device.pollStateIndex === null || uncertain}
             onClick={() => void run(async () => {
               if (device.pollStateIndex === null) throw new Error('Join the poll first');
@@ -185,7 +206,7 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
               }
             })}>Submit encrypted 100-unit vote</button>
           {!active && <p>Encrypted voting is available only during the poll window.</p>}
-          {uncertain && <p>Submission status is uncertain. Check the local chain before submitting another command with this nonce.</p>}
+          {uncertain && <p>Submission status is uncertain. Check the poll transaction before submitting another command with this nonce.</p>}
           <p>You may submit another choice while voting is open. Each confirmed message advances your private nonce.</p>
         </div>
       </>}

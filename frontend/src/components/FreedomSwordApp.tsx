@@ -202,7 +202,9 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
           </span>
         </div>
         <p className="elections-demo-note">
-          <strong>DEMO</strong> Fictional elections · mock identity and blockchain
+          {election?.protocol === 'MACI_PRIVATE' && election.privatePoll?.registrationMode === 'RARIMO'
+            ? <><strong>PRIVATE POLL</strong> Fictional election · Rarimo eligibility on chain 7368</>
+            : <><strong>DEMO</strong> Fictional elections · mock identity and blockchain</>}
         </p>
         {refreshError && (
           <div className="refresh-banner" role="status">

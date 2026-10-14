@@ -40,7 +40,7 @@ const config: NextConfig = {
             value:
               "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://telegram.org" +
               (process.env.NODE_ENV !== 'production' ? " 'unsafe-eval'" : '') +
-              "; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; frame-ancestors https://web.telegram.org https://*.telegram.org; base-uri 'self'; form-action 'self'; object-src 'none'",
+              "; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.app.rarime.com; worker-src 'self' blob:; frame-ancestors https://web.telegram.org https://*.telegram.org; base-uri 'self'; form-action 'self'; object-src 'none'",
           },
         ],
       },

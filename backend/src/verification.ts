@@ -37,6 +37,9 @@ export async function requireVerified(tx: Prisma.TransactionClient, userId: stri
 }
 export async function requireEligibility(tx: Prisma.TransactionClient, userId: string) {
   await requireVerified(tx, userId);
+  await requireCurrentAgreement(tx, userId);
+}
+export async function requireCurrentAgreement(tx: Prisma.TransactionClient, userId: string) {
   const agreement = await tx.voterAgreement.findUnique({
     where: {
       userId_documentId_version: { userId, documentId: 'citizen', version: AGREEMENT_VERSION },
@@ -131,7 +134,12 @@ export async function signCitizenAgreement(user: User, textHash: string) {
     throw new ApiError(409, 'Agreement changed; review the current version');
   return serializable(async (tx) => {
     await lockCitizen(tx, user.id);
-    await requireVerified(tx, user.id);
+    const rarimoRegistration = await tx.privateRegistration.findFirst({
+      where: { userId: user.id, signupTxHash: { not: null },
+        election: { privatePoll: { is: { registrationMode: 'RARIMO' } } } },
+      select: { id: true },
+    });
+    if (!rarimoRegistration) await requireVerified(tx, user.id);
     const key = { userId: user.id, documentId: 'citizen', version: AGREEMENT_VERSION };
     const existing = await tx.voterAgreement.findUnique({
       where: { userId_documentId_version: key },
