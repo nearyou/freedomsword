@@ -38,17 +38,6 @@ contract LocalMaciTestGateTest {
         gate.setMaci(address(maci));
     }
 
-    function testLocalSignupUsesGateAndCannotRepeat() public {
-        vm.prank(address(0xBEEF));
-        gate.signUp(IMaciSignup.PublicKey(1, 2));
-        require(maci.signups() == 1 && maci.lastX() == 1, "signup not forwarded");
-        vm.prank(address(0xBEEF));
-        try gate.signUp(IMaciSignup.PublicKey(3, 4)) {
-            revert("duplicate signup accepted");
-        } catch {}
-        require(maci.signups() == 1, "duplicate changed state");
-    }
-
     function testDirectSignupAndPolicyBypassFail() public {
         try maci.signUp(IMaciSignup.PublicKey(1, 2), "") {
             revert("direct MACI signup accepted");
@@ -81,5 +70,33 @@ contract LocalMaciTestGateTest {
             blocked = true;
         }
         require(blocked && address(unconfigured.maci()) == address(0), "EOA target accepted");
+    }
+
+    function testOwnerCanRelayDistinctLocalCitizensOnlyOnce() public {
+        bytes32 first = keccak256("first test citizen");
+        bytes32 second = keccak256("second test citizen");
+        gate.signUpFor(first, IMaciSignup.PublicKey(1, 2));
+        gate.signUpFor(second, IMaciSignup.PublicKey(3, 4));
+        require(maci.signups() == 2 && maci.lastX() == 3, "distinct citizens were not registered");
+        bool blocked;
+        try gate.signUpFor(first, IMaciSignup.PublicKey(5, 6)) {
+            blocked = false;
+        } catch {
+            blocked = true;
+        }
+        require(blocked && maci.signups() == 2, "reused nullifier registered");
+        try gate.signUpFor(keccak256("different nullifier"), IMaciSignup.PublicKey(3, 4)) {
+            blocked = false;
+        } catch {
+            blocked = true;
+        }
+        require(blocked && maci.signups() == 2, "reused public key registered");
+        vm.prank(address(0xBEEF));
+        try gate.signUpFor(keccak256("third"), IMaciSignup.PublicKey(7, 8)) {
+            blocked = false;
+        } catch {
+            blocked = true;
+        }
+        require(blocked && maci.signups() == 2, "untrusted relayer registered");
     }
 }

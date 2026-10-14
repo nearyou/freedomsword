@@ -9,6 +9,7 @@ import { appendAudit } from './audit';
 import { effectiveElectionStatus } from '@backend/core/lifecycle';
 import { databaseNow } from './database-time';
 import { chainElectionKey } from './chain/action';
+import { validateLocalPrivatePoll, type PrivatePollInput } from './private-poll-chain';
 
 const id = z.string().min(1).max(100);
 const text = z.string().trim().min(1).max(2000);
@@ -32,6 +33,12 @@ export const adminCommand = z.discriminatedUnion('action', [
     recallCooldownSeconds: z.number().int().min(0).max(31_536_000),
     maxRecallOperations: z.number().int().min(1).max(100).nullable(),
   }).strict(),
+  z.object({ action: z.literal('configurePrivatePoll'), electionId: id,
+    chainId: z.number().int().positive(),
+    maciAddress: z.string(), pollAddress: z.string(), tallyAddress: z.string(),
+    messageProcessorAddress: z.string(), pollId: z.string(), gateAddress: z.string(),
+    voiceCreditProxyAddress: z.string(), deploymentBlock: z.string(),
+  }).strict(),
 ]);
 export type AdminCommand = z.infer<typeof adminCommand>;
 
@@ -53,6 +60,11 @@ export async function adminElections() {
       closesAt: true, recallEnabled: true, fullRecallEnabled: true,
       partialRecallEnabled: true, partialRecallAmount: true,
       firstRecallDelaySeconds: true, recallCooldownSeconds: true, maxRecallOperations: true,
+      privatePoll: { select: { chainId: true, maciAddress: true, pollAddress: true,
+        tallyAddress: true, messageProcessorAddress: true, pollId: true,
+        gateAddress: true, voiceCreditProxyAddress: true, deploymentBlock: true,
+        coordinatorPublicKeyX: true, coordinatorPublicKeyY: true, candidateIds: true,
+        registrationMode: true } },
       candidates: {
         select: {
           id: true, fullName: true, party: true, ideology: true, bio: true, color: true,
@@ -65,13 +77,28 @@ export async function adminElections() {
 }
 
 export async function administer(userId: string, input: AdminCommand) {
+  let validatedPrivatePoll: { coordinatorPublicKeyX: string; coordinatorPublicKeyY: string; candidateIds: string[]; opensAt: number; closesAt: number } | undefined;
+  if (input.action === 'configurePrivatePoll') {
+    const draft = await db.election.findUnique({
+      where: { id: input.electionId },
+      include: { candidates: { where: { withdrawn: false }, orderBy: { id: 'asc' }, select: { id: true } } },
+    });
+    if (!draft || draft.protocol !== 'MACI_PRIVATE' || draft.status !== 'DRAFT' || draft.candidates.length < 2)
+      throw new ApiError(409, 'Configure a draft private election with at least two candidates');
+    const keys = await validateLocalPrivatePoll(input as PrivatePollInput, {
+      opensAt: draft.opensAt, closesAt: draft.closesAt, candidateCount: draft.candidates.length,
+    });
+    validatedPrivatePoll = { ...keys, candidateIds: draft.candidates.map((c) => c.id),
+      opensAt: draft.opensAt.getTime(), closesAt: draft.closesAt.getTime() };
+  }
   return serializable(async (tx) => {
     if (input.action === 'create') {
       if (new Date(input.closesAt) <= new Date(input.opensAt) || new Date(input.opensAt) <= new Date())
         throw new ApiError(400, 'Choose a future start before the end');
       const election = await tx.election.create({
         data: { id: randomUUID(), title: input.title, description: input.description,
-          type: input.type, protocol: input.protocol ?? 'LEGACY_RECALL', opensAt: new Date(input.opensAt), closesAt: new Date(input.closesAt), status: 'DRAFT' },
+          type: input.type, protocol: input.protocol ?? 'LEGACY_RECALL', opensAt: new Date(input.opensAt), closesAt: new Date(input.closesAt), status: 'DRAFT',
+          recallEnabled: input.protocol !== 'MACI_PRIVATE', partialRecallEnabled: input.protocol !== 'MACI_PRIVATE', fullRecallEnabled: input.protocol !== 'MACI_PRIVATE' },
       });
       await appendAudit(tx, JSON.stringify({ action: 'ADMIN_CREATE_ELECTION', actor: userId, electionId: election.id }), election.id);
       return { electionId: election.id, status: election.status };
@@ -86,6 +113,7 @@ export async function administer(userId: string, input: AdminCommand) {
     const current = effectiveElectionStatus(election, now);
     const editable = current === 'DRAFT' &&
       (await tx.vote.count({ where: { electionId: election.id } })) === 0;
+    const configured = await tx.privatePoll.findUnique({ where: { electionId: election.id } });
     if (input.action === 'close') {
       if (current !== 'ACTIVE') throw new ApiError(409, 'Only an active election can be closed');
       await tx.election.update({ where: { id: election.id }, data: { status: 'FINISHED' } });
@@ -98,6 +126,7 @@ export async function administer(userId: string, input: AdminCommand) {
       if (!editable) throw new ApiError(409, 'Election can no longer be changed');
       switch (input.action) {
         case 'edit': {
+          if (configured) throw new ApiError(409, 'Private poll timing is frozen after configuration');
           if (new Date(input.closesAt) <= new Date(input.opensAt) || new Date(input.opensAt) <= new Date())
             throw new ApiError(400, 'Choose a future start before the end');
           await tx.election.update({ where: { id: election.id }, data: {
@@ -107,11 +136,13 @@ export async function administer(userId: string, input: AdminCommand) {
           break;
         }
         case 'addCandidate':
+          if (configured) throw new ApiError(409, 'Private poll candidates are frozen after configuration');
           await tx.candidate.create({ data: { id: randomUUID(), electionId: election.id,
             fullName: input.fullName, party: input.party, ideology: input.ideology,
             bio: input.bio, color: input.color } });
           break;
         case 'removeCandidate': {
+          if (configured) throw new ApiError(409, 'Private poll candidates are frozen after configuration');
           const changed = await tx.candidate.updateMany({ where: { id: input.candidateId, electionId: election.id, withdrawn: false }, data: { withdrawn: true } });
           if (changed.count !== 1) throw new ApiError(404, 'Candidate not found');
           break;
@@ -145,6 +176,7 @@ export async function administer(userId: string, input: AdminCommand) {
           break;
         }
         case 'recallPolicy':
+          if (election.protocol === 'MACI_PRIVATE') throw new ApiError(409, 'MACI polls do not use recall policies');
           await tx.election.update({ where: { id: election.id }, data: {
             recallEnabled: input.recallEnabled,
             fullRecallEnabled: input.fullRecallEnabled,
@@ -155,6 +187,26 @@ export async function administer(userId: string, input: AdminCommand) {
             maxRecallOperations: input.maxRecallOperations,
           } });
           break;
+        case 'configurePrivatePoll': {
+          if (!validatedPrivatePoll || configured) throw new ApiError(409, 'Private poll is already configured');
+          const candidates = await tx.candidate.findMany({ where: { electionId: election.id, withdrawn: false }, orderBy: { id: 'asc' }, select: { id: true } });
+          if (election.protocol !== 'MACI_PRIVATE' || election.opensAt.getTime() !== validatedPrivatePoll.opensAt ||
+            election.closesAt.getTime() !== validatedPrivatePoll.closesAt ||
+            candidates.map((c) => c.id).join(',') !== validatedPrivatePoll.candidateIds.join(','))
+            throw new ApiError(409, 'Election changed while its private poll was being verified');
+          await tx.privatePoll.create({ data: {
+            electionId: election.id, registrationMode: 'LOCAL_TEST',
+            chainId: input.chainId, maciAddress: input.maciAddress, pollAddress: input.pollAddress,
+            tallyAddress: input.tallyAddress, messageProcessorAddress: input.messageProcessorAddress,
+            pollId: input.pollId, gateAddress: input.gateAddress,
+            voiceCreditProxyAddress: input.voiceCreditProxyAddress,
+            deploymentBlock: input.deploymentBlock,
+            coordinatorPublicKeyX: validatedPrivatePoll.coordinatorPublicKeyX,
+            coordinatorPublicKeyY: validatedPrivatePoll.coordinatorPublicKeyY,
+            candidateIds: validatedPrivatePoll.candidateIds,
+          } });
+          break;
+        }
       }
     }
     await appendAudit(tx, JSON.stringify({ action: `ADMIN_${input.action}`, actor: userId,

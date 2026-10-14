@@ -23,6 +23,9 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
           firstRecallDelaySeconds: true,
           recallCooldownSeconds: true,
           maxRecallOperations: true,
+          privatePoll: { select: { chainId: true, maciAddress: true, pollAddress: true,
+            pollId: true, coordinatorPublicKeyX: true, coordinatorPublicKeyY: true,
+            deploymentBlock: true, candidateIds: true, registrationMode: true } },
           candidates: {
             where: { withdrawn: false },
             orderBy: { id: 'asc' },
@@ -74,6 +77,7 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
           description: e.description,
           type: e.type,
           protocol: e.protocol,
+          privatePoll: e.protocol === 'MACI_PRIVATE' ? e.privatePoll : null,
           status: effectiveElectionStatus(e, new Date()),
           opensAt: e.opensAt.toISOString(),
           closesAt: e.closesAt.toISOString(),

@@ -43,6 +43,11 @@ export async function GET(request: Request) {
         },
       },
     });
+    const privateRegistrations = await db.privateRegistration.findMany({
+      where: { userId: user.id },
+      select: { electionId: true, publicKeyX: true, publicKeyY: true,
+        signupTxHash: true, stateIndex: true },
+    });
     return json({
       connected: true,
       verified: !!verification?.verified && verification.expiresAt > new Date(),
@@ -64,6 +69,7 @@ export async function GET(request: Request) {
         recallCount: vote._count.events,
         lastRecallAt: vote.events[0]?.createdAt.toISOString() ?? null,
       })),
+      privateRegistrations,
     });
   });
 }

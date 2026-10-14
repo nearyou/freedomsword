@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto';
 
-export type MetricAction = 'auth' | 'vote' | 'recall' | 'outbox';
+export type MetricAction = 'auth' | 'vote' | 'recall' | 'private-register' | 'outbox';
 export type ErrorCategory = 'none' | 'authentication' | 'authorization' | 'validation' |
   'conflict' | 'rate_limit' | 'dependency' | 'internal';
 export type MetricOutcome = 'success' | 'failure';
-const actions = new Set<MetricAction>(['auth', 'vote', 'recall', 'outbox']);
+const actions = new Set<MetricAction>(['auth', 'vote', 'recall', 'private-register', 'outbox']);
 const outcomes = new Set<MetricOutcome>(['success', 'failure']);
 const categories = new Set<ErrorCategory>(['none', 'authentication', 'authorization', 'validation',
   'conflict', 'rate_limit', 'dependency', 'internal']);

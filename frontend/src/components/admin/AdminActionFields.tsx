@@ -36,6 +36,15 @@ export default function AdminActionFields({
             <option value="COMMUNITY">Community representative</option>
           </select>
         </label>
+        {action === 'create' && (
+          <label>
+            Voting protocol
+            <select name="protocol" defaultValue="LEGACY_RECALL">
+              <option value="LEGACY_RECALL">Legacy demonstration · recall</option>
+              <option value="MACI_PRIVATE">Private MACI · setup required</option>
+            </select>
+          </label>
+        )}
         <div className="form-row">
           <label>
             Start time · your local time
@@ -231,6 +240,23 @@ export default function AdminActionFields({
             />
           </label>
         </div>
+      </fieldset>
+    );
+  if (action === 'configurePrivatePoll')
+    return (
+      <fieldset>
+        <legend>Local MACI deployment</legend>
+        <p>Chain ID 31337 only. The server verifies the MACI poll, signup gate, candidate count, election dates, coordinator key, non-quadratic mode, and 100 voice credits before saving. Private voting stays disabled until the complete encrypted ballot flow is ready.</p>
+        {([['maciAddress', 'MACI contract'], ['pollAddress', 'Poll contract'],
+          ['tallyAddress', 'Tally contract'], ['messageProcessorAddress', 'Message processor'],
+          ['pollId', 'Poll ID'], ['gateAddress', 'Local test gate'],
+          ['voiceCreditProxyAddress', 'Voice-credit proxy'],
+          ['deploymentBlock', 'Deployment block']] as const).map(([name, label]) => (
+          <label key={name}>
+            {label}
+            <input name={name} required autoComplete="off" defaultValue={selected?.privatePoll?.[name] ?? ''} />
+          </label>
+        ))}
       </fieldset>
     );
   return (

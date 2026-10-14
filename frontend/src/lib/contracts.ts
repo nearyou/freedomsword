@@ -32,6 +32,17 @@ export interface ElectionView {
   description: string;
   type: string;
   protocol?: 'LEGACY_RECALL' | 'MACI_PRIVATE';
+  privatePoll?: {
+    chainId: number;
+    maciAddress: string;
+    pollAddress: string;
+    pollId: string;
+    coordinatorPublicKeyX: string;
+    coordinatorPublicKeyY: string;
+    deploymentBlock: string;
+    candidateIds: string[];
+    registrationMode: 'LOCAL_TEST' | 'RARIMO';
+  } | null;
   status: string;
   recallPolicy?: {
     enabled: boolean;
@@ -62,6 +73,13 @@ export interface CitizenView {
     castAt?: string;
     recallCount?: number;
     lastRecallAt?: string | null;
+  }[];
+  privateRegistrations?: {
+    electionId: string;
+    publicKeyX: string;
+    publicKeyY: string;
+    signupTxHash: string | null;
+    stateIndex: number | null;
   }[];
 }
 export interface AuditView {

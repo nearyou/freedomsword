@@ -14,6 +14,7 @@ import { GET as healthGet } from './routes/health';
 import { POST as logoutPost } from './routes/logout';
 import { GET as meGet } from './routes/me';
 import { POST as platformSignPost } from './routes/platform-sign';
+import { POST as privateRegisterPost } from './routes/private-register';
 import { GET as readyGet } from './routes/ready';
 import { POST as recallPost } from './routes/recall';
 import { POST as verifyPost } from './routes/verify';
@@ -92,6 +93,7 @@ const routes: Array<[string, Partial<Record<'get' | 'post', Handler | ParameterH
   ['/api/logout', { post: logoutPost }],
   ['/api/me', { get: meGet }],
   ['/api/platform/sign', { post: platformSignPost }],
+  ['/api/private/register', { post: privateRegisterPost }],
   ['/api/ready', { get: readyGet }],
   ['/api/recall', { post: recallPost }],
   ['/api/verify', { post: verifyPost }],

@@ -32,6 +32,17 @@ export interface ElectionView {
   description: string;
   type: string;
   protocol: 'LEGACY_RECALL' | 'MACI_PRIVATE';
+  privatePoll?: {
+    chainId: number;
+    maciAddress: string;
+    pollAddress: string;
+    pollId: string;
+    coordinatorPublicKeyX: string;
+    coordinatorPublicKeyY: string;
+    deploymentBlock: string;
+    candidateIds: string[];
+    registrationMode: 'LOCAL_TEST' | 'RARIMO';
+  } | null;
   status: string;
   recallPolicy?: {
     enabled: boolean;

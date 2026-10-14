@@ -26,6 +26,11 @@ enum ElectionProtocol {
   MACI_PRIVATE
 }
 
+enum PrivateRegistrationMode {
+  LOCAL_TEST
+  RARIMO
+}
+
 enum AdminRole {
   ELECTION_MANAGER
 }
@@ -69,6 +74,7 @@ model User {
   agreements     VoterAgreement[]
   credentials    VotingCredential[]
   adminGrants    AdminGrant[]
+  privateRegistrations PrivateRegistration[]
 }
 
 model AdminGrant {
@@ -153,6 +159,47 @@ model Election {
   votes                   Vote[]
   credentials             VotingCredential[]
   auditEvents             AuditEvent[]
+  privatePoll             PrivatePoll?
+  privateRegistrations    PrivateRegistration[]
+}
+
+model PrivatePoll {
+  electionId             String @id @map("_id")
+  election               Election @relation(fields: [electionId], references: [id])
+  registrationMode        PrivateRegistrationMode
+  chainId                 Int
+  maciAddress             String
+  pollAddress             String
+  tallyAddress            String
+  messageProcessorAddress String
+  pollId                  String
+  gateAddress             String
+  voiceCreditProxyAddress String
+  coordinatorPublicKeyX   String
+  coordinatorPublicKeyY   String
+  deploymentBlock         String
+  candidateIds            String[]
+  createdAt               DateTime @default(now())
+
+  @@unique([chainId, maciAddress, pollId])
+}
+
+model PrivateRegistration {
+  id                    String @id @default(uuid()) @map("_id")
+  userId                String
+  user                  User @relation(fields: [userId], references: [id])
+  electionId            String
+  election              Election @relation(fields: [electionId], references: [id])
+  eligibilityCommitment String
+  publicKeyX            String
+  publicKeyY            String
+  signupTxHash          String?
+  stateIndex            Int?
+  createdAt             DateTime @default(now())
+
+  @@unique([userId, electionId])
+  @@unique([electionId, eligibilityCommitment])
+  @@unique([electionId, publicKeyX, publicKeyY])
 }
 
 model Candidate {

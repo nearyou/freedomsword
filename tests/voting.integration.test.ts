@@ -27,6 +27,7 @@ import { MongoRateLimitStore } from '../backend/src/rate-limit';
 import { MongoCommitmentOutboxStore } from '../backend/src/outbox-store';
 import { appendAudit } from '../backend/src/audit';
 import { GET as adminMetrics } from '../backend/src/routes/admin-metrics';
+import { POST as privateRegister } from '../backend/src/routes/private-register';
 import { verifyDatabaseEvidence } from '../backend/src/integrity-check';
 if (process.env.INTEGRATION_TEST !== 'true')
   throw new Error('Run npm run test:integration to use an isolated temporary database');
@@ -78,6 +79,26 @@ it('isolates a private election from plaintext ballots and live transparency', a
   expect(shown?.protocol).toBe('MACI_PRIVATE');
   expect(shown?.candidates[0].units).toBe(0);
   expect((await publicTransparency(new Request('http://127.0.0.1:3000'), id)).status).toBe(409);
+  const registerRequest = new Request('http://127.0.0.1:3000/api/private/register', {
+    method: 'POST',
+    headers: {
+      origin: 'http://127.0.0.1:3000', 'content-type': 'application/json',
+      cookie: `${sessionCookieName()}=${createSession(citizen.id, citizen.sessionVersion, secret('SESSION_SECRET'))}`,
+    },
+    body: JSON.stringify({ electionId: id, publicKeyX: '1', publicKeyY: '2' }),
+  });
+  expect((await privateRegister(registerRequest)).status).toBe(409);
+  const draft = await administer(citizen.id, { action: 'create', title: 'Private draft',
+    description: 'Test only', type: 'COUNCIL', protocol: 'MACI_PRIVATE',
+    opensAt: '2032-01-01T00:00:00Z', closesAt: '2032-02-01T00:00:00Z' });
+  const saved = await db.election.findUniqueOrThrow({ where: { id: draft.electionId } });
+  expect(saved.recallEnabled).toBe(false);
+  await expect(administer(citizen.id, { action: 'activate', electionId: draft.electionId }))
+    .rejects.toThrow('Private elections require');
+  await expect(administer(citizen.id, { action: 'recallPolicy', electionId: draft.electionId,
+    recallEnabled: true, fullRecallEnabled: true, partialRecallEnabled: true,
+    partialRecallAmount: 25, firstRecallDelaySeconds: 0,
+    recallCooldownSeconds: 0, maxRecallOperations: null })).rejects.toThrow('do not use recall');
 });
 
 it('requires an explicit election manager grant and audits each management action', async () => {

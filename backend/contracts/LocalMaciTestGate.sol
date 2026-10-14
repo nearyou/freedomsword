@@ -17,11 +17,15 @@ contract LocalMaciTestGate {
     error AlreadyRegistered();
     error MaciNotConfigured();
     error InvalidTarget();
+    error InvalidNullifier();
     error Unauthorized();
 
     address public immutable owner;
     IMaciSignup public maci;
-    mapping(address => bool) public registered;
+    mapping(bytes32 => bool) public usedTestNullifiers;
+    mapping(bytes32 => bool) public usedPublicKeys;
+
+    event LocalTestSignup(bytes32 indexed testNullifier, uint256 publicKeyX, uint256 publicKeyY);
 
     constructor() {
         if (block.chainid != 31337) revert LocalChainOnly();
@@ -35,11 +39,19 @@ contract LocalMaciTestGate {
         maci = IMaciSignup(maci_);
     }
 
-    function signUp(IMaciSignup.PublicKey calldata publicKey) external {
+    /// @notice Local-only relayed signup for a distinct test citizen.
+    /// The owner is trusted to issue opaque one-use nullifiers; this does not prove personhood.
+    function signUpFor(bytes32 testNullifier, IMaciSignup.PublicKey calldata publicKey) external {
+        if (msg.sender != owner) revert Unauthorized();
         if (address(maci) == address(0)) revert MaciNotConfigured();
-        if (registered[msg.sender]) revert AlreadyRegistered();
-        registered[msg.sender] = true;
+        if (testNullifier == bytes32(0)) revert InvalidNullifier();
+        if (usedTestNullifiers[testNullifier]) revert AlreadyRegistered();
+        bytes32 publicKeyHash = keccak256(abi.encode(publicKey.x, publicKey.y));
+        if (usedPublicKeys[publicKeyHash]) revert AlreadyRegistered();
+        usedTestNullifiers[testNullifier] = true;
+        usedPublicKeys[publicKeyHash] = true;
         maci.signUp(publicKey, "");
+        emit LocalTestSignup(testNullifier, publicKey.x, publicKey.y);
     }
 }
 

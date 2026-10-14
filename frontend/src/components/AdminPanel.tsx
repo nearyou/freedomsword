@@ -9,6 +9,7 @@ import {
   SlidersHorizontal,
   Play,
   ShieldCheck,
+  LockKeyhole,
   RefreshCw,
 } from 'lucide-react';
 import ThemeControl from './ThemeControl';
@@ -32,6 +33,7 @@ const sections: { name: string; icon: typeof Users; actions: AdminAction[] }[] =
   { name: 'Platforms', icon: FileText, actions: ['platform'] },
   { name: 'Promises', icon: CheckCheck, actions: ['promise'] },
   { name: 'Recall policy', icon: SlidersHorizontal, actions: ['recallPolicy'] },
+  { name: 'Private poll', icon: LockKeyhole, actions: ['configurePrivatePoll'] },
   { name: 'Lifecycle', icon: Play, actions: ['activate', 'close', 'archive'] },
 ];
 const input = (form: FormData, key: string) => String(form.get(key) ?? '').trim();
@@ -86,6 +88,14 @@ export default function AdminPanel() {
       ? ''
       : !selected
         ? 'Select an election first.'
+        : action === 'configurePrivatePoll' && selected.protocol !== 'MACI_PRIVATE'
+          ? 'Select a private-election draft.'
+        : action === 'configurePrivatePoll' && selected.privatePoll
+          ? 'This private poll has already been configured and frozen.'
+        : action === 'recallPolicy' && selected.protocol === 'MACI_PRIVATE'
+          ? 'Private MACI elections do not use recall policies.'
+        : action === 'activate' && selected.protocol === 'MACI_PRIVATE'
+          ? 'Private activation remains locked until the encrypted vote and verified tally flow is complete.'
         : action === 'close'
           ? selectedStatus === 'ACTIVE'
             ? ''
@@ -137,6 +147,7 @@ export default function AdminPanel() {
         opensAt: new Date(input(form, 'opensAt')).toISOString(),
         closesAt: new Date(input(form, 'closesAt')).toISOString(),
       });
+    if (action === 'create') payload.protocol = input(form, 'protocol');
     if (action === 'addCandidate')
       for (const key of ['fullName', 'party', 'ideology', 'bio', 'color'])
         payload[key] = input(form, key);
@@ -154,6 +165,12 @@ export default function AdminPanel() {
       payload.maxRecallOperations = input(form, 'maxRecallOperations')
         ? Number(input(form, 'maxRecallOperations'))
         : null;
+    }
+    if (action === 'configurePrivatePoll') {
+      payload.chainId = 31337;
+      for (const key of ['maciAddress', 'pollAddress', 'tallyAddress',
+        'messageProcessorAddress', 'pollId', 'gateAddress',
+        'voiceCreditProxyAddress', 'deploymentBlock']) payload[key] = input(form, key);
     }
     if (requiresConfirmation(action))
       setConfirmation({
@@ -240,6 +257,7 @@ export default function AdminPanel() {
                   {election.candidates.filter((candidate) => !candidate.withdrawn).length}{' '}
                   candidates
                 </small>
+                <small>{election.protocol === 'MACI_PRIVATE' ? 'Private MACI draft' : 'Legacy demonstration'}</small>
               </button>
             ))}
             {!elections.length && <p>No elections yet. Create your first draft.</p>}

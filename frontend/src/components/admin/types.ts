@@ -3,6 +3,7 @@ export type AdminElection = {
   title: string;
   description: string;
   type: string;
+  protocol: 'LEGACY_RECALL' | 'MACI_PRIVATE';
   status: string;
   opensAt: string;
   closesAt: string;
@@ -13,6 +14,21 @@ export type AdminElection = {
   firstRecallDelaySeconds: number;
   recallCooldownSeconds: number;
   maxRecallOperations: number | null;
+  privatePoll?: {
+    chainId: number;
+    maciAddress: string;
+    pollAddress: string;
+    tallyAddress: string;
+    messageProcessorAddress: string;
+    pollId: string;
+    gateAddress: string;
+    voiceCreditProxyAddress: string;
+    deploymentBlock: string;
+    coordinatorPublicKeyX: string;
+    coordinatorPublicKeyY: string;
+    candidateIds: string[];
+    registrationMode: 'LOCAL_TEST' | 'RARIMO';
+  } | null;
   candidates: {
     id: string;
     fullName: string;
@@ -36,7 +52,8 @@ export type AdminAction =
   | 'activate'
   | 'close'
   | 'archive'
-  | 'recallPolicy';
+  | 'recallPolicy'
+  | 'configurePrivatePoll';
 export const labels: Record<AdminAction, string> = {
   create: 'Create election',
   edit: 'Edit election',
@@ -48,6 +65,7 @@ export const labels: Record<AdminAction, string> = {
   close: 'Close election',
   archive: 'Archive election',
   recallPolicy: 'Set recall policy',
+  configurePrivatePoll: 'Configure local MACI poll',
 };
 export const requiresConfirmation = (action: AdminAction) =>
   ['activate', 'removeCandidate', 'close', 'archive'].includes(action);
