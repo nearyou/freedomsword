@@ -222,8 +222,8 @@ export default function WelcomeScreen() {
               aria-label={t.language}
               onChange={(event) => setLang(event.target.value as Language)}
             >
-              <option value="en">EN</option>
-              <option value="uk">UK</option>
+              <option value="en" lang="en">English</option>
+              <option value="uk" lang="uk">Українська</option>
             </select>
             <ChevronDown size={13} aria-hidden="true" />
           </label>
