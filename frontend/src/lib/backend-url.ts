@@ -4,7 +4,7 @@ export function backendOrigin() {
     (process.env.NODE_ENV === 'development' &&
       (!process.env.APP_ENV || process.env.APP_ENV === 'development')
       ? 'http://127.0.0.1:3001' : undefined);
-  if (!raw) throw new Error('BACKEND_URL is required for the frontend');
+  if (!raw) throw new Error('Set BACKEND_URL in frontend/.env or the frontend deployment environment');
   const url = new URL(raw);
   if (!['http:', 'https:'].includes(url.protocol) || !url.hostname ||
     url.origin !== raw || url.username || url.password || url.search || url.hash)

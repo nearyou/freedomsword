@@ -39,6 +39,12 @@ No Rarimo L2 poll has been deployed from this repository and no real Ukrainian p
 
 Deploy two Vercel projects from this repository with root directories `backend` and `frontend`. Vercel detects the Express app exported from `backend/src/app.ts`; `backend/vercel.json` retains the outbox cron. Deploy the backend first and set the frontend's `BACKEND_URL` to the backend's HTTPS origin without a trailing slash. The frontend rewrites same-origin `/api/*` to that URL. Set backend `APP_ORIGIN` to the frontend's exact public HTTPS origin. Keep backend credentials entirely out of the frontend project. Configure these variables for the intended environment, including at build time:
 
+To point the frontend at a specific backend locally, set `BACKEND_URL="https://api.example.com"` in the ignored `frontend/.env` file and restart Next.js. Use the backend's public origin only: no `/api` path or trailing slash. The variable is server-only, so do not prefix it with `NEXT_PUBLIC_`.
+
+For the deployed frontend, open the **frontend** project in Vercel and go to **Settings → Environment Variables**. Set `BACKEND_URL` for Production (and Preview if needed) to the same backend origin, and set `APP_ENV=production` for a production deployment. Your local `.env` file is not uploaded to Vercel. Save the variables and redeploy the frontend; an existing deployment does not pick up changed environment variables.
+
+The backend must be reachable at `https://api.example.com/api/ready`, and its `APP_ORIGIN` must equal the frontend's public origin. After redeploying, open `https://<frontend-domain>/api/ready`: an `ok` response confirms that the frontend proxy reaches the configured backend. `https://<frontend-domain>/api/elections` should then return the backend's elections. Each Vercel deployment uses one configured backend; visitors cannot change it in the browser.
+
 | Project | Variable | Value |
 | --- | --- | --- |
 | Frontend | `APP_ENV`, `BACKEND_URL` | `production` and the backend HTTPS origin |
