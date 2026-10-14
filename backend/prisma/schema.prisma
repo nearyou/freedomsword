@@ -21,6 +21,11 @@ enum ElectionStatus {
   ARCHIVED
 }
 
+enum ElectionProtocol {
+  LEGACY_RECALL
+  MACI_PRIVATE
+}
+
 enum AdminRole {
   ELECTION_MANAGER
 }
@@ -133,6 +138,7 @@ model Election {
   description             String
   type                    ElectionType
   status                  ElectionStatus     @default(DRAFT)
+  protocol                ElectionProtocol   @default(LEGACY_RECALL)
   revision                Int                @default(0)
   opensAt                 DateTime
   closesAt                DateTime

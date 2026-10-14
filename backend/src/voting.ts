@@ -11,6 +11,7 @@ import { databaseNow } from './database-time';
 import { permittedRecallAmount } from './recall-policy';
 import { voteIdempotencyStore } from './idempotency-store';
 import { chainElectionKey, chainNullifier, chainCandidateCommitment, electionChainConfig } from './chain/action';
+import { requireLegacyBallotProtocol } from './core/protocol';
 export async function requireOpenElection(tx: Prisma.TransactionClient, electionId: string) {
   const locked = await tx.election.updateMany({
     where: { id: electionId }, data: { revision: { increment: 1 } },
@@ -18,6 +19,7 @@ export async function requireOpenElection(tx: Prisma.TransactionClient, election
   if (locked.count !== 1) throw new ApiError(409, 'This election is not open');
   const election = await tx.election.findUnique({ where: { id: electionId } });
   if (!election) throw new ApiError(409, 'This election is not open');
+  requireLegacyBallotProtocol(election.protocol);
   const now = await databaseNow(tx);
   const status = effectiveElectionStatus(election, now);
   if (status !== election.status)

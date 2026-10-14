@@ -12,6 +12,7 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
           title: true,
           description: true,
           type: true,
+          protocol: true,
           status: true,
           opensAt: true,
           closesAt: true,
@@ -72,6 +73,7 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
           title: e.title,
           description: e.description,
           type: e.type,
+          protocol: e.protocol,
           status: effectiveElectionStatus(e, new Date()),
           opensAt: e.opensAt.toISOString(),
           closesAt: e.closesAt.toISOString(),
@@ -84,9 +86,9 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
             cooldownSeconds: e.recallCooldownSeconds,
             maxOperations: e.maxRecallOperations,
           },
-          activeUnits,
-          ballotCount,
-          recalledUnits: ballotCount * 100 - activeUnits,
+          activeUnits: e.protocol === 'MACI_PRIVATE' ? 0 : activeUnits,
+          ballotCount: e.protocol === 'MACI_PRIVATE' ? 0 : ballotCount,
+          recalledUnits: e.protocol === 'MACI_PRIVATE' ? 0 : ballotCount * 100 - activeUnits,
           candidates: e.candidates
             .filter((c) =>
               c.fullName.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
@@ -101,7 +103,7 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
                 ideology: c.ideology,
                 bio: c.bio,
                 color: c.color,
-                units: tally.find((t) => t.candidateId === c.id)?._sum.balance ?? 0,
+                units: e.protocol === 'MACI_PRIVATE' ? 0 : (tally.find((t) => t.candidateId === c.id)?._sum.balance ?? 0),
                 platform: p
                   ? {
                       id: p.id,

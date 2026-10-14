@@ -58,6 +58,28 @@ afterAll(async () => {
   await db.$disconnect();
 });
 
+it('isolates a private election from plaintext ballots and live transparency', async () => {
+  const id = `private-${randomUUID()}`;
+  const candidateId = `private-candidate-${randomUUID()}`;
+  await db.election.create({ data: {
+    id, title: 'Private test poll', description: 'Test only', type: 'COUNCIL',
+    protocol: 'MACI_PRIVATE', status: 'ACTIVE',
+    opensAt: new Date(Date.now() - 60_000), closesAt: new Date(Date.now() + 3_600_000),
+  } });
+  await db.candidate.create({ data: { id: candidateId, electionId: id,
+    fullName: 'Private Candidate', party: 'Independent', ideology: 'Civic',
+    bio: 'Test only', color: '#3377cc' } });
+  await expect(castVote(citizen, { electionId: id, candidateId, requestId: randomUUID() }))
+    .rejects.toThrow('legacy ballot API is unavailable');
+  await expect(recallVote(citizen, { electionId: id, mode: 'full', requestId: randomUUID() }))
+    .rejects.toThrow('legacy ballot API is unavailable');
+  expect(await db.vote.count({ where: { electionId: id } })).toBe(0);
+  const shown = (await listElections()).find((e) => e.id === id);
+  expect(shown?.protocol).toBe('MACI_PRIVATE');
+  expect(shown?.candidates[0].units).toBe(0);
+  expect((await publicTransparency(new Request('http://127.0.0.1:3000'), id)).status).toBe(409);
+});
+
 it('requires an explicit election manager grant and audits each management action', async () => {
   const manager = await db.user.create({ data: { telegramId: `test:manager:${randomUUID()}` } });
   const request = () => new Request('http://127.0.0.1:3000/api/admin/elections', {

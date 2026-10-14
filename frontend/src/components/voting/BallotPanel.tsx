@@ -26,6 +26,14 @@ export default function BallotPanel({
   onExplore: () => void;
   onPassport: () => void;
 }) {
+  if (election.protocol === 'MACI_PRIVATE') {
+    return (
+      <div className="panel ballot-panel empty-state">
+        <h3>Private ballot</h3>
+        <p>This poll is awaiting its Rarimo eligibility gate and MACI deployment. No private ballot has been submitted.</p>
+      </div>
+    );
+  }
   const candidate = election.candidates.find((candidate) => candidate.id === ballot?.candidateId);
   const segments = supportSegments(
     ballot?.balance ?? 100,

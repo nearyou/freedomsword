@@ -1,6 +1,8 @@
 # FreedomSword private voting decision
 
-Status: selected target architecture, not yet implemented. The deployed and local app still use mock eligibility and the legacy plaintext ballot workflow. No current election should be described as a MACI or Rarimo election.
+Status: implementation in progress. The deployed and local app still use mock eligibility and the legacy plaintext ballot workflow. No current election should be described as a MACI or Rarimo election.
+
+The `MACI_PRIVATE` election protocol is now isolated from the legacy cast and recall APIs and from legacy transparency projections. Private elections cannot be activated until a deployed MACI poll and Rarimo gate can be verified. `LocalMaciTestGate.sol` is a local-chain-only signup gate for contract tests: it refuses deployment unless chain ID is 31337 and cannot satisfy production eligibility. Run `npm run contract:test` to exercise it. This is a test bypass, not a private-voting deployment.
 
 ## Product rules
 

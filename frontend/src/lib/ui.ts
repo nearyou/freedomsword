@@ -33,6 +33,8 @@ export function electionOpen(election: ElectionView, now = Date.now()) {
   );
 }
 export function voteExplanation(election: ElectionView, ballot?: BallotView, busy = false) {
+  if (election.protocol === 'MACI_PRIVATE')
+    return 'Private voting is unavailable until this poll has a verified Rarimo gate and MACI deployment.';
   if (busy) return 'An action is being recorded.';
   if (ballot) return 'One initial ballot per election. Recalled units cannot be reassigned.';
   if (!electionOpen(election))

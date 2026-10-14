@@ -14,8 +14,9 @@ const id = z.string().min(1).max(100);
 const text = z.string().trim().min(1).max(2000);
 const date = z.iso.datetime({ offset: true });
 const type = z.enum(['COUNCIL', 'BUDGET', 'COMMUNITY']);
+const protocol = z.enum(['LEGACY_RECALL', 'MACI_PRIVATE']);
 export const adminCommand = z.discriminatedUnion('action', [
-  z.object({ action: z.literal('create'), title: text.max(160), description: text, type, opensAt: date, closesAt: date }).strict(),
+  z.object({ action: z.literal('create'), title: text.max(160), description: text, type, protocol: protocol.optional(), opensAt: date, closesAt: date }).strict(),
   z.object({ action: z.literal('edit'), electionId: id, title: text.max(160), description: text, type, opensAt: date, closesAt: date }).strict(),
   z.object({ action: z.literal('addCandidate'), electionId: id, fullName: text.max(160), party: text.max(160), ideology: text.max(80), bio: text, color: z.string().regex(/^#[0-9a-fA-F]{6}$/) }).strict(),
   z.object({ action: z.literal('removeCandidate'), electionId: id, candidateId: id }).strict(),
@@ -48,7 +49,7 @@ export async function adminElections() {
   return db.election.findMany({
     orderBy: { opensAt: 'desc' },
     select: {
-      id: true, title: true, description: true, type: true, status: true, opensAt: true,
+      id: true, title: true, description: true, type: true, protocol: true, status: true, opensAt: true,
       closesAt: true, recallEnabled: true, fullRecallEnabled: true,
       partialRecallEnabled: true, partialRecallAmount: true,
       firstRecallDelaySeconds: true, recallCooldownSeconds: true, maxRecallOperations: true,
@@ -70,7 +71,7 @@ export async function administer(userId: string, input: AdminCommand) {
         throw new ApiError(400, 'Choose a future start before the end');
       const election = await tx.election.create({
         data: { id: randomUUID(), title: input.title, description: input.description,
-          type: input.type, opensAt: new Date(input.opensAt), closesAt: new Date(input.closesAt), status: 'DRAFT' },
+          type: input.type, protocol: input.protocol ?? 'LEGACY_RECALL', opensAt: new Date(input.opensAt), closesAt: new Date(input.closesAt), status: 'DRAFT' },
       });
       await appendAudit(tx, JSON.stringify({ action: 'ADMIN_CREATE_ELECTION', actor: userId, electionId: election.id }), election.id);
       return { electionId: election.id, status: election.status };
@@ -134,6 +135,8 @@ export async function administer(userId: string, input: AdminCommand) {
           break;
         }
         case 'activate': {
+          if (election.protocol === 'MACI_PRIVATE')
+            throw new ApiError(409, 'Private elections require a deployed MACI poll and Rarimo gate before activation', 'PRIVATE_ELECTION_NOT_CONFIGURED');
           if (now >= election.closesAt)
             throw new ApiError(409, 'Reschedule this draft before activating it');
           const count = await tx.candidate.count({ where: { electionId: election.id, withdrawn: false } });
@@ -156,7 +159,8 @@ export async function administer(userId: string, input: AdminCommand) {
     }
     await appendAudit(tx, JSON.stringify({ action: `ADMIN_${input.action}`, actor: userId,
       electionId: election.id, commandHash: sha256(JSON.stringify(input)) }), election.id,
-      input.action === 'close' ? { kind: 'CLOSE', electionKey: chainElectionKey(election.id) } : undefined);
+      input.action === 'close' && election.protocol === 'LEGACY_RECALL'
+        ? { kind: 'CLOSE', electionKey: chainElectionKey(election.id) } : undefined);
     return { electionId: election.id, action: input.action };
   });
 }

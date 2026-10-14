@@ -15,12 +15,14 @@ export async function GET(request: Request) {
       where: { userId: user.id },
       select: { documentId: true, version: true, textHash: true },
     });
-    const elections = await db.election.findMany({ select: { id: true } });
+    const elections = await db.election.findMany({
+      select: { id: true, protocol: true },
+    });
     const lookups = await db.$transaction((tx) =>
       privateBallotPseudonyms(
         tx,
         user,
-        elections.map((e) => e.id),
+        elections.filter((e) => e.protocol !== 'MACI_PRIVATE').map((e) => e.id),
       ),
     );
     const votes = await db.vote.findMany({

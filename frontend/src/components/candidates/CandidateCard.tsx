@@ -24,13 +24,19 @@ export default function CandidateCard({
         </div>
         <ChevronRight className="candidate-row-arrow" size={18} aria-hidden="true" />
       </div>
-      <div className="candidate-card-support">
-        <span>Support</span>
-        <strong>{percentage.toFixed(1)}%</strong>
-      </div>
-      <div className="progress-track" role="progressbar" aria-label={`${candidate.fullName} support`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentage}>
-        <span style={{ width: `${percentage}%`, background: candidate.color }} />
-      </div>
+      {election.protocol === 'MACI_PRIVATE' ? (
+        <p className="fine-print">Choices remain private until the verified final tally.</p>
+      ) : (
+        <>
+          <div className="candidate-card-support">
+            <span>Support</span>
+            <strong>{percentage.toFixed(1)}%</strong>
+          </div>
+          <div className="progress-track" role="progressbar" aria-label={`${candidate.fullName} support`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentage}>
+            <span style={{ width: `${percentage}%`, background: candidate.color }} />
+          </div>
+        </>
+      )}
       <button className="candidate-card-open" type="button" aria-label={`View ${candidate.fullName} profile`} onClick={() => onProfile(candidate)}>
         <span className="sr-only">View {candidate.fullName} profile</span>
       </button>

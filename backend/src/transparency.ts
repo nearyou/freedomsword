@@ -5,7 +5,7 @@ import { effectiveElectionStatus } from '@backend/core/lifecycle';
 
 export async function electionTransparencySnapshot(tx: PrismaTypes.TransactionClient, electionId: string, auditLimit: number | null = 100) {
     const election = await tx.election.findUnique({ where: { id: electionId }, select: {
-      id: true, title: true, description: true, type: true, status: true,
+      id: true, title: true, description: true, type: true, protocol: true, status: true,
       opensAt: true, closesAt: true, recallEnabled: true, fullRecallEnabled: true,
       partialRecallEnabled: true, partialRecallAmount: true, firstRecallDelaySeconds: true,
       recallCooldownSeconds: true, maxRecallOperations: true,
@@ -17,6 +17,8 @@ export async function electionTransparencySnapshot(tx: PrismaTypes.TransactionCl
       } },
     } });
     if (!election || election.status === 'DRAFT') throw new ApiError(404, 'Election not found');
+    if (election.protocol === 'MACI_PRIVATE')
+      throw new ApiError(409, 'Private-election results require a verified final MACI tally', 'PRIVATE_TALLY_PENDING');
     const tallies = await tx.vote.groupBy({ by: ['candidateId'], where: { electionId },
       _sum: { balance: true }, _count: true });
     const cast = await tx.voteEvent.aggregate({ where: { type: 'CAST', vote: { electionId } }, _sum: { units: true } });

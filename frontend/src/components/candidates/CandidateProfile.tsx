@@ -52,7 +52,7 @@ export default function CandidateProfile({
           <IdeologyBadge label={candidate.ideology} color={candidate.color} />
         </div>
       </div>
-      <div className="profile-stats">
+      {election.protocol !== 'MACI_PRIVATE' && <div className="profile-stats">
         <div>
           <strong>{support(candidate, election).toFixed(1)}%</strong>
           <span>Current support</span>
@@ -65,7 +65,7 @@ export default function CandidateProfile({
           <strong>{platform ? count(platform.signatures) : '—'}</strong>
           <span>Endorsements</span>
         </div>
-      </div>
+      </div>}
       <div className="tabs profile-tabs" role="tablist" aria-label="Candidate profile sections">
         {['Overview', 'Platform', 'Promises'].map((value) => (
           <button
