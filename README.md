@@ -37,7 +37,7 @@ No Rarimo L2 poll has been deployed from this repository and no real Ukrainian p
 
 ## Vercel and Telegram release
 
-Deploy two Vercel projects from this repository with root directories `backend` and `frontend`. Vercel detects the Express app exported from `backend/src/app.ts`; `backend/vercel.json` retains the outbox cron. Deploy the backend first and set the frontend's `BACKEND_URL` to the backend's HTTPS origin without a trailing slash. The frontend rewrites same-origin `/api/*` to that URL. Set backend `APP_ORIGIN` to the frontend's exact public HTTPS origin. Keep backend credentials entirely out of the frontend project. Configure these variables for the intended environment, including at build time:
+Deploy two Vercel projects from this repository with root directories `backend` and `frontend`. The backend build bundles the Express app into `backend/dist/application.js`; `backend/api/index.js` exports that bundle as one Vercel Function, and `backend/vercel.json` routes `/api/*` to it and retains the outbox cron. Deploy the backend first and set the frontend's `BACKEND_URL` to the backend's HTTPS origin without a trailing slash. The frontend rewrites same-origin `/api/*` to that URL. Set backend `APP_ORIGIN` to the frontend's exact public HTTPS origin. Keep backend credentials entirely out of the frontend project. Configure these variables for the intended environment, including at build time:
 
 To point the frontend at a specific backend locally, set `BACKEND_URL="https://api.example.com"` in the ignored `frontend/.env` file and restart Next.js. Use the backend's public origin only: no `/api` path or trailing slash. The variable is server-only, so do not prefix it with `NEXT_PUBLIC_`.
 

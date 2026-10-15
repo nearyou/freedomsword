@@ -1,7 +1,7 @@
 import type { AddressInfo } from 'node:net';
 import type { Server } from 'node:http';
 import { afterAll, beforeAll, expect, it, vi } from 'vitest';
-import app from '../backend/src/app';
+import app from '../backend/src/application';
 
 let server: Server;
 let base: string;
