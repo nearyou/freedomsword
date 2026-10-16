@@ -21,5 +21,5 @@ export async function verifyDatabaseEvidence() {
       throw new Error('Platform version integrity failed');
     return { auditEvents: events.length, ballots: ballots.length, platforms: platforms.length,
       rootHash: events.at(-1)?.hash ?? '0'.repeat(64) };
-  });
+  }, { maxWait: 20_000, timeout: 30_000 });
 }

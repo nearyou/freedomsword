@@ -111,7 +111,7 @@ it('isolates a private election from plaintext ballots and live transparency', a
   await expect(administer(citizen.id, { action: 'activate', electionId: draft.electionId }))
     .rejects.toThrow('Private election needs a configured MACI poll');
   await expect(administer(citizen.id, { action: 'publishPrivateResults', electionId: draft.electionId }))
-    .rejects.toThrow('finished local MACI poll');
+    .rejects.toThrow('A finished MACI poll is required');
   await expect(administer(citizen.id, { action: 'recallPolicy', electionId: draft.electionId,
     recallEnabled: true, fullRecallEnabled: true, partialRecallEnabled: true,
     partialRecallAmount: 25, firstRecallDelaySeconds: 0,
