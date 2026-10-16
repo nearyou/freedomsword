@@ -70,6 +70,7 @@ function adapt(handler: Handler | ParameterHandler) {
 const app = express();
 app.disable('x-powered-by');
 let validated = false;
+let loggedConfigurationFailure = false;
 app.use((_req, res, next) => {
   try {
     if (!validated) {
@@ -77,7 +78,14 @@ app.use((_req, res, next) => {
       validated = true;
     }
     next();
-  } catch {
+  } catch (error) {
+    if (!loggedConfigurationFailure) {
+      const message = error instanceof Error &&
+        /^Invalid server configuration: [A-Za-z0-9_ ,.-]+$/.test(error.message)
+        ? error.message : 'Invalid server configuration value';
+      console.error(message);
+      loggedConfigurationFailure = true;
+    }
     res.status(503).set('Cache-Control', 'no-store').json({ error: 'Service unavailable. Check server configuration.' });
   }
 });
