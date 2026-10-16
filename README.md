@@ -37,6 +37,8 @@ No Rarimo L2 poll has been deployed from this repository and no real Ukrainian p
 
 ## Vercel and Telegram release
 
+For an Atlas IP allowlist that must stay restricted, keep the frontend on Vercel and run the backend on a server with a fixed outbound IPv4 address. The Docker Compose, HTTPS, outbox-worker, and frontend-switch steps are in [Fixed-IP backend deployment](docs/FIXED_IP_BACKEND.md). Do not point the Mini App at the server; its URL remains the frontend's Vercel URL.
+
 Deploy two Vercel projects from this repository with root directories `backend` and `frontend`. The backend build bundles the Express app into `backend/dist/application.js`; `backend/index.js` exports that bundle through Vercel's Express preset, and `backend/vercel.json` retains the outbox cron. Deploy the backend first and set the frontend's `BACKEND_URL` to the backend's HTTPS origin without a trailing slash. The frontend rewrites same-origin `/api/*` to that URL. Set backend `APP_ORIGIN` to the frontend's exact public HTTPS origin. Keep backend credentials entirely out of the frontend project. Configure these variables for the intended environment, including at build time:
 
 To point the frontend at a specific backend locally, set `BACKEND_URL="https://api.example.com"` in the ignored `frontend/.env` file and restart Next.js. Use the backend's public origin only: no `/api` path or trailing slash. The variable is server-only, so do not prefix it with `NEXT_PUBLIC_`.

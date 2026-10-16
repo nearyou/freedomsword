@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch bin/server.ts",
-    "build": "prisma generate --schema prisma/schema.prisma && esbuild bin/server.ts src/application.ts --bundle --platform=node --format=esm --packages=external --outdir=dist --entry-names=[name]",
+    "build": "prisma generate --schema prisma/schema.prisma && esbuild bin/server.ts src/application.ts scripts/outbox-worker.ts prisma/seed.ts --bundle --platform=node --format=esm --packages=external --outdir=dist --entry-names=[name]",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate --schema prisma/schema.prisma",
