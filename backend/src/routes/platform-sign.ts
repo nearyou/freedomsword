@@ -1,4 +1,5 @@
-import { settleOutbox } from '@backend/blockchain';
+import { afterCommittedOutbox } from '@backend/outbox-queue';
+import { invalidateElectionCache } from '@backend/election-cache';
 import { z } from 'zod';
 import { body, handle, json } from '@backend/http';
 import { enforceRateLimitAsync } from '@backend/rate-limit';
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
     const user = await requireUser(request);
     await enforceRateLimitAsync('platform-sign', user.id, 20);
     const result = await signPlatform(user, input);
-    await settleOutbox();
+    await Promise.all([afterCommittedOutbox(), invalidateElectionCache()]);
     return json(result);
   });
 }

@@ -77,6 +77,7 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
   const agreementReady = rarimo ? citizen.agreementSigned : ready;
   const wasmUrl = process.env.NEXT_PUBLIC_MACI_JOIN_WASM_URL;
   const zkeyUrl = process.env.NEXT_PUBLIC_MACI_JOIN_ZKEY_URL;
+  const vkeyUrl = process.env.NEXT_PUBLIC_MACI_JOIN_VKEY_URL;
   const active = election.status === 'ACTIVE' &&
     now >= new Date(election.opensAt).getTime() &&
     now < new Date(election.closesAt).getTime();
@@ -149,7 +150,7 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
           })}>Register public key</button>}
           {registration && rarimo && !agreementReady && <RarimoAgreement onAccepted={onRefresh} />}
           {registration && agreementReady && device.pollStateIndex === null && <>
-            {!wasmUrl || !zkeyUrl ? <p>Poll-join proof artifacts are not configured for this election.</p> :
+            {!wasmUrl || !zkeyUrl || !vkeyUrl ? <p>Poll-join proof artifacts are not configured for this election.</p> :
               <button className="button primary" disabled={busy}
                 onClick={() => void run(async () => {
                   const { publicKeyForPrivateKey } = await import('@frontend/lib/maci-device');
@@ -159,7 +160,7 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
                   const data = await api<MaciJoiningData>(`private/join-data?electionId=${encodeURIComponent(election.id)}`);
                   const { createMaciJoinProof } = await import('@frontend/lib/maci-join');
                   const proof = await createMaciJoinProof({ privateKey: device.privateKey,
-                    pollId: poll.pollId, data, wasmUrl, zkeyUrl });
+                    pollId: poll.pollId, data, wasmUrl, zkeyUrl, vkeyUrl });
                   const joined = await api<Join>('private/join', { electionId: election.id, ...proof });
                   save({ ...device, pollStateIndex: joined.pollStateIndex });
                   setNotice('Poll joined. You can now submit an encrypted ballot when voting opens.');

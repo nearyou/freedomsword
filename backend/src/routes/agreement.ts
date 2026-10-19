@@ -1,4 +1,4 @@
-import { settleOutbox } from '@backend/blockchain';
+import { afterCommittedOutbox } from '@backend/outbox-queue';
 import { z } from 'zod';
 import { AGREEMENT_TEXT, AGREEMENT_VERSION } from '@backend/core/agreement';
 import { sha256 } from '@backend/core/hash';
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     const user = await requireUser(request);
     await enforceRateLimitAsync('agreement', user.id, 20);
     const result = await signCitizenAgreement(user, input.textHash);
-    await settleOutbox();
+    await afterCommittedOutbox();
     return json(result);
   });
 }

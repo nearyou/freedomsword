@@ -14,6 +14,8 @@ Each successful MongoDB write creates a salted audit commitment. Cast and recall
 
 MongoDB and Ethereum have no shared transaction. The API returns a successful database write before the contract confirms it. If the chain action fails, the ballot remains in MongoDB and the outbox marks it failed for investigation. Delayed submissions can miss the on-chain election window. Existing ballots created before contract integration have no matching on-chain cast; they require a reviewed migration before their recalls can be mirrored. Do not enable the Sepolia adapter for a populated election without reconciliation.
 
+On the fixed-IP Compose deployment, Redis caches public election reads for two seconds and supplies distributed rate-limit counters. BullMQ jobs wake a single Sepolia outbox worker after MongoDB commits. The worker also polls the MongoDB outbox, which remains the durable source of pending actions if Redis or a job is lost. The API never acknowledges a cast or recall before the MongoDB transaction succeeds. Vercel deployments without a continuous worker keep bounded inline outbox processing. Sepolia access is through an external HTTPS RPC URL, not a node in the backend container.
+
 The on-chain nullifier links a cast to its recalls in public data. It does not contain a Telegram ID or raw candidate ID, but the server and signer can relate it to a MongoDB ballot. This is a fictional demonstration with a mock eligibility provider, not an anonymous or binding election system.
 
 ## API surface

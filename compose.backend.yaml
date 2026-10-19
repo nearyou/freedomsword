@@ -9,6 +9,9 @@ services:
     environment:
       NODE_ENV: production
       PORT: "3001"
+      REDIS_URL: redis://redis:6379
+      OUTBOX_PROCESSING: worker
+      RATE_LIMIT_BACKEND: redis
     expose:
       - "3001"
 
@@ -18,10 +21,24 @@ services:
     env_file: .env.production
     environment:
       NODE_ENV: production
+      REDIS_URL: redis://redis:6379
+      OUTBOX_PROCESSING: worker
     command: ["node", "dist/outbox-worker.js"]
     depends_on:
       api:
         condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
   caddy:
     image: caddy:2-alpine
@@ -42,3 +59,4 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  redis_data:

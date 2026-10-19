@@ -1,4 +1,4 @@
-import { settleOutbox } from '@backend/blockchain';
+import { afterCommittedOutbox } from '@backend/outbox-queue';
 import { z } from 'zod';
 import { requireUser } from '@backend/auth';
 import { body, handle, json } from '@backend/http';
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const user = await requireUser(request);
     await enforceRateLimitAsync('verify', user.id, 10);
     const result = await verifyCitizen(user, undefined, input.proof);
-    await settleOutbox();
+    await afterCommittedOutbox();
     return json(result);
   });
 }

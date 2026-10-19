@@ -30,8 +30,16 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     env.ELIGIBILITY_PROVIDER ?? (strict ? undefined : 'mock'),
   );
   const logLevel = z.enum(['error', 'warn', 'info', 'debug']).parse(env.LOG_LEVEL ?? 'info');
-  const rateLimitBackend = z.enum(['memory', 'mongo']).parse(env.RATE_LIMIT_BACKEND ?? 'memory');
+  const rateLimitBackend = z.enum(['memory', 'mongo', 'redis']).parse(env.RATE_LIMIT_BACKEND ?? 'memory');
   const blockchainAdapter = z.enum(['mock', 'sepolia']).parse(env.BLOCKCHAIN_ADAPTER ?? 'mock');
+  const outboxProcessing = z.enum(['inline', 'worker']).parse(env.OUTBOX_PROCESSING ?? 'inline');
+  if (env.REDIS_URL) {
+    let redis: URL;
+    try { redis = new URL(env.REDIS_URL); }
+    catch { throw new Error('Invalid server configuration: REDIS_URL'); }
+    if (!['redis:', 'rediss:'].includes(redis.protocol) || !redis.hostname)
+      throw new Error('Invalid server configuration: REDIS_URL');
+  }
 
   let database: URL;
   let app: URL;
@@ -96,8 +104,10 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     throw new Error('Invalid server configuration: Telegram authentication required');
   if (strict && env.ALLOW_DEMO_AUTH === 'true')
     throw new Error('Invalid server configuration: demo authentication');
-  if (strict && rateLimitBackend !== 'mongo')
-    throw new Error('Invalid server configuration: MongoDB rate limits required');
+  if (strict && rateLimitBackend === 'memory')
+    throw new Error('Invalid server configuration: distributed rate limits required');
+  if (rateLimitBackend === 'redis' && !env.REDIS_URL)
+    throw new Error('Invalid server configuration: REDIS_URL required for Redis rate limits');
   if (mode === 'production' && blockchainAdapter !== 'sepolia')
     throw new Error('Invalid server configuration: Sepolia blockchain adapter required');
   if (blockchainAdapter === 'sepolia' &&
@@ -127,6 +137,7 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     logLevel,
     rateLimitBackend,
     blockchainAdapter,
+    outboxProcessing,
   };
 }
 

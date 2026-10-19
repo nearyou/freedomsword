@@ -7,6 +7,7 @@ export default defineConfig({
   } },
   test: {
     environment: 'node',
+    env: { RATE_LIMIT_BACKEND: 'memory' },
     pool: 'threads',
     include: ['tests/**/*.test.ts'],
     exclude: ['tests/**/*.integration.test.ts'],

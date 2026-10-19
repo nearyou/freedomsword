@@ -49,14 +49,20 @@ export async function createMaciJoinProof(input: {
   data: MaciJoiningData;
   wasmUrl: string;
   zkeyUrl: string;
+  vkeyUrl: string;
 }) {
-  for (const path of [input.wasmUrl, input.zkeyUrl])
+  for (const path of [input.wasmUrl, input.zkeyUrl, input.vkeyUrl])
     if (!path.startsWith('/') || path.startsWith('//'))
       throw new Error('MACI proof artifacts must use same-origin paths');
   const prepared = maciJoiningInputs(input.privateKey, input.pollId, input.data);
+  const response = await fetch(input.vkeyUrl, { cache: 'force-cache' });
+  if (!response.ok) throw new Error('MACI verification key is unavailable');
+  const verificationKey: unknown = await response.json();
   const { groth16 } = await import('snarkjs');
-  const { proof } = await groth16.fullProve(prepared.circuitInputs,
+  const { proof, publicSignals } = await groth16.fullProve(prepared.circuitInputs,
     input.wasmUrl, input.zkeyUrl);
+  if (!await groth16.verify(verificationKey, publicSignals, proof))
+    throw new Error('This device generated an invalid MACI join proof');
   return { nullifier: prepared.nullifier, stateRootIndex: prepared.stateRootIndex,
     proof: [proof.pi_a[0], proof.pi_a[1], proof.pi_b[0][1], proof.pi_b[0][0],
       proof.pi_b[1][1], proof.pi_b[1][0], proof.pi_c[0], proof.pi_c[1]] };

@@ -1,6 +1,7 @@
 import { adminCommand, adminElections, administer, requireAdmin } from '@backend/admin';
 import { body, handle, json } from '@backend/http';
-import { settleOutbox } from '@backend/blockchain';
+import { afterCommittedOutbox } from '@backend/outbox-queue';
+import { invalidateElectionCache } from '@backend/election-cache';
 export async function GET(request: Request) {
   return handle(async () => {
     await requireAdmin(request);
@@ -12,7 +13,7 @@ export async function POST(request: Request) {
     const input = await body(request, adminCommand);
     const user = await requireAdmin(request);
     const result = await administer(user.id, input);
-    await settleOutbox();
+    await Promise.all([afterCommittedOutbox(), invalidateElectionCache()]);
     return json(result);
   });
 }

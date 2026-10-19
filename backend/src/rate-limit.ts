@@ -1,6 +1,7 @@
 import { sha256 } from '@backend/core/hash';
 import { ApiError } from './errors';
 import { serializable } from './transaction';
+import { redisClient } from './redis';
 
 export interface RateLimitStore {
   consume(key: string, max: number, windowMs: number, now: number): boolean;
@@ -45,8 +46,30 @@ export class MongoRateLimitStore implements DistributedRateLimitStore {
   }
 }
 let distributedBackend: DistributedRateLimitStore = new MongoRateLimitStore();
+const incrementWithExpiry = `
+  local count = redis.call('INCR', KEYS[1])
+  if count == 1 then redis.call('PEXPIRE', KEYS[1], ARGV[1]) end
+  return count
+`;
+export class RedisRateLimitStore implements DistributedRateLimitStore {
+  async consume(key: string, max: number, windowMs: number) {
+    const redis = redisClient();
+    if (!redis) return distributedBackend.consume(key, max, windowMs);
+    try {
+      const count = await redis.eval(incrementWithExpiry, 1,
+        `freedomsword:rate:${key}`, String(windowMs));
+      return Number(count) <= max;
+    } catch {
+      return distributedBackend.consume(key, max, windowMs);
+    }
+  }
+}
+let redisBackend: DistributedRateLimitStore = new RedisRateLimitStore();
 export function setDistributedRateLimitStore(store: DistributedRateLimitStore) {
   distributedBackend = store;
+}
+export function setRedisRateLimitStore(store: DistributedRateLimitStore) {
+  redisBackend = store;
 }
 export function setRateLimitStore(store: RateLimitStore) {
   backend = store;
@@ -60,8 +83,10 @@ export function enforceRateLimit(action: string, subject: string, max = 40, now 
   }
 }
 export async function enforceRateLimitAsync(action: string, subject: string, max = 40) {
-  if (process.env.RATE_LIMIT_BACKEND !== 'mongo') return enforceRateLimit(action, subject, max);
-  const allowed = await distributedBackend.consume(`${action}:${sha256(subject)}`, max, 60_000);
+  const mode = process.env.RATE_LIMIT_BACKEND;
+  if (mode !== 'mongo' && mode !== 'redis') return enforceRateLimit(action, subject, max);
+  const store = mode === 'redis' ? redisBackend : distributedBackend;
+  const allowed = await store.consume(`${action}:${sha256(subject)}`, max, 60_000);
   if (!allowed) {
     if (process.env.NODE_ENV !== 'test' && process.env.LOG_LEVEL !== 'error')
       console.warn(`Rate limit reached: ${action}`);

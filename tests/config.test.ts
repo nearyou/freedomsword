@@ -32,6 +32,7 @@ describe('startup configuration', () => {
     expect(config.authMaxAgeSeconds).toBe(300);
     expect(config.sessionMaxAgeSeconds).toBe(3600);
     expect(loadConfig({ ...valid, RATE_LIMIT_BACKEND: 'mongo' }).rateLimitBackend).toBe('mongo');
+    expect(loadConfig({ ...valid, RATE_LIMIT_BACKEND: 'redis', REDIS_URL: 'redis://cache:6379' }).rateLimitBackend).toBe('redis');
   });
   it.each([
     [{ DATABASE_URL: 'sqlite://x' }, 'DATABASE_URL'],
@@ -57,7 +58,9 @@ describe('startup configuration', () => {
     [{ TELEGRAM_AUTH_ENABLED: 'false' }, 'Telegram authentication'],
     [{ BLOCKCHAIN_ADAPTER: 'mock' }, 'Sepolia blockchain'],
     [{ BLOCKCHAIN_CONTRACT_ADDRESS: '' }, 'voting contract'],
-    [{ RATE_LIMIT_BACKEND: 'memory' }, 'MongoDB rate limits'],
+    [{ RATE_LIMIT_BACKEND: 'memory' }, 'distributed rate limits'],
+    [{ RATE_LIMIT_BACKEND: 'redis' }, 'REDIS_URL'],
+    [{ REDIS_URL: 'http://cache:6379' }, 'REDIS_URL'],
     [{ CRON_SECRET: '' }, 'CRON_SECRET'],
   ])('rejects unsafe configuration %#', (change, pattern) => {
     expect(() => loadConfig({ ...valid, ...change })).toThrow(pattern);
