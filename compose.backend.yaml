@@ -24,6 +24,8 @@ services:
       REDIS_URL: redis://redis:6379
       OUTBOX_PROCESSING: worker
     command: ["node", "dist/outbox-worker.js"]
+    healthcheck:
+      disable: true
     depends_on:
       api:
         condition: service_healthy
