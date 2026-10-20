@@ -1,0 +1,12 @@
+freedomsword.org {
+  encode zstd gzip
+
+  @api path /api /api/*
+  handle @api {
+    reverse_proxy 127.0.0.1:3001
+  }
+
+  handle {
+    reverse_proxy 127.0.0.1:3000
+  }
+}

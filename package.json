@@ -10,7 +10,7 @@
     "start:frontend": "npm run start -w @freedomsword/frontend",
     "typecheck": "tsc --noEmit && npm run typecheck -w @freedomsword/backend && npm run typecheck -w @freedomsword/frontend",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "vitest run && node --test tests/vps-dns.test.mjs",
     "check": "npm run typecheck && npm run lint && npm run test && npm run contract:test",
     "db:generate": "npm run db:generate -w @freedomsword/backend",
     "db:push": "npm run db:push -w @freedomsword/backend",

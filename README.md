@@ -35,7 +35,11 @@ To operate it, deploy the official `TD3QueryProofVerifier`, `RarimoMaciGate`, th
 
 No Rarimo L2 poll has been deployed from this repository and no real Ukrainian passport proof has been exercised here. The full MACI coordinator and tally sequence remains an external integration step. Keep the fictional-election and mock labels for legacy elections; a source-code check alone does not establish a live verified election.
 
-## Vercel and Telegram release
+## Ubuntu VPS deployment without Docker
+
+The [VPS deployment guide](docs/VPS_DEPLOYMENT.md) installs the frontend, API, Redis, blockchain outbox worker, and Caddy on one Ubuntu VPS. `https://freedomsword.org` serves the frontend and routes same-origin `/api/*` to the private API. The guide includes the build, systemd services, DNS cutover, health checks, and Telegram checks. Vercel is not required for this deployment.
+
+## Vercel and Telegram release (alternative)
 
 For an Atlas IP allowlist that must stay restricted, keep the frontend on Vercel and run the backend on a server with a fixed outbound IPv4 address. The Docker Compose, HTTPS, outbox-worker, and frontend-switch steps are in [Fixed-IP backend deployment](docs/FIXED_IP_BACKEND.md). Do not point the Mini App at the server; its URL remains the frontend's Vercel URL.
 
