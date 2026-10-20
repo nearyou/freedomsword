@@ -10,3 +10,12 @@ freedomsword.org {
     reverse_proxy 127.0.0.1:3000
   }
 }
+
+www.freedomsword.org {
+  redir https://freedomsword.org{uri} permanent
+}
+
+api.freedomsword.org {
+  encode zstd gzip
+  reverse_proxy 127.0.0.1:3001
+}

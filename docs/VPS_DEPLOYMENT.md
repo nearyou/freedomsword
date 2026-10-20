@@ -1,8 +1,8 @@
 # FreedomSword on one Ubuntu VPS (no Docker)
 
-This deployment serves the Next.js frontend and Express API at `https://freedomsword.org`. Caddy routes `/api/*` directly to the API; both Node processes and Redis listen only on loopback. A systemd worker continuously processes the durable MongoDB blockchain outbox. MongoDB Atlas and the blockchain RPC remain external services. The current mock eligibility flow is a demonstration, not a binding election.
+This deployment serves the Next.js frontend and Express API at `https://freedomsword.org`. Caddy routes `/api/*` directly to the API, redirects `www.freedomsword.org` to the apex, and serves the API at `api.freedomsword.org` for compatibility. Both Node processes and Redis listen only on loopback. A systemd worker continuously processes the durable MongoDB blockchain outbox. MongoDB Atlas and the blockchain RPC remain external services. The current mock eligibility flow is a demonstration, not a binding election.
 
-The scripts install into `/opt/freedomsword`, run as a dedicated `freedomsword` user, and keep the last release available for rollback. They do **not** change DNS or Telegram bot settings. Keep the current site online until the VPS checks pass.
+The deployment scripts install into `/opt/freedomsword`, run as a dedicated `freedomsword` user, and keep the last release available for rollback. They do **not** change DNS or Telegram bot settings. The separate Porkbun DNS helper changes only the apex, `www`, and `api` web records. If DNS is pointed to the VPS before deployment, the site will remain unavailable until Caddy and both apps are running.
 
 ## 1. Prepare the VPS and repository
 
@@ -59,7 +59,7 @@ sudo bash deploy/vps/bootstrap.sh
 sudo bash deploy/vps/deploy.sh
 ```
 
-`bootstrap.sh` installs Redis and Caddy, creates the systemd units and Caddy site, and backs up an existing Caddyfile before replacing it. Use this on a VPS dedicated to FreedomSword. `deploy.sh` archives the checked-out commit to a new release directory, installs dependencies, builds both workspaces, switches the `current` symlink, and checks the local API and frontend. If an update fails its checks, it restores the previous release. It does not run `prisma db push` or seed data automatically. For a **new, empty** demo Atlas database, after reviewing the target URI and schema, run `npm run db:push` and then `npm run db:seed` from the source checkout once; do not reseed an existing database.
+`bootstrap.sh` installs Redis and Caddy, creates the systemd units and Caddy site, and backs up an existing Caddyfile before replacing it. Run it again if an earlier FreedomSword deployment installed the old Caddyfile without `www` and `api` hosts. Use this on a VPS dedicated to FreedomSword. `deploy.sh` archives the checked-out commit to a new release directory, installs dependencies, builds both workspaces, switches the `current` symlink, and checks the local API and frontend. If an update fails its checks, it restores the previous release. It does not run `prisma db push` or seed data automatically. For a **new, empty** demo Atlas database, after reviewing the target URI and schema, run `npm run db:push` and then `npm run db:seed` from the source checkout once; do not reseed an existing database.
 
 Check the services:
 
@@ -78,7 +78,7 @@ journalctl -u caddy -n 80 --no-pager
 
 ## 4. Point the domain to the VPS
 
-At Porkbun, replace the **apex A** record for `freedomsword.org` that currently points to Vercel with an A record pointing to `45.61.162.179`. Keep unrelated MX, TXT, and NS records. The old `api` CNAME is unnecessary for this single-domain setup; it does not control the apex domain. If you only have Porkbun API access, use the included helper. It reads the zone, refuses an ambiguous apex A selection, asks Porkbun to validate the edit without changing DNS, and applies it only with `--apply`. It uses Porkbun's [DNS record API](https://porkbun.com/api/json/v3/documentation). Do not send API credentials to anyone.
+At Porkbun, point the **apex A** record to `45.61.162.179`, and point `www` and `api` CNAME records to `freedomsword.org`. Keep unrelated MX, TXT, wildcard, and NS records. The included helper reads the zone, refuses ambiguous web records, validates all changes with Porkbun, and applies them only with `--apply`. It uses Porkbun's [DNS record API](https://porkbun.com/api/json/v3/documentation). If the records are already set, it makes no changes. Keep credentials out of files, shell history, and chat.
 
 ```bash
 read -r -s -p 'Porkbun API key: ' PORKBUN_API_KEY; echo
@@ -99,7 +99,7 @@ curl -fsS https://freedomsword.org/api/ready
 curl -fsS -o /dev/null -w '%{http_code}\n' https://freedomsword.org/
 ```
 
-DNS should resolve to `45.61.162.179`. Once DNS and firewall access are correct, Caddy obtains and renews the HTTPS certificate. The API check must return MongoDB `ok`; the page check must return a successful status. No `api.freedomsword.org` certificate or Vercel `BACKEND_URL` change is needed.
+DNS for the apex, `www`, and `api` should resolve to `45.61.162.179`. Once DNS and firewall access are correct, Caddy obtains and renews their HTTPS certificates. The API check must return MongoDB `ok`; the page check must return a successful status. Check `https://www.freedomsword.org/` redirects to the apex and `https://api.freedomsword.org/api/ready` returns readiness. No Vercel `BACKEND_URL` change is needed.
 
 ## 5. Verify Telegram and later updates
 
