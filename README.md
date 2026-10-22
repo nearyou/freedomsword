@@ -37,7 +37,7 @@ No Rarimo L2 poll has been deployed from this repository and no real Ukrainian p
 
 ## Ubuntu VPS deployment without Docker
 
-The [VPS deployment guide](docs/VPS_DEPLOYMENT.md) installs the frontend, API, Redis, blockchain outbox worker, and Caddy on one Ubuntu VPS. `https://freedomsword.org` serves the frontend and routes same-origin `/api/*` to the private API. The guide includes the build, systemd services, DNS cutover, health checks, and Telegram checks. Vercel is not required for this deployment.
+The [VPS deployment guide](docs/VPS_DEPLOYMENT.md) installs the frontend, API, Redis, blockchain outbox worker, and Caddy on one Ubuntu VPS. `https://freedomsword.org` serves the frontend and routes same-origin `/api/*` to the private API; `https://api.freedomsword.org` also serves the API over HTTPS. The API's port 3001 is private and uses loopback HTTP behind Caddy. The guide includes the build, systemd services, DNS cutover, health checks, and Telegram checks. Vercel is not required for this deployment.
 
 ## Vercel and Telegram release (alternative)
 

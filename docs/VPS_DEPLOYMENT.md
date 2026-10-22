@@ -22,6 +22,21 @@ The checkout must have no uncommitted project changes before deployment. Ignored
 
 Create `backend/.env` from `backend/.env.example` if it does not exist, and edit it locally on the VPS. If it already exists, edit it in place; **do not overwrite the working Atlas URI**. Never paste its contents into chat or commit it.
 
+To reuse a local `backend/.env` without retyping secrets on the VPS, run this in PowerShell from the project directory on your PC:
+
+```powershell
+scp .\backend\.env root@45.61.162.179:/root/freedomsword/backend/.env.import
+```
+
+Then run this on the VPS after `git pull --ff-only`:
+
+```bash
+cd /root/freedomsword
+python3 deploy/vps/prepare-env.py backend/.env.import backend/.env
+```
+
+The import keeps existing nonempty VPS values, including the Atlas URI and Telegram bot token, fills missing values from the local file, and sets the VPS-specific mock-flow settings below. It creates a mode-600 backup of an existing VPS `.env`, writes the result with mode 600, and removes the uploaded copy. It stops without replacing `.env` if a required secret is still missing. Do not use this command to switch a real Sepolia deployment to mock mode.
+
 For the current Telegram **mock** flow, these settings must be present:
 
 ```dotenv
@@ -47,7 +62,7 @@ Also set the existing `DATABASE_URL` to a working Atlas URI with a database name
 chmod 600 backend/.env
 ```
 
-The frontend uses `BACKEND_URL=http://127.0.0.1:3001` at build and runtime. The deployment script supplies this value; it is a server-only URL. The browser calls `/api/*` on `freedomsword.org`, and Caddy routes those requests to the API.
+The frontend uses `BACKEND_URL=http://127.0.0.1:3001` at build and runtime. This is a private loopback connection on the VPS, not the public backend URL. The deployment script supplies it. Browsers reach the API over HTTPS at `https://freedomsword.org/api/*` or `https://api.freedomsword.org/api/*`; Caddy terminates TLS and forwards the request to the private API. Keep port 3001 closed to the public.
 
 ## 3. Install services and deploy
 
@@ -100,6 +115,19 @@ curl -fsS -o /dev/null -w '%{http_code}\n' https://freedomsword.org/
 ```
 
 DNS for the apex, `www`, and `api` should resolve to `45.61.162.179`. Once DNS and firewall access are correct, Caddy obtains and renews their HTTPS certificates. The API check must return MongoDB `ok`; the page check must return a successful status. Check `https://www.freedomsword.org/` redirects to the apex and `https://api.freedomsword.org/api/ready` returns readiness. No Vercel `BACKEND_URL` change is needed.
+
+If the HTTPS API does not respond after deployment, check the VPS directly:
+
+```bash
+sudo systemctl status caddy freedomsword-api --no-pager
+sudo caddy validate --config /etc/caddy/Caddyfile
+sudo ss -lntp | grep -E ':(80|443|3001)\b'
+curl -fsS http://127.0.0.1:3001/api/ready
+curl -fsS https://api.freedomsword.org/api/ready
+sudo journalctl -u caddy -n 80 --no-pager
+```
+
+The first `curl` checks the private API. The second checks public HTTPS and certificate issuance. If the first succeeds but the second fails, check that Caddy is running and TCP 80/443 are open in both UFW and the VPS provider firewall. Do not expose 3001 to fix HTTPS.
 
 ## 5. Verify Telegram and later updates
 
