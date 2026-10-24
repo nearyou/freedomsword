@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ArrowRight,
+  ArrowUpRight,
   BarChart3,
   Check,
   ChevronDown,
@@ -14,12 +15,15 @@ import {
   Globe2,
   History,
   ListChecks,
+  MessageCircle,
   MoreHorizontal,
   Send,
   ShieldCheck,
   Users,
+  Wallet,
 } from 'lucide-react';
 import {
+  openTelegramLink,
   telegramHaptic,
   useTelegram,
   useTelegramBackButton,
@@ -36,8 +40,11 @@ const stageCopy = {
   en: {
     launchTitle: 'Your voice. Your choice.',
     launchDetail: 'Explore candidates. Make your choice.',
+    motto: 'PEOPLE · VOICE · ACTION',
     start: 'Get started',
-    missionTitle: 'Explore. Choose. Track.',
+    missionKicker: 'WELCOME',
+    missionTitle: 'Real people. Real influence.',
+    missionIntro: 'See the people, ideas and progress behind each election.',
     missionSteps: [
       'Explore candidates',
       'Read their platforms',
@@ -45,6 +52,14 @@ const stageCopy = {
       'Track public promises',
       'Inspect the audit trail',
     ],
+    missionDetails: [
+      'Get to know each person before choosing',
+      'Compare published proposals',
+      'Follow aggregate support',
+      'Review progress and evidence',
+      'See recorded election actions',
+    ],
+    readyKicker: 'GETTING READY',
     connectTitle: 'Connect to FreedomSword',
     connectDetail: 'Connect your Telegram account to continue. Wallet support is planned.',
     telegramAccount: 'Telegram account',
@@ -72,13 +87,15 @@ const stageCopy = {
     done: 'Complete',
     next: 'Continue',
     viewElections: 'Explore elections',
-    walletNote: 'Telegram Wallet integration is planned.',
   },
   uk: {
     launchTitle: 'Ваш голос. Ваш вибір.',
     launchDetail: 'Знайомтеся з кандидатами. Зробіть вибір.',
+    motto: 'ЛЮДИ · ГОЛОС · ДІЯ',
     start: 'Почати',
-    missionTitle: 'Дізнайтеся. Оберіть. Стежте.',
+    missionKicker: 'ЛАСКАВО ПРОСИМО',
+    missionTitle: 'Реальні люди. Реальний вплив.',
+    missionIntro: 'Дізнайтеся про людей, ідеї та прогрес кожних виборів.',
     missionSteps: [
       'Знайомтеся з кандидатами',
       'Читайте їхні програми',
@@ -86,6 +103,14 @@ const stageCopy = {
       'Стежте за обіцянками',
       'Переглядайте журнал дій',
     ],
+    missionDetails: [
+      'Дізнайтеся більше про кожного перед вибором',
+      'Порівнюйте опубліковані пропозиції',
+      'Стежте за загальною підтримкою',
+      'Переглядайте прогрес і підтвердження',
+      'Перевіряйте записані дії виборів',
+    ],
+    readyKicker: 'ПІДГОТОВКА',
     connectTitle: 'Підключіться до FreedomSword',
     connectDetail: 'Підключіть Telegram, щоб продовжити. Підтримку гаманця заплановано.',
     telegramAccount: 'Обліковий запис Telegram',
@@ -113,7 +138,6 @@ const stageCopy = {
     done: 'Виконано',
     next: 'Продовжити',
     viewElections: 'Переглянути вибори',
-    walletNote: 'Інтеграцію з Telegram Wallet заплановано.',
   },
 } as const;
 
@@ -122,12 +146,15 @@ export default function WelcomeScreen() {
   const [lang, setLang] = useState<Language>('en');
   const [stage, setStage] = useState<Stage>('launch');
   const [modal, setModal] = useState<Modal>(null);
-  const light = (stage === 'launch' || stage === 'connect') && !modal;
+  // The opening two screens are light; Telegram's chrome follows the dark modal backdrop.
+  const lightStage = stage === 'launch' || stage === 'mission';
+  const light = lightStage && !modal;
   const telegram = useTelegram(light ? '#F8F3E8' : '#071522');
   const flow = useWelcomeFlow(telegram.launch);
   const t = copy[lang];
   const s = stageCopy[lang];
   const available = telegram.launch === 'ready' || telegram.launch === 'outside';
+  const stepsDone = [telegram.launch === 'ready', flow.verified, flow.accepted].filter(Boolean).length;
 
   useTelegramBackButton(
     telegram.launch,
@@ -178,8 +205,9 @@ export default function WelcomeScreen() {
 
   return (
     <div
-      className={`welcome-root fs-welcome ${light ? 'fs-light' : 'fs-dark'}`}
+      className={`welcome-root fs-welcome ${lightStage ? 'fs-light' : 'fs-dark'}`}
       lang={lang}
+      data-stage={stage}
       data-telegram={telegram.launch === 'ready'}
     >
       <Script
@@ -243,8 +271,9 @@ export default function WelcomeScreen() {
             />
             <h1 id="fs-launch-title">{s.launchTitle}</h1>
             <p>{s.launchDetail}</p>
+            <span className="fs-launch-motto">{s.motto}</span>
             <div className="fs-stage-bottom">
-              <button type="button" className="fs-button" onClick={() => go('mission')}>
+              <button type="button" className="fs-button fs-gold" onClick={() => go('mission')}>
                 {s.start}
                 <ArrowRight size={18} />
               </button>
@@ -253,32 +282,49 @@ export default function WelcomeScreen() {
           </main>
         ) : stage === 'mission' ? (
           <main className="fs-stage fs-mission" aria-labelledby="fs-mission-title">
+            <span className="fs-stage-kicker">{s.missionKicker}</span>
             <h1 id="fs-mission-title">{s.missionTitle}</h1>
-            <div className="fs-mission-list">
+            <p className="fs-stage-intro">{s.missionIntro}</p>
+            <ul className="fs-mission-list">
               {[Users, FileText, BarChart3, ListChecks, History].map((Icon, index) => (
-                <div className="fs-mission-card" key={s.missionSteps[index]}>
+                <li className="fs-mission-card" key={s.missionSteps[index]}>
                   <span className="fs-mission-icon">
-                    <Icon size={21} />
+                    <Icon size={20} aria-hidden="true" />
                   </span>
-                  <strong>{s.missionSteps[index]}</strong>
-                </div>
+                  <div>
+                    <strong>{s.missionSteps[index]}</strong>
+                    <p>{s.missionDetails[index]}</p>
+                  </div>
+                </li>
               ))}
-            </div>
+            </ul>
             <div className="fs-stage-bottom">
-              <button type="button" className="fs-button fs-gold" onClick={() => go('connect')}>
+              <button type="button" className="fs-button" onClick={() => go('connect')}>
                 {s.next}
                 <ArrowRight size={18} />
               </button>
-              <span className="fs-dots">
-                <i className="active" />
+              <span className="fs-dots" aria-hidden="true">
                 <i />
+                <i className="active" />
                 <i />
               </span>
             </div>
           </main>
         ) : (
           <main className="fs-stage fs-connect" aria-labelledby="fs-connect-title">
-            <span className="fs-stage-kicker">01 / 03</span>
+            <span className="fs-stage-kicker">
+              {s.readyKicker} · {stepsDone} / 3
+            </span>
+            <span
+              className="fs-progress"
+              role="progressbar"
+              aria-label={t.progress}
+              aria-valuemin={0}
+              aria-valuemax={3}
+              aria-valuenow={stepsDone}
+            >
+              <span style={{ width: `${(stepsDone / 3) * 100}%` }} />
+            </span>
             <h1 id="fs-connect-title">{s.passportTitle}</h1>
             <p className="fs-stage-intro">{s.passportDetail}</p>
             <div className="fs-passport-steps">
@@ -305,7 +351,24 @@ export default function WelcomeScreen() {
                 {flow.accepted ? <span className="fs-passport-status"><Check size={16} aria-label={s.done} /></span> : <ArrowRight className="fs-passport-arrow" size={17} aria-hidden="true" />}
               </button>
             </div>
-            <p className="fs-wallet-note">{s.walletNote}</p>
+            <div className="fs-passport-step fs-passport-wallet">
+              <span className="fs-passport-icon"><Wallet size={20} aria-hidden="true" /></span>
+              <span className="fs-passport-copy"><strong>{s.walletTitle}</strong><small>{s.walletDetail}</small></span>
+              <span className="fs-passport-preview">{s.planned}</span>
+            </div>
+            <a
+              className="fs-feedback"
+              href="https://t.me/freedomswordbot?start=feedback"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(event) => {
+                if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
+              }}
+            >
+              <MessageCircle size={16} aria-hidden="true" />
+              <span>{s.feedback}</span>
+              <ArrowUpRight size={15} aria-hidden="true" />
+            </a>
             {telegram.launch === 'failed' && (
               <p className="civic-field-error" role="alert">
                 {t.failed}

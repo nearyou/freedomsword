@@ -74,6 +74,7 @@
 }
 .fs-stage h1 {
   line-height: 1.13;
+  text-wrap: balance;
 }
 .fs-stage-bottom {
   margin-top: auto;
@@ -84,7 +85,7 @@
 }
 .fs-stage-bottom small {
   color: var(--civic-muted);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
 }
 .fs-stage-bottom small a {
@@ -94,7 +95,7 @@
 }
 .fs-button {
   width: 100%;
-  min-height: 49px;
+  min-height: 52px;
   border-radius: 13px;
   display: flex;
   align-items: center;
@@ -102,7 +103,7 @@
   gap: 10px;
   color: #fff;
   background: linear-gradient(180deg, #2997f0, #0872d9);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 730;
   box-shadow: 0 8px 17px #0566be40;
 }
@@ -140,7 +141,7 @@
 }
 .fs-launch-motto {
   color: #a0773b;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.19em;
   margin-top: 35px;
@@ -149,7 +150,7 @@
   align-self: stretch;
 }
 .fs-stage-kicker {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.16em;
   color: #a47b40;
@@ -164,7 +165,7 @@
   max-width: 330px;
 }
 .fs-stage-intro {
-  font-size: 13px;
+  font-size: 14.5px;
   line-height: 1.6;
   color: var(--civic-muted);
 }
@@ -195,12 +196,12 @@
 }
 .fs-mission-card strong {
   display: block;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.35;
 }
 .fs-mission-card p {
   color: #61717a;
-  font-size: 11px;
+  font-size: 12.5px;
   line-height: 1.4;
   margin-top: 2px;
 }
@@ -309,7 +310,7 @@
   border-radius: 10px;
   color: #a5dafe;
   background: #123148;
-  font-size: 11px;
+  font-size: 13px;
 }
 .fs-feedback svg:last-child {
   margin-left: auto;
