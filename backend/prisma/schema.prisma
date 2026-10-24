@@ -53,6 +53,7 @@ enum BlockchainStatus {
   CONFIRMED
   FAILED
   PROCESSING
+  REJECTED
 }
 
 model RateLimitCounter {
@@ -311,6 +312,8 @@ model BlockchainRecord {
   confirmedAt    DateTime?
   claimToken     String?
   leaseExpiresAt DateTime?
+  nextAttemptAt  DateTime?
+  submittedAt    DateTime?
 
   @@index([actionSequence])
 }

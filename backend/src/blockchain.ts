@@ -3,6 +3,9 @@ import { sha256 } from '@backend/core/hash';
 import { commitmentOutboxStore, type CommitmentOutboxStore } from './outbox-store';
 import { recordOperational } from './observability';
 import { SepoliaBlockchainAdapter } from './sepolia';
+import { ChainRejectedError } from './chain/rejection';
+const stalePendingMs = 10 * 60_000;
+const maxRetryableRejections = 8;
 export interface BlockchainAdapter {
   readonly name: string;
   submit(commitment: string, actionJson?: string | null): Promise<{ receipt: string }>;
@@ -42,9 +45,17 @@ export async function flushOutbox(
         else submitted++;
         recordOperational('outbox', 'success', 'none');
       }
-    } catch {
-      await store.fail(record);
-      recordOperational('outbox', 'failure', 'dependency');
+    } catch (error) {
+      // A rule the contract enforces cannot be satisfied by retrying: settle it as REJECTED so it
+      // stops blocking later actions. A revert that may clear with time is retried a bounded number of times.
+      if (error instanceof ChainRejectedError &&
+        (!error.retryable || (record.attempts ?? 0) >= maxRetryableRejections)) {
+        await store.reject(record);
+        recordOperational('outbox', 'failure', 'conflict');
+      } else {
+        await store.fail(record);
+        recordOperational('outbox', 'failure', 'dependency');
+      }
     }
   }
   return { processed: records.length, confirmed, submitted, adapter: adapter.name };
@@ -59,10 +70,16 @@ export async function reconcileOutbox(
   let confirmed = 0;
   for (const record of records) {
     try {
-      const status = await adapter.confirm(record.receipt, record.commitment, record.actionJson);
-      if (status === 'pending') continue;
-      if (await store.finalizeSubmitted(record, status === 'confirmed') && status === 'confirmed')
-        confirmed++;
+      let status = await adapter.confirm(record.receipt, record.commitment, record.actionJson);
+      if (status === 'pending') {
+        // A transaction dropped from the mempool never gets a receipt and would block every later
+        // action. After the stale limit it is queued for resubmission, which replaces it at its nonce.
+        const stale = !record.submittedAt || Date.now() - record.submittedAt.getTime() > stalePendingMs;
+        if (!stale) continue;
+        status = 'failed';
+      }
+      if (await store.finalizeSubmitted(record, status === 'confirmed' ? 'confirmed' : 'failed') &&
+        status === 'confirmed') confirmed++;
     } catch {
       recordOperational('outbox', 'failure', 'dependency');
     }

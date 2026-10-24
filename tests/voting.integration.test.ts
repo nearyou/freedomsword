@@ -770,6 +770,28 @@ it('leases each outbox commitment to one worker and rejects stale completion', a
   expect((await db.blockchainRecord.findUniqueOrThrow({ where: { id: first.id } })).status).toBe('CONFIRMED');
 });
 
+it('settles a rejected head, backs off failures and still advances the queue', async () => {
+  const store = new MongoCommitmentOutboxStore();
+  await db.blockchainRecord.updateMany({
+    where: { status: { notIn: ['CONFIRMED', 'REJECTED'] } },
+    data: { status: 'CONFIRMED', receipt: `mock:${'a'.repeat(64)}`, confirmedAt: new Date(),
+      claimToken: null, leaseExpiresAt: null },
+  });
+  const first = await db.$transaction((tx) => appendAudit(tx, JSON.stringify({ action: 'TEST_OUTBOX_HEAD' })));
+  const second = await db.$transaction((tx) => appendAudit(tx, JSON.stringify({ action: 'TEST_OUTBOX_NEXT' })));
+  const [head] = await store.claimBatch(1, 60_000);
+  expect(head.id).toBe((await db.blockchainRecord.findUniqueOrThrow({ where: { auditId: first.id } })).id);
+  expect(await store.fail(head)).toBe(true);
+  expect(await store.claimBatch(1, 60_000)).toHaveLength(0);
+  await db.blockchainRecord.update({ where: { id: head.id }, data: { nextAttemptAt: new Date(0) } });
+  const retried = await store.claimBatch(1, 60_000);
+  expect(retried[0].id).toBe(head.id);
+  expect(await store.reject(retried[0])).toBe(true);
+  const [next] = await store.claimBatch(1, 60_000);
+  expect(next.id).toBe((await db.blockchainRecord.findUniqueOrThrow({ where: { auditId: second.id } })).id);
+  expect((await db.blockchainRecord.findUniqueOrThrow({ where: { id: head.id } })).status).toBe('REJECTED');
+});
+
 it('checks the live audit chain, ballot ledgers and platform hashes read-only', async () => {
   const before = await db.auditEvent.count();
   const result = await verifyDatabaseEvidence();

@@ -14,7 +14,6 @@ import { logAuthOutcome } from '@backend/safe-log';
 import { telegramReplayStore } from '@backend/replay-store';
 export async function POST(request: Request) {
   return handle(async () => {
-    await enforceRateLimitAsync('auth', 'global', 60);
     const input = await body(
       request,
       z
@@ -57,6 +56,8 @@ export async function POST(request: Request) {
         (Number(telegramParams.get('auth_date')) + authMaxAgeSeconds() + 1) * 1000,
       );
     }
+    // Limit per verified account: invalid launches never reach the database or a shared bucket.
+    await enforceRateLimitAsync('auth', telegramId, 10);
     const sessionSecret = secret('SESSION_SECRET');
     let user;
     try {

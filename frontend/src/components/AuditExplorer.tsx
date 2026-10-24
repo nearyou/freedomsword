@@ -79,7 +79,9 @@ export default function AuditExplorer({ onClose }: { onClose: () => void }) {
                 </a>
               ) : event.blockchain?.adapter === 'MOCK'
                 ? 'Mock receipt · demonstration only'
-                : 'Awaiting blockchain proof'}
+                : event.blockchain?.status === 'REJECTED'
+                  ? 'Not recorded on-chain: the contract rejected this action'
+                  : 'Awaiting blockchain proof'}
             </dd>
           </dl>
         </details>
