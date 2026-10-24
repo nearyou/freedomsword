@@ -1,5 +1,4 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { BarChart3 } from 'lucide-react';
 import type { ElectionView } from '@frontend/lib/contracts';
 import { count, support } from '@frontend/lib/ui';
 export default function ElectionSnapshot({
@@ -19,16 +18,33 @@ export default function ElectionSnapshot({
         color: candidate.color,
       }))
     : [{ name: 'No active support', value: 1, color: 'var(--border)' }];
+  const sample = source === 'preview';
   return (
-    <section className="panel live-panel">
-      <div className="panel-heading">
-        <h3>
-          <BarChart3 size={18} />
-          Support by candidate
-        </h3>
+    <section className="panel live-panel" aria-labelledby="live-results-title">
+      <div className="live-panel-heading">
+        <div>
+          <h2 id="live-results-title">Support by candidate</h2>
+          <p>
+            {election.title} · {sample ? 'sample figures' : 'live aggregate units'}
+          </p>
+        </div>
         <span className={`live-tag ${stale ? 'stale-tag' : ''}`}>
-          {source === 'preview' ? 'SAMPLE' : stale ? 'STALE' : 'LIVE'}
+          {sample ? 'SAMPLE' : stale ? 'STALE' : 'LIVE'}
         </span>
+      </div>
+      <div className="snapshot-stats">
+        <div>
+          <strong>{count(election.activeUnits)}</strong>
+          <span>active units</span>
+        </div>
+        <div>
+          <strong>{count(election.ballotCount)}</strong>
+          <span>ballots cast</span>
+        </div>
+        <div>
+          <strong>{count(election.recalledUnits)}</strong>
+          <span>recalled units</span>
+        </div>
       </div>
       <div
         className="donut"
@@ -41,8 +57,8 @@ export default function ElectionSnapshot({
               data={chart}
               dataKey="value"
               innerRadius={76}
-              outerRadius={94}
-              paddingAngle={3}
+              outerRadius={98}
+              paddingAngle={2}
               stroke="none"
               isAnimationActive={false}
             >
@@ -65,34 +81,30 @@ export default function ElectionSnapshot({
         </ResponsiveContainer>
         <div className="donut-label">
           <strong>{count(election.activeUnits)}</strong>
-          <span>active vote units</span>
+          <span>active units</span>
         </div>
       </div>
-      <div className="chart-legend">
-        {ranked.map((candidate) => (
-          <div key={candidate.id}>
-            <span className="legend-name">
-              <i style={{ background: candidate.color }} />
-              {candidate.fullName}
-            </span>
-            <strong>{support(candidate, election).toFixed(1)}% · {count(candidate.units)}</strong>
-          </div>
-        ))}
-      </div>
-      <div className="snapshot-stats">
-        <div>
-          <strong>{count(election.ballotCount)}</strong>
-          <span>ballots cast</span>
-        </div>
-        <div>
-          <strong>{count(election.ballotCount * 100)}</strong>
-          <span>original units</span>
-        </div>
-        <div>
-          <strong>{count(election.recalledUnits)}</strong>
-          <span>units recalled</span>
-        </div>
-      </div>
+      <ol className="result-ranking">
+        {ranked.map((candidate) => {
+          const percent = support(candidate, election);
+          return (
+            <li key={candidate.id}>
+              <span className="legend-name">
+                <i style={{ background: candidate.color }} />
+                <span>
+                  {candidate.fullName}
+                  <small>{count(candidate.units)} units</small>
+                </span>
+              </span>
+              <span className="result-ranking-bar" aria-hidden="true">
+                <span style={{ width: `${percent}%`, background: candidate.color }} />
+              </span>
+              <strong>{percent.toFixed(1)}%</strong>
+            </li>
+          );
+        })}
+      </ol>
+      {sample && <p className="fine-print">Illustrative values until live results load.</p>}
     </section>
   );
 }

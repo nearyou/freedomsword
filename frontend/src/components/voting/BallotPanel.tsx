@@ -1,9 +1,8 @@
-import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Check, Undo2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import type { CitizenView, ElectionView } from '@frontend/lib/contracts';
 import type { BallotView } from '@frontend/lib/ui';
 import { supportSegments } from '@frontend/lib/ballot-ui';
-import Avatar from '../ui/Avatar';
 import RecallPanel from './RecallPanel';
 import ShareInvite from './ShareInvite';
 const PrivateBallotPanel = dynamic(() => import('./PrivateBallotPanel'), { ssr: false });
@@ -43,31 +42,37 @@ export default function BallotPanel({
       ? 100
       : (election.recallPolicy?.partialAmount ?? 25),
   );
-  return (
-    <div className="panel ballot-panel">
-      {ballot ? (
-        <>
-          <div className="panel-heading">
-            <h3>Your choice</h3>
-            <ShieldCheck size={19} />
-          </div>
-          <div className="ballot-candidate">
-            {candidate && <Avatar name={candidate.fullName} color={candidate.color} />}
-            <div>
-              <strong>{candidate?.fullName ?? 'Your selected candidate'}</strong>
-              <span>{candidate?.party ?? 'Candidate details unavailable'}</span>
+  if (ballot) {
+    const recalled = ballot.balance === 0;
+    const state = recalled ? 'RECALLED' : election.status === 'ACTIVE' ? 'ACTIVE' : 'FINAL';
+    return (
+      <div className="ballot-after">
+        <header className={`ballot-hero ${recalled ? 'recalled' : ''}`}>
+          <span className="ballot-hero-icon" aria-hidden="true">
+            {recalled ? <Undo2 size={30} /> : <Check size={34} strokeWidth={2.6} />}
+          </span>
+          <h2>{recalled ? 'Your support is recalled' : 'Your vote is cast'}</h2>
+          <p>
+            {recalled ? 'Your demo ballot no longer supports ' : 'Your demo ballot supports '}
+            <strong>{candidate?.fullName ?? 'your selected candidate'}</strong>
+            {candidate?.party ? ` · ${candidate.party}` : ''}.
+          </p>
+        </header>
+        <section className="panel ballot-panel" aria-labelledby="ballot-card-title">
+          <div className="ballot-card-top">
+            <div className="balance">
+              <span className="ballot-kicker" id="ballot-card-title">Your ballot</span>
+              <strong>
+                {ballot.balance}
+                <small> / 100</small>
+              </strong>
+              <span>units remaining</span>
             </div>
-          </div>
-          <div className="balance">
-            <strong>
-              {ballot.balance}
-              <small> / 100</small>
-            </strong>
-            <span>units remaining</span>
+            <span className={`ballot-state ballot-state-${state.toLowerCase()}`}>{state}</span>
           </div>
           <div
             className="support-meter"
-            style={{ gap: `${Math.min(3, 100 / segments.length)}px` }}
+            style={{ gap: `${Math.min(4, 100 / segments.length)}px` }}
             role="meter"
             aria-label="Remaining ballot support"
             aria-valuemin={0}
@@ -94,21 +99,24 @@ export default function BallotPanel({
             privateError={privateError}
             onRecall={onRecall}
           />
-          <ShareInvite />
-        </>
-      ) : (
-        <div className="empty-ballot">
-          <h3>No choice recorded yet</h3>
-          <p>Explore the candidates, then choose one to support.</p>
-          <button className="button primary" onClick={onExplore}>
-            Explore candidates
-            <ArrowRight size={17} />
-          </button>
-          {!ready && (
-            <button className="text-button" onClick={onPassport}>Complete Citizen Passport to vote</button>
-          )}
-        </div>
-      )}
+        </section>
+        {!recalled && <ShareInvite />}
+      </div>
+    );
+  }
+  return (
+    <div className="panel ballot-panel">
+      <div className="empty-ballot">
+        <h3>No choice recorded yet</h3>
+        <p>Explore the candidates, then choose one to support.</p>
+        <button className="button primary" onClick={onExplore}>
+          Explore candidates
+          <ArrowRight size={17} />
+        </button>
+        {!ready && (
+          <button className="text-button" onClick={onPassport}>Complete Citizen Passport to vote</button>
+        )}
+      </div>
     </div>
   );
 }

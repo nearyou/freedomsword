@@ -1,4 +1,4 @@
-import { ArrowDownLeft, Clock3 } from 'lucide-react';
+import { ArrowDownLeft } from 'lucide-react';
 import type { ElectionView } from '@frontend/lib/contracts';
 import { timeLabel, type BallotView } from '@frontend/lib/ui';
 import { recallAvailability } from '@frontend/lib/ballot-ui';
@@ -35,15 +35,11 @@ export default function RecallPanel({
     Math.ceil((new Date(election.closesAt).getTime() - now) / 86400000),
   );
   return (
-    <section className="recall-panel">
-      <div className="panel-heading">
-        <h3>Recall support</h3>
-        <Clock3 size={17} />
-      </div>
+    <section className="recall-panel" aria-label="Recall support">
       <div className="recall-options">
         <div>
           <button
-            className="button secondary full"
+            className="button recall-partial full"
             disabled={!!partialReason}
             aria-describedby={partialReason ? 'partial-reason' : undefined}
             onClick={() => onRecall('partial')}
@@ -59,12 +55,12 @@ export default function RecallPanel({
         </div>
         <div>
           <button
-            className="button danger full"
+            className="button recall-full full"
             disabled={!!fullReason}
             aria-describedby={fullReason ? 'full-reason' : undefined}
             onClick={() => onRecall('full')}
           >
-            Recall all support
+            Recall remaining
           </button>
           {fullReason && (
             <p className="disabled-reason" id="full-reason">

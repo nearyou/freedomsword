@@ -308,8 +308,121 @@
   margin-top: 38px;
 }
 
+.live-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.live-panel-heading h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.live-panel-heading p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.live-panel .live-tag {
+  flex: none;
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
 .results-dashboard .snapshot-stats {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.results-dashboard .snapshot-stats > div {
+  padding: 12px 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #0d2538;
+}
+
+.results-dashboard .snapshot-stats strong {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.results-dashboard .snapshot-stats span {
+  font-size: 11px;
+}
+
+.live-panel .donut {
+  margin: 14px 0 8px;
+}
+
+.live-panel .donut-label span {
+  font-size: 12px;
+}
+
+.result-ranking {
+  display: grid;
+  gap: 13px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result-ranking li {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(56px, 1fr) 52px;
+  align-items: center;
+  gap: 12px;
+}
+
+.result-ranking .legend-name {
+  min-width: 0;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.result-ranking .legend-name > span {
+  min-width: 0;
+}
+
+.result-ranking .legend-name small {
+  display: block;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.result-ranking .legend-name i {
+  width: 8px;
+  height: 8px;
+}
+
+.result-ranking-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #22405a;
+}
+
+.result-ranking-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.result-ranking strong {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.live-panel > .fine-print {
+  margin: 16px 0 0;
 }
 
 .results-transparency-link {
@@ -441,3 +554,245 @@
 .private-result-row > div:first-child { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 .private-result-row span { color: var(--muted); }
 .private-results code { overflow-wrap: anywhere; }
+
+/* Post-vote ballot: confirmation, ballot card with recall, then the invitation. */
+.ballot-after {
+  display: grid;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.ballot-hero {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 10px 8px 4px;
+  text-align: center;
+}
+
+.ballot-hero-icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  color: #fff;
+  background: radial-gradient(circle at 35% 30%, #3fd08f, #16965c);
+  box-shadow: 0 0 0 8px #30b77d22, 0 12px 28px #0006;
+}
+
+.ballot-hero.recalled .ballot-hero-icon {
+  color: #f6f7f4;
+  background: #2b4a62;
+  box-shadow: 0 0 0 8px #2b4a6233;
+}
+
+.ballot-hero h2 {
+  margin: 0;
+  font-size: 27px;
+}
+
+.ballot-hero p {
+  max-width: 340px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ballot-hero p strong {
+  color: var(--text);
+}
+
+.ballot-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ballot-card-top .balance {
+  margin: 0;
+  text-align: left;
+}
+
+.ballot-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ballot-card-top .balance strong,
+html[data-theme='light'] .ballot-card-top .balance strong {
+  color: var(--text);
+  font-size: 34px;
+  letter-spacing: -0.04em;
+}
+
+.ballot-card-top .balance strong small {
+  font-size: 18px;
+}
+
+.ballot-card-top .balance > span {
+  font-size: 13px;
+}
+
+.ballot-state {
+  flex: none;
+  padding: 4px 9px;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.ballot-state-active {
+  color: #87e5b3;
+  background: #174b3c;
+}
+
+.ballot-state-final {
+  color: #c9d7e0;
+  background: #24405a;
+}
+
+.ballot-state-recalled {
+  color: #efd086;
+  background: #493a29;
+}
+
+.ballot-panel .support-meter {
+  height: 10px;
+  margin-top: 16px;
+  background: transparent;
+}
+
+.ballot-panel .support-meter > span {
+  border-radius: 5px;
+  background: #24415a;
+}
+
+.ballot-panel .recall-panel {
+  margin-top: 18px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.ballot-panel .recall-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.recall-options .button.recall-partial,
+.recall-options .button.recall-full {
+  min-height: 44px;
+  padding: 10px 8px;
+  border-width: 1.5px;
+  background: transparent;
+  box-shadow: none;
+  font-size: 13px;
+}
+
+.recall-options .button.recall-partial {
+  border-color: #d4ad62;
+  color: #e8c986;
+}
+
+.recall-options .button.recall-full {
+  border-color: #e67577;
+  color: #ffb3b3;
+}
+
+.recall-options .button.recall-partial:hover:not(:disabled) {
+  background: #d4ad6214;
+}
+
+.recall-options .button.recall-full:hover:not(:disabled) {
+  background: #e6757714;
+}
+
+.recall-options .button:disabled {
+  border-color: #35556a;
+  color: #7f97a7;
+}
+
+.ballot-panel .recall-panel > .fine-print {
+  margin-top: 12px;
+}
+
+.ballot-after .share-invite {
+  margin-top: 0;
+}
+
+.share-invite > p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.share-invite-link {
+  font-size: 13px;
+}
+
+.share-invite-status {
+  font-size: 12px;
+}
+
+.share-invite-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.share-invite-options a,
+.share-invite-options button {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: #c6d8e4;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.share-invite-options a:hover,
+.share-invite-options button:hover {
+  color: #f6f7f4;
+}
+
+.share-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.share-icon.telegram {
+  background: #2697e0;
+}
+
+.share-icon.x {
+  border: 1px solid #5d7a8f;
+  background: #0b1824;
+}
+
+.share-icon.facebook {
+  background: #1f6fe5;
+  font-family: Georgia, serif;
+  font-size: 21px;
+}
+
+.share-icon.more {
+  background: #17924f;
+}

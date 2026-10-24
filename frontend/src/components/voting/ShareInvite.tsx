@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Copy, ExternalLink, Send } from 'lucide-react';
+import { ArrowUpRight, Check, Copy, Send } from 'lucide-react';
 import { openTelegramLink, telegramHaptic } from '@frontend/hooks/useTelegram';
 
 const inviteUrl = 'https://t.me/freedomswordbot';
@@ -24,9 +24,22 @@ export default function ShareInvite() {
     }
   }
 
+  async function shareMore() {
+    if (typeof navigator.share !== 'function') {
+      await copyLink();
+      return;
+    }
+    try {
+      await navigator.share({ title: 'FreedomSword', text: inviteText, url: inviteUrl });
+    } catch {
+      /* The person closed the share sheet. */
+    }
+  }
+
   return (
-    <section className="share-invite" aria-labelledby="share-invite-title">
-      <h3 id="share-invite-title">Invite a friend</h3>
+    <section className="panel share-invite" aria-labelledby="share-invite-title">
+      <h3 id="share-invite-title">Invite someone to take part</h3>
+      <p>{inviteText}</p>
       <div className="share-invite-link">
         <span>t.me/freedomswordbot</span>
         <button type="button" onClick={() => void copyLink()} aria-label="Copy FreedomSword link">
@@ -47,29 +60,29 @@ export default function ShareInvite() {
             if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
           }}
         >
-          <Send size={16} /> Telegram contacts
+          <span className="share-icon telegram" aria-hidden="true"><Send size={18} /></span>
+          Telegram
         </a>
         <a
           href={`https://x.com/intent/post?text=${encodedText}&url=${encodedUrl}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          X <ExternalLink size={13} />
+          <span className="share-icon x" aria-hidden="true">X</span>
+          X
         </a>
         <a
           href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          Facebook <ExternalLink size={13} />
+          <span className="share-icon facebook" aria-hidden="true">f</span>
+          Facebook
         </a>
-        <a
-          href={`https://wa.me/?text=${encodedText}%20${encodedUrl}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          WhatsApp <ExternalLink size={13} />
-        </a>
+        <button type="button" onClick={() => void shareMore()}>
+          <span className="share-icon more" aria-hidden="true"><ArrowUpRight size={18} /></span>
+          More
+        </button>
       </div>
     </section>
   );

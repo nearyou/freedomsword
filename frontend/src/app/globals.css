@@ -824,17 +824,6 @@ html[data-theme='light'] .ideology {
   font-size: 10px;
   color: var(--muted);
 }
-.chart-legend {
-  display: grid;
-  gap: 11px;
-  margin: 8px 0 22px;
-}
-.chart-legend > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 10px;
-}
 .legend-name {
   display: inline-flex;
   align-items: center;
