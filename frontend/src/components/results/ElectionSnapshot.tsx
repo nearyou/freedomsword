@@ -39,11 +39,11 @@ export default function ElectionSnapshot({
         </div>
         <div>
           <strong>{count(election.ballotCount)}</strong>
-          <span>ballots cast</span>
+          <span>{election.protocol === 'CONTINUOUS_SUPPORT' ? 'participants' : 'ballots cast'}</span>
         </div>
         <div>
           <strong>{count(election.recalledUnits)}</strong>
-          <span>recalled units</span>
+          <span>{election.protocol === 'CONTINUOUS_SUPPORT' ? 'cooling units' : 'recalled units'}</span>
         </div>
       </div>
       <div

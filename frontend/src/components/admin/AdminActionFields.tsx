@@ -39,8 +39,9 @@ export default function AdminActionFields({
         {action === 'create' && (
           <label>
             Voting protocol
-            <select name="protocol" defaultValue="LEGACY_RECALL">
+            <select name="protocol" defaultValue="CONTINUOUS_SUPPORT">
               <option value="LEGACY_RECALL">Legacy demonstration · recall</option>
+              <option value="CONTINUOUS_SUPPORT">Reusable support · six-month recall cooldown</option>
               <option value="MACI_PRIVATE">Private MACI · setup required</option>
             </select>
           </label>

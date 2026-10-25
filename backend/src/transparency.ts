@@ -19,21 +19,39 @@ export async function electionTransparencySnapshot(tx: PrismaTypes.TransactionCl
     if (!election || election.status === 'DRAFT') throw new ApiError(404, 'Election not found');
     if (election.protocol === 'MACI_PRIVATE')
       throw new ApiError(409, 'Private-election results require a verified final MACI tally', 'PRIVATE_TALLY_PENDING');
-    const tallies = await tx.vote.groupBy({ by: ['candidateId'], where: { electionId },
+    const reusable = election.protocol === 'CONTINUOUS_SUPPORT';
+    let tallies = await tx.vote.groupBy({ by: ['candidateId'], where: { electionId },
       _sum: { balance: true }, _count: true });
-    const cast = await tx.voteEvent.aggregate({ where: { type: 'CAST', vote: { electionId } }, _sum: { units: true } });
-    const recalled = await tx.voteEvent.aggregate({ where: { type: 'RECALL', vote: { electionId } }, _sum: { units: true } });
+    let castUnits: number;
+    let recalledUnits: number;
+    if (reusable) {
+      const allocations = await tx.supportAllocation.groupBy({ by: ['candidateId'],
+        where: { electionId, units: { gt: 0 } }, _sum: { units: true }, _count: true });
+      tallies = allocations.map((entry) => ({ candidateId: entry.candidateId,
+        _sum: { balance: entry._sum.units }, _count: entry._count }));
+      const allocated = await tx.supportEvent.aggregate({ where: { type: 'ALLOCATE', budget: { electionId } }, _sum: { units: true } });
+      const withdrawn = await tx.supportEvent.aggregate({ where: { type: 'WITHDRAW', budget: { electionId } }, _sum: { units: true } });
+      castUnits = allocated._sum.units ?? 0;
+      recalledUnits = withdrawn._sum.units ?? 0;
+    } else {
+      const cast = await tx.voteEvent.aggregate({ where: { type: 'CAST', vote: { electionId } }, _sum: { units: true } });
+      const recalled = await tx.voteEvent.aggregate({ where: { type: 'RECALL', vote: { electionId } }, _sum: { units: true } });
+      castUnits = cast._sum.units ?? 0;
+      recalledUnits = -(recalled._sum.units ?? 0);
+    }
     const auditEvents = await tx.auditEvent.findMany({ where: { electionId },
       orderBy: { sequence: 'desc' }, take: auditLimit ?? undefined,
       select: { sequence: true, commitment: true, previousHash: true, hash: true,
         blockchain: { select: { adapter: true, status: true, receipt: true } } },
     });
     const activeUnits = tallies.reduce((sum, tally) => sum + (tally._sum.balance ?? 0), 0);
-    const participation = tallies.reduce((sum, tally) => sum + tally._count, 0);
+    const participation = reusable ? await tx.supportBudget.count({ where: { electionId } })
+      : tallies.reduce((sum, tally) => sum + tally._count, 0);
     return {
       schemaVersion: 1,
       election: {
         id: election.id, title: election.title, description: election.description,
+        protocol: election.protocol,
         type: election.type, status: effectiveElectionStatus(election, new Date()),
         opensAt: election.opensAt.toISOString(), closesAt: election.closesAt.toISOString(),
         recallPolicy: {
@@ -57,14 +75,16 @@ export async function electionTransparencySnapshot(tx: PrismaTypes.TransactionCl
       })),
       totals: {
         participation,
-        voteUnitsCast: cast._sum.units ?? 0,
-        recalledUnits: -(recalled._sum.units ?? 0),
+        voteUnitsCast: castUnits,
+        recalledUnits,
         activeUnits,
       },
       audit: {
         scope: 'election',
         recentEvents: auditEvents.reverse(),
-        note: 'Historical events created before election scoping remain in the global /api/audit chain.',
+        note: reusable
+          ? 'Reusable support is enforced by the application. Blockchain anchors commit to audit events, not on-chain support balances. Allocation and recall totals include all cycles; no individual account or allocation is disclosed.'
+          : 'Historical events created before election scoping remain in the global /api/audit chain.',
       },
     };
 }

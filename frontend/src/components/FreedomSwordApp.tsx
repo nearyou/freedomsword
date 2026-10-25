@@ -38,7 +38,11 @@ const headings: Record<AppTab, string> = {
   'My ballot': 'My ballot',
   Accountability: 'Promises',
 };
-export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean }) {
+export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates', initialElectionId }: {
+  demoEnabled: boolean;
+  initialTab?: AppTab;
+  initialElectionId?: string;
+}) {
   const citizenState = useCitizen();
   const electionState = useElections();
   const telegram = useTelegram();
@@ -51,8 +55,8 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
     [refreshCitizen, refreshElections],
   );
   const actions = useVoting(() => refresh(true));
-  const [activeId, setActiveId] = useState('council-2026');
-  const [tab, setTab] = useState<AppTab>('Candidates');
+  const [activeId, setActiveId] = useState(initialElectionId ?? 'council-2026');
+  const [tab, setTab] = useState<AppTab>(initialTab);
   const [showElectionList, setShowElectionList] = useState(true);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('support');
@@ -114,7 +118,7 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
     }
   }
   function cast(candidate: CandidateView) {
-    if (election.protocol === 'MACI_PRIVATE') {
+    if (election.protocol === 'MACI_PRIVATE' || election.protocol === 'CONTINUOUS_SUPPORT') {
       close();
       setTab('My ballot');
       window.scrollTo(0, 0);
@@ -267,7 +271,7 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
                     election={election}
                     ballot={ballot}
                     citizen={citizen}
-                    onRefresh={() => refreshCitizen(true)}
+                    onRefresh={() => refresh(true)}
                     ready={ready}
                     busy={actions.busy}
                     privateError={!!citizenState.error}

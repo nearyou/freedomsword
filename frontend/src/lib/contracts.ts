@@ -31,7 +31,7 @@ export interface ElectionView {
   title: string;
   description: string;
   type: string;
-  protocol?: 'LEGACY_RECALL' | 'MACI_PRIVATE';
+  protocol?: 'LEGACY_RECALL' | 'MACI_PRIVATE' | 'CONTINUOUS_SUPPORT';
   privatePoll?: {
     chainId: number;
     maciAddress: string;

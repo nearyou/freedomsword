@@ -1,0 +1,155 @@
+'use client';
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { api, ClientApiError } from '@frontend/lib/client-api';
+import type { ElectionView } from '@frontend/lib/contracts';
+import { electionOpen, timeLabel } from '@frontend/lib/ui';
+import Dialog from '../ui/Dialog';
+import ShareInvite from './ShareInvite';
+
+interface SupportState {
+  totalUnits: number;
+  activeUnits: number;
+  availableUnits: number;
+  coolingUnits: number;
+  allocations: { candidateId: string; units: number }[];
+  withdrawals: { units: number; availableAt: string }[];
+}
+type Command = { electionId: string; candidateId: string; action: 'allocate' | 'withdraw';
+  units: number; requestId: string };
+
+export default function ReusableSupportPanel({ election, connected, ready, now, onPassport, onRefresh }: {
+  election: ElectionView;
+  connected: boolean;
+  ready: boolean;
+  now: number;
+  onPassport: () => void;
+  onRefresh: () => Promise<void>;
+}) {
+  const [state, setState] = useState<SupportState | null>(null);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [candidateId, setCandidateId] = useState('');
+  const [amount, setAmount] = useState('25');
+  const [busy, setBusy] = useState(false);
+  const [confirm, setConfirm] = useState<Command | null>(null);
+  const [retry, setRetry] = useState<Command | null>(null);
+  const lock = useRef(false);
+  const currentCandidate = candidateId || election.candidates[0]?.id || '';
+  const candidate = election.candidates.find((item) => item.id === currentCandidate);
+  const selectedUnits = state?.allocations.find((item) => item.candidateId === currentCandidate)?.units ?? 0;
+  const units = Number(amount);
+  const validAmount = Number.isInteger(units) && units >= 1 && units <= 100;
+  const canAct = ready && electionOpen(election, now) && !!state && !busy && !error && !retry;
+  const generation = useRef(0);
+
+  const refresh = useCallback(async () => {
+    if (!connected) return;
+    const revision = ++generation.current;
+    try {
+      const next = await api<SupportState>(`support?electionId=${encodeURIComponent(election.id)}`);
+      if (revision === generation.current) { setState(next); setError(''); }
+    } catch (failure) {
+      if (revision === generation.current)
+        setError(failure instanceof Error ? failure.message : 'Your support could not be refreshed.');
+    }
+  }, [connected, election.id]);
+  useEffect(() => {
+    const revision = generation;
+    const initial = setTimeout(() => { setState(null); void refresh(); }, 0);
+    const timer = setInterval(() => { if (!document.hidden && !lock.current) void refresh(); }, 30_000);
+    return () => { clearTimeout(initial); clearInterval(timer); revision.current++; };
+  }, [refresh]);
+
+  function prepare(action: Command['action'], requestedUnits = units) {
+    setConfirm({ electionId: election.id, candidateId: currentCandidate, action,
+      units: requestedUnits, requestId: crypto.randomUUID() });
+  }
+  async function execute(command: Command) {
+    if (lock.current) return;
+    lock.current = true;
+    generation.current++;
+    setBusy(true); setError(''); setNotice('');
+    try {
+      const next = await api<SupportState>('support', command);
+      setState(next); setRetry(null); setConfirm(null);
+      setNotice(command.action === 'withdraw'
+        ? `${command.units} units recalled. Each withdrawal unlocks six calendar months later.`
+        : `${command.units} units allocated.`);
+      await onRefresh();
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : 'The action could not be confirmed.');
+      if (!(failure instanceof ClientApiError) || failure.status === 0 || failure.status >= 500)
+        setRetry(command);
+      setConfirm(null);
+    } finally { lock.current = false; setBusy(false); }
+  }
+
+  return <div className="reusable-support">
+    <section className="panel" aria-labelledby="support-title">
+      <h2 id="support-title">Your reusable support</h2>
+      <p>100 units to allocate across candidates. Recall any whole amount, including all your
+        support, in one action. Each withdrawal becomes available again six calendar months later.</p>
+      {!connected ? <button className="button primary" onClick={onPassport}>Connect Telegram</button> : <>
+        {state && <>
+          <dl className="support-budget">
+            <div><dt>Available</dt><dd>{state.availableUnits}</dd></div>
+            <div><dt>Supporting candidates</dt><dd>{state.activeUnits}</dd></div>
+            <div><dt>Cooling down</dt><dd>{state.coolingUnits}</dd></div>
+          </dl>
+          <h3>Your allocations</h3>
+          {state.allocations.length ? <ul className="support-allocations">
+            {state.allocations.map((entry) => <li key={entry.candidateId}>
+              <span>{election.candidates.find((item) => item.id === entry.candidateId)?.fullName ?? 'Candidate'}</span>
+              <strong>{entry.units} units</strong>
+            </li>)}
+          </ul> : <p>You have no active allocations.</p>}
+          <div className="support-form">
+            <label>Candidate<select value={currentCandidate} disabled={busy || !!retry}
+              onChange={(event) => setCandidateId(event.target.value)}>
+              {election.candidates.map((item) => <option key={item.id} value={item.id}>{item.fullName}</option>)}
+            </select></label>
+            <label>Amount · whole units<input type="number" min={1} max={100} step={1} value={amount}
+              disabled={busy || !!retry} onChange={(event) => setAmount(event.target.value)} /></label>
+            <div className="support-actions">
+              <button className="button primary" disabled={!canAct || !validAmount || !candidate || units > state.availableUnits}
+                onClick={() => prepare('allocate')}>Allocate {validAmount ? units : ''} units</button>
+              <button className="button secondary" disabled={!canAct || !validAmount || units > selectedUnits}
+                onClick={() => prepare('withdraw')}>Recall {validAmount ? units : ''} units</button>
+              <button className="button danger" disabled={!canAct || selectedUnits === 0}
+                onClick={() => prepare('withdraw', selectedUnits)}>Recall all {selectedUnits} units from this candidate</button>
+            </div>
+          </div>
+          {!ready && <button className="button secondary" onClick={onPassport}>Complete Citizen Passport</button>}
+          {!electionOpen(election, now) && <p>Changes are available only while this election is open.</p>}
+          {state.withdrawals.length > 0 && <section className="support-cooldowns">
+            <h3>When your recalled units return</h3>
+            <ul>{state.withdrawals.map((entry, index) => <li key={`${entry.availableAt}-${index}`}>
+              <strong>{entry.units} units</strong><time dateTime={entry.availableAt}>{timeLabel(entry.availableAt)}</time>
+            </li>)}</ul>
+            <p>After each timer ends, allocate those units to the same candidate or others, in parts or in full.
+              Recalling them again starts a new six-month timer.</p>
+          </section>}
+        </>}
+        {!state && !error && <p role="status">Loading your support…</p>}
+        {error && <p role="alert">{error}</p>}
+        {retry ? <button className="button secondary" disabled={busy} onClick={() => void execute(retry)}>
+          Retry the same action safely
+        </button> : error && <button className="button secondary" disabled={busy} onClick={() => void refresh()}>Refresh support</button>}
+        {notice && <p role="status">{notice}</p>}
+      </>}
+      <p className="fine-print">Fictional-election demo. The operator can correlate accounts and allocations.
+        The application enforces this budget; blockchain records anchor audit commitments.</p>
+    </section>
+    {!!state?.activeUnits && <ShareInvite />}
+    {confirm && <Dialog titleId="support-confirm-title" onClose={() => setConfirm(null)} busy={busy}>
+      <h2 id="support-confirm-title">{confirm.action === 'withdraw' ? 'Recall' : 'Allocate'} {confirm.units} units?</h2>
+      <p>{election.candidates.find((item) => item.id === confirm.candidateId)?.fullName}</p>
+      {confirm.action === 'withdraw' && <p>These units stop supporting this candidate immediately. You can use them
+        again six calendar months after this withdrawal.</p>}
+      <div className="dialog-actions"><button className="button secondary" disabled={busy} onClick={() => setConfirm(null)}>Cancel</button>
+        <button className="button primary" disabled={busy} onClick={() => void execute(confirm)}>{busy ? 'Recording…' : 'Confirm'}</button>
+      </div>
+    </Dialog>}
+  </div>;
+}

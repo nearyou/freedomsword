@@ -3,20 +3,15 @@
 import { useState } from 'react';
 import { ArrowUpRight, Check, Copy, Send } from 'lucide-react';
 import { openTelegramLink, telegramHaptic } from '@frontend/hooks/useTelegram';
-
-const inviteUrl = 'https://t.me/freedomswordbot';
-const inviteText =
-  'I made my choice on FreedomSword. Explore the candidates, make yours, and help shape what comes next.';
-const encodedUrl = encodeURIComponent(inviteUrl);
-const encodedText = encodeURIComponent(inviteText);
+import { inviteUrl, inviteText, shareDestinations } from '@frontend/lib/share';
 
 export default function ShareInvite() {
-  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
+  const [copyState, setCopyState] = useState<'idle' | 'link' | 'invitation' | 'failed'>('idle');
 
-  async function copyLink() {
+  async function copyLink(includeMessage = false) {
     try {
-      await navigator.clipboard.writeText(inviteUrl);
-      setCopyState('copied');
+      await navigator.clipboard.writeText(includeMessage ? `${inviteText}\n${inviteUrl}` : inviteUrl);
+      setCopyState(includeMessage ? 'invitation' : 'link');
       telegramHaptic('success');
     } catch {
       setCopyState('failed');
@@ -26,7 +21,7 @@ export default function ShareInvite() {
 
   async function shareMore() {
     if (typeof navigator.share !== 'function') {
-      await copyLink();
+      await copyLink(true);
       return;
     }
     try {
@@ -43,47 +38,42 @@ export default function ShareInvite() {
       <div className="share-invite-link">
         <span>t.me/freedomswordbot</span>
         <button type="button" onClick={() => void copyLink()} aria-label="Copy FreedomSword link">
-          {copyState === 'copied' ? <Check size={16} /> : <Copy size={16} />}
+          {copyState === 'link' ? <Check size={16} /> : <Copy size={16} />}
         </button>
       </div>
       {copyState !== 'idle' && (
         <span className="share-invite-status" role="status">
-          {copyState === 'copied' ? 'Link copied.' : 'Copy failed. Use a share option below.'}
+          {copyState === 'failed' ? 'Copy failed. Use a share option below.' :
+            copyState === 'invitation' ? 'Invitation and link copied.' : 'Link copied.'}
         </span>
       )}
       <div className="share-invite-options">
-        <a
-          href={`https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`}
+        {shareDestinations.map((destination) => <a
+          key={destination.name}
+          href={destination.href}
           target="_blank"
           rel="noopener noreferrer"
           onClick={(event) => {
-            if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
+            if (destination.name === 'Telegram' && openTelegramLink(event.currentTarget.href))
+              event.preventDefault();
           }}
         >
-          <span className="share-icon telegram" aria-hidden="true"><Send size={18} /></span>
-          Telegram
-        </a>
-        <a
-          href={`https://x.com/intent/post?text=${encodedText}&url=${encodedUrl}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span className="share-icon x" aria-hidden="true">X</span>
-          X
-        </a>
-        <a
-          href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span className="share-icon facebook" aria-hidden="true">f</span>
-          Facebook
-        </a>
+          <span className={`share-icon ${destination.style}`} aria-hidden="true">
+            {destination.name === 'Telegram' ? <Send size={18} /> : destination.symbol}
+          </span>
+          {destination.name}
+        </a>)}
+        <button type="button" onClick={() => void copyLink(true)}>
+          <span className="share-icon copy" aria-hidden="true"><Copy size={18} /></span>
+          Copy invitation
+        </button>
         <button type="button" onClick={() => void shareMore()}>
           <span className="share-icon more" aria-hidden="true"><ArrowUpRight size={18} /></span>
           More
         </button>
       </div>
+      <p className="fine-print share-other-apps">For Instagram, TikTok and other installed apps,
+        use More or paste the copied invitation into your post. Available apps depend on your device.</p>
     </section>
   );
 }

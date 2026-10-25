@@ -1,5 +1,5 @@
-import { openTelegramLink } from '@frontend/hooks/useTelegram';
-import { ChevronRight, MessageCircle, ShieldCheck } from 'lucide-react';
+import { ChevronRight, ShieldCheck } from 'lucide-react';
+import FeedbackLink from '../FeedbackLink';
 import BrandMark from '../ui/BrandMark';
 import Sidebar from './Sidebar';
 import MobileNavigation from './MobileNavigation';
@@ -35,19 +35,7 @@ export default function AppShell({
               <strong>{tab === 'Candidates' ? 'Elections' : tab}</strong>
             </div>
             <div className="topbar-actions">
-              <a
-                className="feedback-link"
-                href="https://t.me/freedomswordbot?start=feedback"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open FreedomSword bot to send feedback"
-                onClick={(event) => {
-                  if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
-                }}
-              >
-                <MessageCircle size={16} />
-                <span>Feedback</span>
-              </a>
+              <FeedbackLink />
               <button className="connection" onClick={onPassport}>
                 <ShieldCheck size={15} />
                 <span>
