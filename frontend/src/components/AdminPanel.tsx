@@ -98,8 +98,8 @@ export default function AdminPanel() {
           ? 'Verified private results have already been published.'
         : action === 'publishPrivateResults' && selectedStatus !== 'FINISHED'
           ? 'Results can be published only after the poll finishes.'
-        : action === 'recallPolicy' && selected.protocol !== 'LEGACY_RECALL'
-          ? 'This voting mode has fixed recall rules.'
+        : action === 'recallPolicy' && selected.protocol === 'MACI_PRIVATE'
+          ? 'Private MACI elections do not use recall policies.'
         : action === 'activate' && selected.protocol === 'MACI_PRIVATE' && !selected.privatePoll
           ? 'Configure a MACI poll before activation.'
         : action === 'close'

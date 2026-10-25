@@ -6,7 +6,6 @@ import { supportSegments } from '@frontend/lib/ballot-ui';
 import RecallPanel from './RecallPanel';
 import ShareInvite from './ShareInvite';
 const PrivateBallotPanel = dynamic(() => import('./PrivateBallotPanel'), { ssr: false });
-const ReusableSupportPanel = dynamic(() => import('./ReusableSupportPanel'), { ssr: false });
 export default function BallotPanel({
   election,
   ballot,
@@ -32,9 +31,6 @@ export default function BallotPanel({
   onExplore: () => void;
   onPassport: () => void;
 }) {
-  if (election.protocol === 'CONTINUOUS_SUPPORT')
-    return <ReusableSupportPanel key={election.id} election={election} connected={citizen.connected}
-      ready={ready && !privateError} now={now} onPassport={onPassport} onRefresh={onRefresh} />;
   if (election.protocol === 'MACI_PRIVATE') {
     return <PrivateBallotPanel key={election.id} election={election} citizen={citizen} ready={ready}
       now={now} onPassport={onPassport} onRefresh={onRefresh} />;

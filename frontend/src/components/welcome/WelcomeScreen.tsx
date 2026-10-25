@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ArrowRight,
+  ArrowUpRight,
   BarChart3,
   Check,
   ChevronDown,
@@ -14,6 +15,7 @@ import {
   Globe2,
   History,
   ListChecks,
+  MessageCircle,
   MoreHorizontal,
   Send,
   ShieldCheck,
@@ -21,6 +23,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import {
+  openTelegramLink,
   telegramHaptic,
   useTelegram,
   useTelegramBackButton,
@@ -29,7 +32,6 @@ import { nextWelcomeStep } from '@frontend/lib/welcome';
 import { copy, type Language } from './copy';
 import { useWelcomeFlow } from './useWelcomeFlow';
 import { AgreementModal, InfoModal, VerificationModal } from './WelcomeModals';
-import FeedbackLink from '../FeedbackLink';
 
 type Modal = 'verification' | 'agreement' | 'about' | 'privacy' | 'exit' | null;
 type Stage = 'launch' | 'mission' | 'connect';
@@ -37,12 +39,7 @@ type Stage = 'launch' | 'mission' | 'connect';
 const stageCopy = {
   en: {
     launchTitle: 'Your voice. Your choice.',
-    launchDetail: 'Take back control.',
-    launchEmphasis: 'Manage your vote.',
-    launchClosing: 'Shape what comes next.',
-    telegramStart: 'Continue in Telegram',
-    previewStart: 'Preview the demo',
-    feedbackPending: 'Feedback bot coming soon',
+    launchDetail: 'Explore candidates. Make your choice.',
     motto: 'PEOPLE · VOICE · ACTION',
     start: 'Get started',
     missionKicker: 'WELCOME',
@@ -93,12 +90,7 @@ const stageCopy = {
   },
   uk: {
     launchTitle: 'Ваш голос. Ваш вибір.',
-    launchDetail: 'Поверни собі вплив.',
-    launchEmphasis: 'Керуй своїм голосом.',
-    launchClosing: 'Формуй те, що буде далі.',
-    telegramStart: 'Продовжити в Telegram',
-    previewStart: 'Переглянути демонстрацію',
-    feedbackPending: 'Бот зворотного зв’язку — незабаром',
+    launchDetail: 'Знайомтеся з кандидатами. Зробіть вибір.',
     motto: 'ЛЮДИ · ГОЛОС · ДІЯ',
     start: 'Почати',
     missionKicker: 'ЛАСКАВО ПРОСИМО',
@@ -272,25 +264,19 @@ export default function WelcomeScreen() {
               alt="FreedomSword original sword and laurel emblem"
               width={1024}
               height={1024}
-              sizes="(max-width: 480px) 80vw, 340px"
+              sizes="(max-width: 480px) 60vw, 260px"
               loading="eager"
               fetchPriority="high"
               unoptimized
             />
             <h1 id="fs-launch-title">{s.launchTitle}</h1>
-            <div className="fs-launch-statement">
-              <p>{s.launchDetail}</p>
-              <p><mark>{s.launchEmphasis}</mark></p>
-              <p>{s.launchClosing}</p>
-            </div>
+            <p>{s.launchDetail}</p>
+            <span className="fs-launch-motto">{s.motto}</span>
             <div className="fs-stage-bottom">
-              {telegram.launch === 'outside' ? <>
-                <a className="fs-button" href="https://t.me/freedomswordbot" target="_blank"
-                  rel="noopener noreferrer"><Send size={20} />{s.telegramStart}</a>
-                <button className="fs-preview-button" onClick={() => go('mission')}>{s.previewStart}</button>
-              </> : <button type="button" className="fs-button" onClick={() => go('mission')}>
-                <Send size={20} />{s.telegramStart}
-              </button>}
+              <button type="button" className="fs-button fs-gold" onClick={() => go('mission')}>
+                {s.start}
+                <ArrowRight size={18} />
+              </button>
               <small>{s.aboutDemo}</small>
             </div>
           </main>
@@ -370,8 +356,19 @@ export default function WelcomeScreen() {
               <span className="fs-passport-copy"><strong>{s.walletTitle}</strong><small>{s.walletDetail}</small></span>
               <span className="fs-passport-preview">{s.planned}</span>
             </div>
-            <FeedbackLink className="fs-feedback" label={s.feedback}
-              unavailableLabel={s.feedbackPending} />
+            <a
+              className="fs-feedback"
+              href="https://t.me/freedomswordbot?start=feedback"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(event) => {
+                if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
+              }}
+            >
+              <MessageCircle size={16} aria-hidden="true" />
+              <span>{s.feedback}</span>
+              <ArrowUpRight size={15} aria-hidden="true" />
+            </a>
             {telegram.launch === 'failed' && (
               <p className="civic-field-error" role="alert">
                 {t.failed}

@@ -62,15 +62,8 @@ chown -R freedomsword:freedomsword "${release_dir}"
     node --env-file=backend/.env --import tsx --input-type=module \
     -e "import { loadConfig } from './backend/src/config.ts'; loadConfig();"
   runuser -u freedomsword -- env HOME="${base_dir}" npm run build -w @freedomsword/backend
-  feedback_bot_username=$(env -i PATH="${PATH}" node --env-file=backend/.env -e '
-const name = process.env.FEEDBACK_BOT_USERNAME || "";
-if (name && (!/^[a-z][a-z0-9_]{4,31}$/i.test(name) || !/bot$/i.test(name) || name.toLowerCase() === "freedomswordbot"))
-  throw Error("FEEDBACK_BOT_USERNAME must identify a separate Telegram feedback bot");
-process.stdout.write(name);
-')
   runuser -u freedomsword -- env HOME="${base_dir}" NODE_ENV=production APP_ENV=production \
-    BACKEND_URL=http://127.0.0.1:3001 NEXT_PUBLIC_FEEDBACK_BOT_USERNAME="${feedback_bot_username}" \
-    npm run build -w @freedomsword/frontend
+    BACKEND_URL=http://127.0.0.1:3001 npm run build -w @freedomsword/frontend
 )
 
 previous_release=''

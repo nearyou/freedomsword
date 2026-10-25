@@ -796,32 +796,3 @@ html[data-theme='light'] .ballot-card-top .balance strong {
 .share-icon.more {
   background: #17924f;
 }
-
-.share-icon.whatsapp { background: #168c51; }
-.share-icon.linkedin { background: #0a66c2; }
-.share-icon.reddit { background: #dc4307; }
-.share-icon.copy { background: #42627c; }
-.support-budget { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 24px 0; }
-.support-budget > div { padding: 14px 8px; background: #0b2135; border: 1px solid #31516a; border-radius: 12px; text-align: center; }
-.support-budget dt { font-size: 11px; color: #b3c8d6; }
-.support-budget dd { margin: 6px 0 0; font-size: 27px; font-weight: 750; }
-.support-allocations, .support-cooldowns ul { list-style: none; margin: 12px 0; padding: 0; }
-.support-allocations li, .support-cooldowns li { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid #29465b; }
-.support-cooldowns li { flex-wrap: wrap; }
-.support-form { display: grid; gap: 16px; margin: 24px 0; }
-.support-form label { display: grid; gap: 8px; }
-.support-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.reusable-support .share-invite { margin-top: 20px; }
-.share-invite > p { white-space: pre-line; }
-.share-invite .share-other-apps { margin-top: 14px; font-size: 12px; }
-.profile-hero { position: relative; }
-.profile-hero.has-portrait { min-height: 320px; margin: 0 -30px 20px; display: flex; align-items: end; }
-.profile-hero.has-portrait .profile-photo { position: absolute; inset: 0; height: 100%; margin: 0; }
-.profile-hero.has-portrait .profile-photo::after { inset: 30% 0 0; background: linear-gradient(transparent, #102b40 90%); }
-.profile-modal .profile-hero.has-portrait .profile-header { margin: 0; padding: 90px 26px 20px; }
-.profile-hero.has-portrait .profile-header h2 { color: #fff; font-size: 32px; }
-.profile-hero.has-portrait .party { color: #d3e2ec; }
-.profile-modal .close-modal { z-index: 3; }
-@media (max-width: 760px) {
-  .profile-hero.has-portrait { margin-left: -18px; margin-right: -18px; min-height: 310px; }
-}

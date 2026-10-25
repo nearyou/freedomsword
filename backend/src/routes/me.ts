@@ -22,7 +22,7 @@ export async function GET(request: Request) {
       privateBallotPseudonyms(
         tx,
         user,
-        elections.filter((e) => e.protocol === 'LEGACY_RECALL').map((e) => e.id),
+        elections.filter((e) => e.protocol !== 'MACI_PRIVATE').map((e) => e.id),
       ),
     );
     const votes = await db.vote.findMany({

@@ -69,19 +69,10 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
         where: { documentId: { startsWith: 'platform:' } },
         _count: true,
       });
-      const support = await tx.supportAllocation.groupBy({ by: ['candidateId', 'electionId'],
-        where: { units: { gt: 0 } }, _sum: { units: true }, _count: true });
-      const budgets = await tx.supportBudget.groupBy({ by: ['electionId'], _count: true });
-      const cooling = await tx.supportWithdrawal.findMany({ where: { availableAt: { gt: new Date() } },
-        select: { units: true, budget: { select: { electionId: true } } } });
       return elections.map((e) => {
-        const reusable = e.protocol === 'CONTINUOUS_SUPPORT';
-        const tally = reusable ? support.filter((t) => t.electionId === e.id).map((t) => ({
-          candidateId: t.candidateId, _sum: { balance: t._sum.units }, _count: t._count,
-        })) : totals.filter((t) => t.electionId === e.id);
+        const tally = totals.filter((t) => t.electionId === e.id);
         const activeUnits = tally.reduce((sum, t) => sum + (t._sum.balance ?? 0), 0);
-        const ballotCount = reusable ? (budgets.find((b) => b.electionId === e.id)?._count ?? 0)
-          : tally.reduce((sum, t) => sum + t._count, 0);
+        const ballotCount = tally.reduce((sum, t) => sum + t._count, 0);
         const privateUnits = e.protocol === 'MACI_PRIVATE' && e.privatePoll?.resultsPublishedAt
           ? e.privatePoll.candidateUnits.map(Number) : [];
         const privateActiveUnits = privateUnits.reduce((sum, units) => sum + units, 0);
@@ -106,9 +97,7 @@ export async function listElections(query = ''): Promise<ElectionView[]> {
           },
           activeUnits: e.protocol === 'MACI_PRIVATE' ? privateActiveUnits : activeUnits,
           ballotCount: e.protocol === 'MACI_PRIVATE' ? 0 : ballotCount,
-          recalledUnits: e.protocol === 'MACI_PRIVATE' ? 0 : reusable
-            ? cooling.filter((entry) => entry.budget.electionId === e.id).reduce((sum, entry) => sum + entry.units, 0)
-            : ballotCount * 100 - activeUnits,
+          recalledUnits: e.protocol === 'MACI_PRIVATE' ? 0 : ballotCount * 100 - activeUnits,
           candidates: e.candidates
             .filter((c) =>
               c.fullName.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),

@@ -6,7 +6,6 @@ export interface TransparencyView {
     description: string;
     type: string;
     status: string;
-    protocol?: string;
     opensAt: string;
     closesAt: string;
     recallPolicy: {

@@ -24,12 +24,6 @@ enum ElectionStatus {
 enum ElectionProtocol {
   LEGACY_RECALL
   MACI_PRIVATE
-  CONTINUOUS_SUPPORT
-}
-
-enum SupportEventType {
-  ALLOCATE
-  WITHDRAW
 }
 
 enum PrivateRegistrationMode {
@@ -82,7 +76,6 @@ model User {
   credentials    VotingCredential[]
   adminGrants    AdminGrant[]
   privateRegistrations PrivateRegistration[]
-  supportBudgets SupportBudget[]
 }
 
 model AdminGrant {
@@ -169,7 +162,6 @@ model Election {
   auditEvents             AuditEvent[]
   privatePoll             PrivatePoll?
   privateRegistrations    PrivateRegistration[]
-  supportBudgets          SupportBudget[]
 }
 
 model PrivatePoll {
@@ -227,64 +219,9 @@ model Candidate {
   withdrawn  Boolean             @default(false)
   platforms  CandidatePlatform[]
   votes      Vote[]
-  supportAllocations SupportAllocation[]
 
   @@unique([id, electionId])
   @@index([electionId, fullName])
-}
-
-model SupportBudget {
-  id          String @id @default(uuid()) @map("_id")
-  userId      String
-  user        User @relation(fields: [userId], references: [id])
-  electionId  String
-  election    Election @relation(fields: [electionId], references: [id])
-  createdAt   DateTime @default(now())
-  allocations SupportAllocation[]
-  withdrawals SupportWithdrawal[]
-  events      SupportEvent[]
-
-  @@unique([userId, electionId])
-  @@unique([id, electionId])
-  @@index([electionId])
-}
-
-model SupportAllocation {
-  id          String @id @default(uuid()) @map("_id")
-  budgetId    String
-  electionId  String
-  budget      SupportBudget @relation(fields: [budgetId, electionId], references: [id, electionId])
-  candidateId String
-  candidate   Candidate @relation(fields: [candidateId, electionId], references: [id, electionId])
-  units       Int
-
-  @@unique([budgetId, candidateId])
-  @@index([electionId, candidateId])
-}
-
-model SupportWithdrawal {
-  id          String @id @default(uuid()) @map("_id")
-  budgetId    String
-  budget      SupportBudget @relation(fields: [budgetId], references: [id])
-  units       Int
-  availableAt DateTime
-  createdAt   DateTime @default(now())
-
-  @@index([budgetId, availableAt])
-}
-
-model SupportEvent {
-  id          String @id @default(uuid()) @map("_id")
-  budgetId    String
-  budget      SupportBudget @relation(fields: [budgetId], references: [id])
-  candidateId String
-  type        SupportEventType
-  units       Int
-  requestId   String
-  requestHash String
-  createdAt   DateTime @default(now())
-
-  @@unique([budgetId, requestId])
 }
 
 model CandidatePlatform {

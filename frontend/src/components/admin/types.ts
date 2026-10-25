@@ -3,7 +3,7 @@ export type AdminElection = {
   title: string;
   description: string;
   type: string;
-  protocol: 'LEGACY_RECALL' | 'MACI_PRIVATE' | 'CONTINUOUS_SUPPORT';
+  protocol: 'LEGACY_RECALL' | 'MACI_PRIVATE';
   status: string;
   opensAt: string;
   closesAt: string;

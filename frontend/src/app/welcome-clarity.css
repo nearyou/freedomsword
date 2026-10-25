@@ -1,27 +1,15 @@
 /* The launch keeps the patriotic landscape; the mission screen uses plain ivory. */
 .fs-welcome.fs-light[data-stage='launch'] .fs-sheet {
   background-color: #f8f3e8;
-  background-image: none;
+  background-image: url('/illustrations/civic-parchment.webp');
   background-size: cover;
   background-position: center bottom;
 }
 
 .fs-launch .fs-original-logo {
-  width: min(80vw, 40svh, 340px);
-  margin: 8px auto 18px;
-  border-radius: 0;
-  box-shadow: none;
-}
-
-.fs-launch-statement { color: #2f5669; font-size: 19px; line-height: 1.5; }
-.fs-launch-statement p { margin: 2px 0; }
-.fs-launch-statement mark { padding: 1px 9px; background: #ffe58b; color: #17475a; }
-.fs-launch .fs-preview-button { padding: 6px; background: transparent; color: #315570; text-decoration: underline; }
-.fs-button { text-decoration: none; }
-.feedback-link[aria-disabled], .fs-feedback[aria-disabled] { opacity: .65; cursor: default; }
-
-@media (max-height: 700px) {
-  .fs-launch .fs-original-logo { width: min(65vw, 30svh, 230px); margin-top: 0; }
+  width: min(55vw, 24svh, 220px);
+  margin: clamp(18px, 4vh, 38px) auto 18px;
+  box-shadow: 0 12px 32px #6b502322;
 }
 
 .fs-launch .fs-stage-bottom small {
