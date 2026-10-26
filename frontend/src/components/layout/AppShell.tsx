@@ -48,7 +48,13 @@ export default function AppShell({
                 <MessageCircle size={16} />
                 <span>Feedback</span>
               </a>
-              <button className="connection" onClick={onPassport}>
+              <button
+                className="connection"
+                data-state={
+                  citizen.connected ? (citizen.verified ? 'verified' : 'connected') : 'disconnected'
+                }
+                onClick={onPassport}
+              >
                 <ShieldCheck size={15} />
                 <span>
                   {citizen.connected

@@ -84,7 +84,7 @@ export default function BallotPanel({
                 <i
                   style={{
                     width: `${segment.fill}%`,
-                    background: candidate?.color ?? 'var(--primary)',
+                    background: candidate?.color ?? 'var(--color-accent)',
                   }}
                 />
               </span>

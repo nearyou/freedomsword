@@ -17,7 +17,7 @@ export default function ElectionSnapshot({
         value: candidate.units,
         color: candidate.color,
       }))
-    : [{ name: 'No active support', value: 1, color: 'var(--border)' }];
+    : [{ name: 'No active support', value: 1, color: 'var(--color-surface-2)' }];
   const sample = source === 'preview';
   return (
     <section className="panel live-panel" aria-labelledby="live-results-title">
@@ -28,7 +28,10 @@ export default function ElectionSnapshot({
             {election.title} · {sample ? 'sample figures' : 'live aggregate units'}
           </p>
         </div>
-        <span className={`live-tag ${stale ? 'stale-tag' : ''}`}>
+        <span
+          className={`live-tag ${stale ? 'stale-tag' : ''}`}
+          data-state={sample ? 'sample' : stale ? 'stale' : 'live'}
+        >
           {sample ? 'SAMPLE' : stale ? 'STALE' : 'LIVE'}
         </span>
       </div>
@@ -70,10 +73,12 @@ export default function ElectionSnapshot({
               <Tooltip
                 formatter={(value) => [`${count(Number(value))} units`, 'Support']}
                 contentStyle={{
-                  background: 'var(--panel)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 12,
-                  color: 'var(--text)',
+                  background: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 10,
+                  boxShadow: 'var(--shadow-md)',
+                  color: 'var(--color-text)',
+                  fontSize: 13,
                 }}
               />
             )}

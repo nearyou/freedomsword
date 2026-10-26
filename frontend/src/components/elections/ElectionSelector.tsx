@@ -86,13 +86,14 @@ export function ElectionGallery({
             key={election.id}
             onClick={() => onSelect(election.id)}
           >
-            <Image
-              src={electionArtwork[election.type] ?? electionArtwork.COMMUNITY}
-              alt=""
-              fill
-              sizes="(max-width: 760px) 100vw, 360px"
-            />
-            <span className="election-gallery-shade" />
+            <span className="election-gallery-media">
+              <Image
+                src={electionArtwork[election.type] ?? electionArtwork.COMMUNITY}
+                alt=""
+                fill
+                sizes="(max-width: 760px) 100vw, (max-width: 1250px) 50vw, 380px"
+              />
+            </span>
             <span className="election-gallery-content">
               <span className={`state-badge state-${election.status.toLowerCase()}`}>
                 {election.status}

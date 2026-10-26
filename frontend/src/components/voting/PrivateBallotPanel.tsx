@@ -88,7 +88,7 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
       {!connected && <button className="button primary" onClick={onPassport}>
         {rarimo ? 'Connect Telegram' : 'Complete Citizen Passport'}
       </button>}
-      {connected && !device && <div className="private-step">
+      {connected && !device && <div className="private-step" data-state="current">
         <h4>1. Create or restore your MACI key</h4>
         <p>The private key stays in this browser session. Keep a backup to change your vote later.</p>
         <button className="button primary" disabled={busy} onClick={() => void run(async () => {
@@ -133,7 +133,8 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
             value={JSON.stringify(device)} onFocus={(event) => event.target.select()} />}
           <p>Anyone with this backup can control your ballot. Store it privately. Session storage clears when this browser session ends.</p>
         </div>
-        <div className="private-step">
+        <div className="private-step"
+          data-state={device.pollStateIndex !== null ? 'complete' : 'current'}>
           <h4>2. Register and join</h4>
           <p>{registration ? `MACI key registered on ${rarimo ? 'Rarimo L2' : 'the local chain'}.` : rarimo
             ? 'Verify with Rarimo to register this public key.' : 'Register your public key after mock eligibility and agreement.'}</p>
@@ -168,7 +169,8 @@ export default function PrivateBallotPanel({ election, citizen, ready, now, onPa
           </>}
           {device.pollStateIndex !== null && <p>Poll joined. Ballot nonce: {device.nonce}.</p>}
         </div>
-        <div className="private-step">
+        <div className="private-step"
+          data-state={device.pollStateIndex === null ? 'unavailable' : 'current'}>
           <h4>3. Submit encrypted choice</h4>
           <label>Candidate
             <select value={candidateId} onChange={(event) => setCandidateId(event.target.value)}>

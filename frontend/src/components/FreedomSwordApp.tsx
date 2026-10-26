@@ -10,7 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import type { CandidateView } from '@frontend/lib/contracts';
-import type { AppTab } from '@frontend/lib/ui';
+import { dateLabel, type AppTab } from '@frontend/lib/ui';
 import { useCitizen } from '@frontend/hooks/useCitizen';
 import { useElections } from '@frontend/hooks/useElections';
 import { telegramHaptic, useTelegram, useTelegramBackButton } from '@frontend/hooks/useTelegram';
@@ -37,6 +37,12 @@ const headings: Record<AppTab, string> = {
   'Live results': 'Results',
   'My ballot': 'My ballot',
   Accountability: 'Promises',
+};
+const subtitles: Record<AppTab, string> = {
+  Candidates: 'Choose an election to meet its candidates, read their platforms and follow public commitments.',
+  'Live results': 'Aggregate support for each candidate, refreshed while you watch.',
+  'My ballot': 'Your choice, your remaining support and what you can still change.',
+  Accountability: 'Published commitments, their progress and the evidence behind them.',
 };
 export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean }) {
   const citizenState = useCitizen();
@@ -195,8 +201,22 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
               </button>
             )}
             <h1>{tab === 'Candidates' && !showElectionList ? election?.title : headings[tab]}</h1>
+            {tab === 'Candidates' && !showElectionList && election ? (
+              <p className="page-subtitle">
+                <span className={`state-badge state-${election.status.toLowerCase()}`}>
+                  {election.status}
+                </span>
+                <span>Closes {dateLabel(election.closesAt)}</span>
+                <span>{election.candidates.length} candidates</span>
+              </p>
+            ) : (
+              <p className="page-subtitle">{subtitles[tab]}</p>
+            )}
           </div>
-          <span className={`network-status ${stale ? 'interrupted' : ''}`}>
+          <span
+            className={`network-status ${stale ? 'interrupted' : ''}`}
+            data-state={source === 'preview' ? 'sample' : stale ? 'paused' : 'live'}
+          >
             <span className="mini-dot" />
             {source === 'preview' ? 'Sample' : stale ? 'Refresh paused' : 'Updated live'}
           </span>

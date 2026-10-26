@@ -1,0 +1,131 @@
+/*
+ * FreedomSword design tokens.
+ * Every colour, size, radius, shadow and duration used by the interface comes from here.
+ * Breakpoints cannot be read inside media queries, so they are documented and mirrored:
+ *   --bp-mobile 760px   single column, bottom navigation, no sidebar
+ *   --bp-tablet 1050px  narrower sidebar, fewer grid columns
+ *   --bp-wide   1250px  three-column election gallery
+ */
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --color-bg: #f7f5f0;
+  --color-sidebar: #f2efe8;
+  --color-surface: #fffefa;
+  --color-surface-2: #f1eee7;
+  --color-surface-hover: #ece7de;
+  --color-overlay: rgb(41 39 34 / 0.36);
+
+  /* Text */
+  --color-text: #292722;
+  --color-text-secondary: #6b675f;
+  --color-text-muted: #8c867d;
+  --color-text-inverse: #fffefa;
+
+  /* Structure */
+  --color-border: #e5e0d7;
+  --color-border-strong: #d4cdc0;
+  --color-divider: #eeeae3;
+
+  /* Accent — muted terracotta. `accent` is for fills and indicators;
+     `accent-strong` keeps white labels above 4.5:1; `accent-text` is accent-coloured copy. */
+  --color-accent: #c66a4a;
+  --color-accent-strong: #b4573a;
+  --color-accent-hover: #a14e33;
+  --color-accent-text: #a14e33;
+  --color-accent-soft: #f5e7df;
+  --color-accent-soft-hover: #f0dccf;
+  --color-accent-border: #e8c7b7;
+
+  /* Semantic states — only for meaning, never decoration */
+  --color-success: #54775e;
+  --color-success-soft: #e8efe7;
+  --color-success-border: #cfdccf;
+  --color-warning: #a87a3d;
+  --color-warning-text: #86602f;
+  --color-warning-soft: #f5ecdc;
+  --color-warning-border: #e8d6b6;
+  --color-danger: #a9473f;
+  --color-danger-hover: #923c35;
+  --color-danger-soft: #f6e4e1;
+  --color-danger-soft-hover: #f0d6d1;
+  --color-danger-border: #e9c9c3;
+  --color-info: #5a6b78;
+  --color-info-soft: #e7ecef;
+
+  /* Typography */
+  --font-sans: 'Inter Variable', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'Playfair Display Variable', Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+  --text-2xs: 11px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: clamp(27px, 1.6vw + 18px, 36px);
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --leading-tight: 1.2;
+  --leading-snug: 1.4;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.7;
+  --tracking-tight: -0.015em;
+  --tracking-label: 0.08em;
+
+  /* Spacing — multiples of four */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 20px;
+  --radius-full: 999px;
+
+  /* Elevation */
+  --shadow-xs: 0 1px 2px rgb(41 39 34 / 0.04);
+  --shadow-sm: 0 1px 2px rgb(41 39 34 / 0.04), 0 2px 10px rgb(41 39 34 / 0.04);
+  --shadow-md: 0 2px 4px rgb(41 39 34 / 0.04), 0 10px 28px -8px rgb(41 39 34 / 0.12);
+  --shadow-lg: 0 2px 6px rgb(41 39 34 / 0.06), 0 28px 64px -18px rgb(41 39 34 / 0.28);
+
+  /* Focus */
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent);
+  --focus-outline: 2px solid var(--color-accent);
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 160ms;
+  --duration-slow: 200ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Layout */
+  --sidebar-width: 214px;
+  --content-max: 1380px;
+  --reading-max: 68ch;
+  --control-height: 40px;
+  --control-height-lg: 48px;
+  --bp-mobile: 760px;
+  --bp-tablet: 1050px;
+  --bp-wide: 1250px;
+
+  /* Telegram safe areas, set at runtime by useTelegram */
+  --tg-safe-top: 0px;
+  --tg-safe-bottom: 0px;
+  --tg-safe-left: 0px;
+  --tg-safe-right: 0px;
+}

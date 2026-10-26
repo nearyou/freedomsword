@@ -6,7 +6,8 @@ import { Monitor, Moon, Sun } from 'lucide-react';
 export type ThemePreference = 'system' | 'light' | 'dark';
 
 const preferences: ThemePreference[] = ['system', 'light', 'dark'];
-const background = { light: '#f4f7fc', dark: '#090f1d' };
+// FreedomSword uses one warm-light palette, so Telegram chrome matches it in every mode.
+const background = { light: '#f7f5f0', dark: '#f7f5f0' };
 
 function savedPreference(): ThemePreference {
   try {

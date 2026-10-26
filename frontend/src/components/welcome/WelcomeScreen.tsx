@@ -36,6 +36,8 @@ import { AgreementModal, InfoModal, VerificationModal } from './WelcomeModals';
 type Modal = 'verification' | 'agreement' | 'about' | 'privacy' | 'exit' | null;
 type Stage = 'launch' | 'mission' | 'connect';
 
+const appBackground = '#F7F5F0';
+
 const stageCopy = {
   en: {
     launchTitle: 'Your voice. Your choice.',
@@ -146,10 +148,8 @@ export default function WelcomeScreen() {
   const [lang, setLang] = useState<Language>('en');
   const [stage, setStage] = useState<Stage>('launch');
   const [modal, setModal] = useState<Modal>(null);
-  // The opening two screens are light; Telegram's chrome follows the dark modal backdrop.
   const lightStage = stage === 'launch' || stage === 'mission';
-  const light = lightStage && !modal;
-  const telegram = useTelegram(light ? '#F8F3E8' : '#071522');
+  const telegram = useTelegram(appBackground);
   const flow = useWelcomeFlow(telegram.launch);
   const t = copy[lang];
   const s = stageCopy[lang];
@@ -172,11 +172,6 @@ export default function WelcomeScreen() {
       document.documentElement.lang = previous;
     };
   }, [lang]);
-
-  useEffect(() => {
-    const color = light ? '#F8F3E8' : '#071522';
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
-  }, [light]);
 
   function go(next: Stage) {
     setStage(next);
@@ -258,17 +253,19 @@ export default function WelcomeScreen() {
         </div>
         {stage === 'launch' ? (
           <main className="fs-stage fs-launch" aria-labelledby="fs-launch-title">
-            <Image
-              className="fs-original-logo"
-              src="/brand/logo.jpg"
-              alt="FreedomSword original sword and laurel emblem"
-              width={1024}
-              height={1024}
-              sizes="(max-width: 480px) 60vw, 260px"
-              loading="eager"
-              fetchPriority="high"
-              unoptimized
-            />
+            <span className="fs-logo-frame">
+              <Image
+                className="fs-original-logo"
+                src="/brand/logo.jpg"
+                alt="FreedomSword original sword and laurel emblem"
+                width={1024}
+                height={1024}
+                sizes="(max-width: 480px) 60vw, 260px"
+                loading="eager"
+                fetchPriority="high"
+                unoptimized
+              />
+            </span>
             <h1 id="fs-launch-title">{s.launchTitle}</h1>
             <p>{s.launchDetail}</p>
             <span className="fs-launch-motto">{s.motto}</span>
