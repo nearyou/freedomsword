@@ -36,7 +36,7 @@ import { AgreementModal, InfoModal, VerificationModal } from './WelcomeModals';
 type Modal = 'verification' | 'agreement' | 'about' | 'privacy' | 'exit' | null;
 type Stage = 'launch' | 'mission' | 'connect';
 
-const appBackground = '#F7F5F0';
+const appBackground = '#151719';
 
 const stageCopy = {
   en: {

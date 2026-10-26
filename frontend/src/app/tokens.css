@@ -7,52 +7,53 @@
  *   --bp-wide   1250px  three-column election gallery
  */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
   /* Surfaces */
-  --color-bg: #f7f5f0;
-  --color-sidebar: #f2efe8;
-  --color-surface: #fffefa;
-  --color-surface-2: #f1eee7;
-  --color-surface-hover: #ece7de;
-  --color-overlay: rgb(41 39 34 / 0.36);
+  --color-bg: #151719;
+  --color-sidebar: #191b1e;
+  --color-surface: #202326;
+  --color-surface-2: #272b2f;
+  --color-surface-hover: #30353a;
+  --color-overlay: rgb(0 0 0 / 0.68);
+  --color-header-glass: rgb(21 23 25 / 0.9);
+  --color-surface-glass: rgb(32 35 38 / 0.95);
 
   /* Text */
-  --color-text: #292722;
-  --color-text-secondary: #6b675f;
-  --color-text-muted: #8c867d;
-  --color-text-inverse: #fffefa;
+  --color-text: #f2ede5;
+  --color-text-secondary: #bbb7af;
+  --color-text-muted: #9a978f;
+  --color-text-inverse: #181a1c;
 
   /* Structure */
-  --color-border: #e5e0d7;
-  --color-border-strong: #d4cdc0;
-  --color-divider: #eeeae3;
+  --color-border: #353a3e;
+  --color-border-strong: #50565b;
+  --color-divider: #2d3236;
 
-  /* Accent — muted terracotta. `accent` is for fills and indicators;
-     `accent-strong` keeps white labels above 4.5:1; `accent-text` is accent-coloured copy. */
-  --color-accent: #c66a4a;
-  --color-accent-strong: #b4573a;
-  --color-accent-hover: #a14e33;
-  --color-accent-text: #a14e33;
-  --color-accent-soft: #f5e7df;
-  --color-accent-soft-hover: #f0dccf;
-  --color-accent-border: #e8c7b7;
+  /* Copper accents preserve the warm palette; filled buttons use dark labels. */
+  --color-accent: #df9475;
+  --color-accent-strong: #df9475;
+  --color-accent-hover: #edaa8e;
+  --color-accent-text: #edaa8e;
+  --color-accent-soft: #352923;
+  --color-accent-soft-hover: #463129;
+  --color-accent-border: #715044;
 
   /* Semantic states — only for meaning, never decoration */
-  --color-success: #54775e;
-  --color-success-soft: #e8efe7;
-  --color-success-border: #cfdccf;
-  --color-warning: #a87a3d;
-  --color-warning-text: #86602f;
-  --color-warning-soft: #f5ecdc;
-  --color-warning-border: #e8d6b6;
-  --color-danger: #a9473f;
-  --color-danger-hover: #923c35;
-  --color-danger-soft: #f6e4e1;
-  --color-danger-soft-hover: #f0d6d1;
-  --color-danger-border: #e9c9c3;
-  --color-info: #5a6b78;
-  --color-info-soft: #e7ecef;
+  --color-success: #9ac3a1;
+  --color-success-soft: #233129;
+  --color-success-border: #415c48;
+  --color-warning: #ddb478;
+  --color-warning-text: #e9c48e;
+  --color-warning-soft: #342d22;
+  --color-warning-border: #655339;
+  --color-danger: #ed9b92;
+  --color-danger-hover: #f4b1aa;
+  --color-danger-soft: #382627;
+  --color-danger-soft-hover: #493032;
+  --color-danger-border: #76504f;
+  --color-info: #a5bed0;
+  --color-info-soft: #25313a;
 
   /* Typography */
   --font-sans: 'Inter Variable', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -98,10 +99,10 @@
   --radius-full: 999px;
 
   /* Elevation */
-  --shadow-xs: 0 1px 2px rgb(41 39 34 / 0.04);
-  --shadow-sm: 0 1px 2px rgb(41 39 34 / 0.04), 0 2px 10px rgb(41 39 34 / 0.04);
-  --shadow-md: 0 2px 4px rgb(41 39 34 / 0.04), 0 10px 28px -8px rgb(41 39 34 / 0.12);
-  --shadow-lg: 0 2px 6px rgb(41 39 34 / 0.06), 0 28px 64px -18px rgb(41 39 34 / 0.28);
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.16);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.16), 0 2px 10px rgb(0 0 0 / 0.12);
+  --shadow-md: 0 2px 4px rgb(0 0 0 / 0.16), 0 10px 28px -8px rgb(0 0 0 / 0.32);
+  --shadow-lg: 0 2px 6px rgb(0 0 0 / 0.2), 0 28px 64px -18px rgb(0 0 0 / 0.56);
 
   /* Focus */
   --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent);
@@ -128,4 +129,49 @@
   --tg-safe-bottom: 0px;
   --tg-safe-left: 0px;
   --tg-safe-right: 0px;
+}
+
+/* Preserve the optional light appearance on admin and transparency screens. */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-bg: #f7f5f0;
+  --color-sidebar: #f2efe8;
+  --color-surface: #fffefa;
+  --color-surface-2: #f1eee7;
+  --color-surface-hover: #ece7de;
+  --color-overlay: rgb(41 39 34 / 0.36);
+  --color-header-glass: rgb(247 245 240 / 0.88);
+  --color-surface-glass: rgb(255 254 250 / 0.94);
+  --color-text: #292722;
+  --color-text-secondary: #6b675f;
+  --color-text-muted: #8c867d;
+  --color-text-inverse: #fffefa;
+  --color-border: #e5e0d7;
+  --color-border-strong: #d4cdc0;
+  --color-divider: #eeeae3;
+  --color-accent: #c66a4a;
+  --color-accent-strong: #b4573a;
+  --color-accent-hover: #a14e33;
+  --color-accent-text: #a14e33;
+  --color-accent-soft: #f5e7df;
+  --color-accent-soft-hover: #f0dccf;
+  --color-accent-border: #e8c7b7;
+  --color-success: #54775e;
+  --color-success-soft: #e8efe7;
+  --color-success-border: #cfdccf;
+  --color-warning: #a87a3d;
+  --color-warning-text: #86602f;
+  --color-warning-soft: #f5ecdc;
+  --color-warning-border: #e8d6b6;
+  --color-danger: #a9473f;
+  --color-danger-hover: #923c35;
+  --color-danger-soft: #f6e4e1;
+  --color-danger-soft-hover: #f0d6d1;
+  --color-danger-border: #e9c9c3;
+  --color-info: #5a6b78;
+  --color-info-soft: #e7ecef;
+  --shadow-xs: 0 1px 2px rgb(41 39 34 / 0.04);
+  --shadow-sm: 0 1px 2px rgb(41 39 34 / 0.04), 0 2px 10px rgb(41 39 34 / 0.04);
+  --shadow-md: 0 2px 4px rgb(41 39 34 / 0.04), 0 10px 28px -8px rgb(41 39 34 / 0.12);
+  --shadow-lg: 0 2px 6px rgb(41 39 34 / 0.06), 0 28px 64px -18px rgb(41 39 34 / 0.28);
 }

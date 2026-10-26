@@ -177,7 +177,7 @@
   min-height: 60px;
   padding: calc(var(--space-2) + var(--tg-safe-top)) var(--space-12) var(--space-2);
   border-bottom: 1px solid var(--color-divider);
-  background: rgb(247 245 240 / 0.88);
+  background: var(--color-header-glass);
   backdrop-filter: saturate(1.2) blur(12px);
   -webkit-backdrop-filter: saturate(1.2) blur(12px);
 }
@@ -458,7 +458,7 @@
     padding: 6px max(var(--space-2), var(--tg-safe-left)) calc(6px + var(--tg-safe-bottom))
       max(var(--space-2), var(--tg-safe-right));
     border-top: 1px solid var(--color-border);
-    background: rgb(255 254 250 / 0.94);
+    background: var(--color-surface-glass);
     backdrop-filter: saturate(1.2) blur(14px);
     -webkit-backdrop-filter: saturate(1.2) blur(14px);
   }

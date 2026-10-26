@@ -307,7 +307,7 @@
   margin-inline: var(--space-8);
 }
 .profile-modal .close-modal {
-  background: rgb(255 254 250 / 0.92);
+  background: var(--color-surface-glass);
   box-shadow: var(--shadow-sm);
 }
 .profile-photo {
