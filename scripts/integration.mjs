@@ -20,8 +20,12 @@ const npmCli = process.env.npm_execpath;
 if (!npmCli) throw new Error('Run integration tests with npm run test:integration');
 const env = {
   ...process.env,
+  NODE_ENV: 'test',
   APP_ENV: 'test',
   APP_ORIGIN: 'http://127.0.0.1:3000',
+  NEXT_PUBLIC_APP_URL: 'http://127.0.0.1:3000',
+  REDIS_URL: '',
+  OUTBOX_PROCESSING: 'inline',
   DATABASE_URL: testUrl.toString(),
   SESSION_SECRET: randomBytes(32).toString('hex'),
   BALLOT_SECRET: randomBytes(32).toString('hex'),

@@ -128,6 +128,24 @@ contract FreedomSwordVoting {
     function recallVote(bytes32 electionId, bytes32 nullifier, bool full, bytes32 auditCommitment)
         external onlyRelayer
     {
+        uint8 amount = full ? ballots[electionId][nullifier].balance : elections[electionId].policy.partialAmount;
+        _recall(electionId, nullifier, amount, full, auditCommitment);
+    }
+
+    function selectableRecallSupported() external pure returns (bool) { return true; }
+
+    function recallVoteAmount(bytes32 electionId, bytes32 nullifier, uint8 amount, bytes32 auditCommitment)
+        external onlyRelayer
+    {
+        if (amount == 0) revert InvalidInput();
+        Policy storage policy = elections[electionId].policy;
+        if (policy.partialAmount == 0 || amount % policy.partialAmount != 0) revert RecallUnavailable();
+        _recall(electionId, nullifier, amount, false, auditCommitment);
+    }
+
+    function _recall(bytes32 electionId, bytes32 nullifier, uint8 amount, bool full, bytes32 auditCommitment)
+        private
+    {
         Election storage election = _requireOpen(electionId);
         Ballot storage ballot = ballots[electionId][nullifier];
         if (ballot.castAt == 0) revert BallotMissing();
@@ -138,7 +156,6 @@ contract FreedomSwordVoting {
             block.timestamp < uint256(ballot.castAt) + policy.firstDelay ||
             (ballot.lastRecallAt != 0 && block.timestamp < uint256(ballot.lastRecallAt) + policy.cooldown))
             revert RecallUnavailable();
-        uint8 amount = full ? ballot.balance : policy.partialAmount;
         if (amount > ballot.balance) revert RecallUnavailable();
         _useAction(auditCommitment);
         ballot.balance -= amount;

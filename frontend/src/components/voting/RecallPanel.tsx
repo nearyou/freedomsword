@@ -1,4 +1,6 @@
-import { ArrowDownLeft } from 'lucide-react';
+'use client';
+import { useState } from 'react';
+import { ArrowDownLeft, ArrowDownUp } from 'lucide-react';
 import type { ElectionView } from '@frontend/lib/contracts';
 import { timeLabel, type BallotView } from '@frontend/lib/ui';
 import { recallAvailability } from '@frontend/lib/ballot-ui';
@@ -17,10 +19,17 @@ export default function RecallPanel({
   ready: boolean;
   busy: boolean;
   privateError: boolean;
-  onRecall: (mode: 'partial' | 'full') => void;
+  onRecall: (mode: 'partial' | 'full', units?: number) => void;
 }) {
   const policy = election.recallPolicy;
   const availability = recallAvailability(election, ballot, now);
+  const [selection, setSelection] = useState('25');
+  const step = policy?.partialAmount ?? 25;
+  const choices = [...new Set([step, 25, 50, 75])].sort((a, b) => a - b)
+    .filter((amount) => amount > 0 && amount <= ballot.balance && amount % step === 0 && policy?.partialEnabled !== false);
+  const selected = selection === 'all' || choices.includes(Number(selection)) ? selection : choices[0]?.toString() ?? 'all';
+  const all = selected === 'all';
+  const amount = all ? ballot.balance : Number(selected);
   const reason = busy
     ? 'An action is being recorded.'
     : privateError
@@ -28,47 +37,26 @@ export default function RecallPanel({
       : !ready
         ? 'Complete or renew your Citizen Passport before recalling.'
         : '';
-  const partialReason = reason || availability.partialReason;
-  const fullReason = reason || availability.fullReason;
+  const selectedReason = reason || (all ? availability.fullReason : availability.partialReason);
   const remainingDays = Math.max(
     0,
     Math.ceil((new Date(election.closesAt).getTime() - now) / 86400000),
   );
   return (
     <section className="recall-panel" aria-label="Recall support">
-      <div className="recall-options">
-        <div>
-          <button
-            className="button recall-partial full"
-            disabled={!!partialReason}
-            aria-describedby={partialReason ? 'partial-reason' : undefined}
-            onClick={() => onRecall('partial')}
-          >
-            <ArrowDownLeft size={17} />
-            Recall {policy?.partialAmount ?? 25} units
-          </button>
-          {partialReason && (
-            <p className="disabled-reason" id="partial-reason">
-              {partialReason}
-            </p>
-          )}
-        </div>
-        <div>
-          <button
-            className="button recall-full full"
-            disabled={!!fullReason}
-            aria-describedby={fullReason ? 'full-reason' : undefined}
-            onClick={() => onRecall('full')}
-          >
-            Recall remaining
-          </button>
-          {fullReason && (
-            <p className="disabled-reason" id="full-reason">
-              {fullReason}
-            </p>
-          )}
-        </div>
-      </div>
+      <label className="recall-amount"><span><ArrowDownUp size={17} aria-hidden="true" /> Choose how much to recall</span>
+        <select value={selected} disabled={busy || ballot.balance === 0} onChange={(event) => setSelection(event.target.value)}>
+          {choices.map((value) => <option key={value} value={String(value)}>{(value / 100).toFixed(2)} · {value} units</option>)}
+          <option value="all" disabled={policy?.fullEnabled === false}>All remaining · {ballot.balance} units</option>
+        </select>
+      </label>
+      <p className="fine-print">Recall {amount} units · Keep {Math.max(0, ballot.balance - amount)} units supporting this candidate.</p>
+      <button className="button recall-partial full" disabled={!!selectedReason}
+        aria-describedby={selectedReason ? 'recall-reason' : undefined}
+        onClick={() => onRecall(all ? 'full' : 'partial', all || amount === step ? undefined : amount)}>
+        <ArrowDownLeft size={17} /> Recall {amount} units
+      </button>
+      {selectedReason && <p className="disabled-reason" id="recall-reason">{selectedReason}</p>}
       <p className="fine-print">Recalled support cannot be reassigned.</p>
       <details className="recall-policy-details">
         <summary>Recall rules</summary>

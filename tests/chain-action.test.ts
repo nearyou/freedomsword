@@ -18,6 +18,14 @@ const config = electionChainConfig({
 });
 
 describe('Ethereum action encoding', () => {
+  it('encodes a selected amount without reducing it to a boolean full/partial call', () => {
+    const input = encodeChainAction(audit, JSON.stringify({
+      kind: 'RECALL_AMOUNT', electionKey: key, nullifier, units: 75, config,
+    }));
+    const decoded = decodeFunctionData({ abi, data: input });
+    expect(decoded.functionName).toBe('recallVoteAmount');
+    expect(decoded.args).toEqual([key, nullifier, 75, `0x${audit}`]);
+  });
   it('encodes a cast and recall with only opaque keys and the real recall policy', () => {
     const cast = chainActionSchema.parse({
       kind: 'CAST', electionKey: key, nullifier, candidateCommitment: choice, config,

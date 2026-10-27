@@ -44,7 +44,9 @@ const subtitles: Record<AppTab, string> = {
   'My ballot': 'Your choice, your remaining support and what you can still change.',
   Accountability: 'Published commitments, their progress and the evidence behind them.',
 };
-export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean }) {
+export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates', initialElectionId }: {
+  demoEnabled: boolean; initialTab?: AppTab; initialElectionId?: string;
+}) {
   const citizenState = useCitizen();
   const electionState = useElections();
   const telegram = useTelegram();
@@ -57,8 +59,8 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
     [refreshCitizen, refreshElections],
   );
   const actions = useVoting(() => refresh(true));
-  const [activeId, setActiveId] = useState('council-2026');
-  const [tab, setTab] = useState<AppTab>('Candidates');
+  const [activeId, setActiveId] = useState(initialElectionId ?? 'council-2026');
+  const [tab, setTab] = useState<AppTab>(initialTab);
   const [showElectionList, setShowElectionList] = useState(true);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('support');
@@ -147,15 +149,15 @@ export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean 
       },
     });
   }
-  function recall(mode: 'partial' | 'full') {
+  function recall(mode: 'partial' | 'full', units?: number) {
     setModal({
       type: 'confirm',
       action: {
         path: 'recall',
-        payload: { electionId: election.id, mode, requestId: crypto.randomUUID() },
+        payload: { electionId: election.id, mode, ...(units === undefined ? {} : { units }), requestId: crypto.randomUUID() },
         success:
           mode === 'partial'
-            ? `${election.recallPolicy?.partialAmount ?? 25} units recalled. Your support balance has been updated.`
+            ? `${units ?? election.recallPolicy?.partialAmount ?? 25} units recalled. Your support balance has been updated.`
             : 'All remaining support recalled. Your initial ballot remains recorded.',
       },
     });

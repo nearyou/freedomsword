@@ -1,5 +1,7 @@
 # FreedomSword
 
+Client corrections and remaining release dependencies: [27 October update](docs/CLIENT_UPDATES_2026-10-27.md).
+
 FreedomSword is a Telegram Mini App MVP for **fictional elections**. Citizens can browse candidates, cast one 100-unit ballot, recall support under each election's policy, inspect aggregate results, and follow public audit commitments. The app is a demonstration: its current eligibility provider is a mock and it must not be used for binding elections.
 
 The interface uses an ivory launch and Citizen Passport, followed by a restrained navy election area. Telegram launch data is validated on the server; opening the site in a browser provides a local preview only when development demo authentication is explicitly enabled.

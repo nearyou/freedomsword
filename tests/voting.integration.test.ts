@@ -62,6 +62,30 @@ afterAll(async () => {
   await db.$disconnect();
 });
 
+it('records selected recalls atomically, replays safely and rejects overspending', async () => {
+  const chooser = await enroll('selected-recall');
+  const electionId = `selectable-${randomUUID()}`;
+  const candidateId = `selectable-candidate-${randomUUID()}`;
+  await db.election.create({ data: { id: electionId, title: 'Selectable recall test', description: 'Isolated test',
+    type: 'COUNCIL', status: 'ACTIVE', opensAt: new Date(Date.now() - 60_000), closesAt: new Date(Date.now() + 3_600_000) } });
+  await db.candidate.create({ data: { id: candidateId, electionId, fullName: 'Test Candidate', party: 'Test', ideology: 'Test', bio: 'Test', color: '#445566' } });
+  await castVote(chooser, { electionId, candidateId, requestId: randomUUID() });
+  const requestId = randomUUID();
+  const command = { electionId, mode: 'partial' as const, units: 50, requestId };
+  expect(await recallVote(chooser, command)).toMatchObject({ balance: 50, recalled: 50, replayed: false });
+  expect(await recallVote(chooser, command)).toMatchObject({ balance: 50, recalled: 50, replayed: true });
+  await expect(recallVote(chooser, { ...command, units: 75 })).rejects.toThrow('different action');
+  await expect(recallVote(chooser, { ...command, units: 75, requestId: randomUUID() })).rejects.toThrow('below');
+  const stored = await db.vote.findUniqueOrThrow({
+    where: { electionId_pseudonym: { electionId, pseudonym: await pseudonymFor(chooser, electionId) } },
+    include: { events: true },
+  });
+  expect(stored.events.filter((event) => event.type === 'RECALL')).toHaveLength(1);
+  expect(stored.events.reduce((sum, event) => sum + event.units, 0)).toBe(50);
+  const outbox = await db.blockchainRecord.findFirst({ where: { actionJson: { contains: 'RECALL_AMOUNT' } } });
+  expect(JSON.parse(outbox!.actionJson!)).toMatchObject({ kind: 'RECALL_AMOUNT', units: 50 });
+});
+
 it('isolates a private election from plaintext ballots and live transparency', async () => {
   const id = `private-${randomUUID()}`;
   const candidateId = `private-candidate-${randomUUID()}`;

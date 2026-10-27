@@ -17,8 +17,10 @@ const cast = z.object({ kind: z.literal('CAST'), electionKey: hex32, nullifier: 
   candidateCommitment: hex32, config }).strict();
 const recall = z.object({ kind: z.literal('RECALL'), electionKey: hex32, nullifier: hex32,
   full: z.boolean(), config }).strict();
+const recallAmount = z.object({ kind: z.literal('RECALL_AMOUNT'), electionKey: hex32, nullifier: hex32,
+  units: z.number().int().min(1).max(100), config }).strict();
 const close = z.object({ kind: z.literal('CLOSE'), electionKey: hex32 }).strict();
-export const chainActionSchema = z.discriminatedUnion('kind', [cast, recall, close]);
+export const chainActionSchema = z.discriminatedUnion('kind', [cast, recall, recallAmount, close]);
 export type ChainAction = z.infer<typeof chainActionSchema>;
 
 export function chainElectionKey(electionId: string) {

@@ -4,6 +4,7 @@ import { ArrowLeft, Download, FileJson, Link2 } from 'lucide-react';
 import { fetchTransparency } from '@frontend/lib/transparency';
 import ThemeControl from '@frontend/components/ThemeControl';
 import BrandMark from '@frontend/components/ui/BrandMark';
+import { personalBallotHref } from '@frontend/lib/citizen-location';
 export const dynamic = 'force-dynamic';
 export default async function TransparencyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -22,8 +23,8 @@ export default async function TransparencyPage({ params }: { params: Promise<{ i
         </div>
         <div className="admin-actions">
           <ThemeControl />
-          <Link href="/">
-            <ArrowLeft size={15} aria-hidden="true" /> Back to app
+          <Link href={personalBallotHref(id)}>
+            <ArrowLeft size={15} aria-hidden="true" /> Back to my ballot
           </Link>
         </div>
       </div>

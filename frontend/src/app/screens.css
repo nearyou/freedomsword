@@ -303,9 +303,21 @@
   gap: 0;
   padding: 0;
 }
-.profile-modal > :not(.profile-photo):not(.close-modal):not(.profile-cta) {
+.profile-modal > :not(.profile-hero):not(.close-modal):not(.profile-cta) {
   margin-inline: var(--space-8);
 }
+.profile-hero { position: relative; }
+.profile-hero:not(.has-portrait) { margin: var(--space-8); }
+.profile-hero.has-portrait .profile-photo { height: 340px; }
+.profile-hero.has-portrait .profile-photo::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(transparent 35%, rgb(12 17 21 / 0.94));
+}
+.profile-hero.has-portrait .profile-header {
+  position: absolute; inset: auto var(--space-8) var(--space-6);
+}
+.profile-hero.has-portrait h2 { color: #fffefa; }
+.profile-hero.has-portrait .party { color: #e4e0d9; }
 .profile-modal .close-modal {
   background: var(--color-surface-glass);
   box-shadow: var(--shadow-sm);
@@ -977,6 +989,12 @@ pre.agreement-text {
   padding-top: var(--space-5);
   border-top: 1px solid var(--color-divider);
 }
+.recall-amount { display: grid; gap: var(--space-3); }
+.recall-amount > span { display: flex; align-items: center; gap: var(--space-2); }
+.feedback-link[aria-disabled='true'] { opacity: 0.6; }
+.share-invite > p { white-space: pre-line; }
+.share-networks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+.share-networks > a, .share-networks > button { white-space: normal; min-height: 48px; }
 .recall-options {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

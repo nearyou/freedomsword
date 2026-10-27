@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ArrowRight,
-  ArrowUpRight,
   BarChart3,
   Check,
   ChevronDown,
@@ -15,7 +14,6 @@ import {
   Globe2,
   History,
   ListChecks,
-  MessageCircle,
   MoreHorizontal,
   Send,
   ShieldCheck,
@@ -23,7 +21,6 @@ import {
   Wallet,
 } from 'lucide-react';
 import {
-  openTelegramLink,
   telegramHaptic,
   useTelegram,
   useTelegramBackButton,
@@ -32,16 +29,15 @@ import { nextWelcomeStep } from '@frontend/lib/welcome';
 import { copy, type Language } from './copy';
 import { useWelcomeFlow } from './useWelcomeFlow';
 import { AgreementModal, InfoModal, VerificationModal } from './WelcomeModals';
+import FeedbackLink from '../FeedbackLink';
 
 type Modal = 'verification' | 'agreement' | 'about' | 'privacy' | 'exit' | null;
 type Stage = 'launch' | 'mission' | 'connect';
 
-const appBackground = '#151719';
-
 const stageCopy = {
   en: {
     launchTitle: 'Your voice. Your choice.',
-    launchDetail: 'Explore candidates. Make your choice.',
+    launchDetail: 'Take back control. Manage your vote.',
     motto: 'PEOPLE · VOICE · ACTION',
     start: 'Get started',
     missionKicker: 'WELCOME',
@@ -92,7 +88,7 @@ const stageCopy = {
   },
   uk: {
     launchTitle: 'Ваш голос. Ваш вибір.',
-    launchDetail: 'Знайомтеся з кандидатами. Зробіть вибір.',
+    launchDetail: 'Поверніть контроль. Керуйте своїм голосом.',
     motto: 'ЛЮДИ · ГОЛОС · ДІЯ',
     start: 'Почати',
     missionKicker: 'ЛАСКАВО ПРОСИМО',
@@ -149,7 +145,8 @@ export default function WelcomeScreen() {
   const [stage, setStage] = useState<Stage>('launch');
   const [modal, setModal] = useState<Modal>(null);
   const lightStage = stage === 'launch' || stage === 'mission';
-  const telegram = useTelegram(appBackground);
+  const light = lightStage && !modal;
+  const telegram = useTelegram(light ? '#f7f5f0' : '#151719');
   const flow = useWelcomeFlow(telegram.launch);
   const t = copy[lang];
   const s = stageCopy[lang];
@@ -164,6 +161,19 @@ export default function WelcomeScreen() {
       else go(stage === 'connect' ? 'mission' : 'launch');
     },
   );
+
+  useEffect(() => {
+    const previousTheme = document.documentElement.dataset.theme;
+    const theme = light ? 'light' : 'dark';
+    document.documentElement.dataset.theme = theme;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', light ? '#f7f5f0' : '#151719');
+    document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', theme);
+    return () => {
+      document.documentElement.dataset.theme = previousTheme ?? 'dark';
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#151719');
+      document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', 'dark');
+    };
+  }, [light]);
 
   useEffect(() => {
     const previous = document.documentElement.lang;
@@ -200,7 +210,7 @@ export default function WelcomeScreen() {
 
   return (
     <div
-      className={`welcome-root fs-welcome ${lightStage ? 'fs-light' : 'fs-dark'}`}
+      className={`welcome-root fs-welcome ${light ? 'fs-light' : 'fs-dark'}`}
       lang={lang}
       data-stage={stage}
       data-telegram={telegram.launch === 'ready'}
@@ -353,19 +363,8 @@ export default function WelcomeScreen() {
               <span className="fs-passport-copy"><strong>{s.walletTitle}</strong><small>{s.walletDetail}</small></span>
               <span className="fs-passport-preview">{s.planned}</span>
             </div>
-            <a
-              className="fs-feedback"
-              href="https://t.me/freedomswordbot?start=feedback"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(event) => {
-                if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
-              }}
-            >
-              <MessageCircle size={16} aria-hidden="true" />
-              <span>{s.feedback}</span>
-              <ArrowUpRight size={15} aria-hidden="true" />
-            </a>
+            <FeedbackLink className="fs-feedback" label={s.feedback}
+              unavailableLabel={lang === 'uk' ? 'Бот відгуків незабаром' : 'Feedback bot coming soon'} />
             {telegram.launch === 'failed' && (
               <p className="civic-field-error" role="alert">
                 {t.failed}

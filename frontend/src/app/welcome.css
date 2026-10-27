@@ -15,6 +15,27 @@
   min-height: 100dvh;
   padding: var(--tg-safe-top) var(--tg-safe-right) var(--tg-safe-bottom) var(--tg-safe-left);
 }
+.fs-welcome.fs-light {
+  color-scheme: light;
+  background: #f7f5f0;
+  --color-accent: #087cca;
+  --color-accent-strong: #0874c0;
+  --color-accent-hover: #0664a6;
+  --color-accent-text: #0765a2;
+  --color-accent-soft: #e0edf5;
+  --color-accent-border: #b6d6ec;
+}
+.fs-welcome.fs-light .fs-sheet {
+  background-color: #f7f5f0;
+  background-image: linear-gradient(#f7f5f0eb 0%, #f7f5f0e8 45%, #f7f5f0aa 100%),
+    url('/illustrations/city-council.webp');
+  background-size: cover;
+  background-position: center bottom;
+}
+.fs-welcome.fs-light .fs-mission-card {
+  background: rgb(255 254 250 / 0.84);
+}
+.fs-feedback[aria-disabled='true'] { opacity: 0.65; }
 .fs-header {
   display: grid;
   grid-template-columns: 1fr auto 1fr;

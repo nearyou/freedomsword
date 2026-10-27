@@ -132,7 +132,8 @@
 }
 
 /* Preserve the optional light appearance on admin and transparency screens. */
-:root[data-theme='light'] {
+:root[data-theme='light'],
+:root:has(.fs-welcome.fs-light) {
   color-scheme: light;
   --color-bg: #f7f5f0;
   --color-sidebar: #f2efe8;

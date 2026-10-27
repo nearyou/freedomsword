@@ -27,7 +27,7 @@ export default function BallotPanel({
   busy: boolean;
   privateError: boolean;
   now: number;
-  onRecall: (mode: 'partial' | 'full') => void;
+  onRecall: (mode: 'partial' | 'full', units?: number) => void;
   onExplore: () => void;
   onPassport: () => void;
 }) {
