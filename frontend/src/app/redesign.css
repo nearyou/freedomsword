@@ -1,0 +1,564 @@
+/* FreedomSword's civic interface: quiet navy surfaces after the light welcome. */
+body {
+  background: radial-gradient(circle at 50% -25%, #12334e 0, #071522 55%);
+  font-family:
+    'Inter Variable',
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
+h1,
+h2,
+h3 {
+  letter-spacing: -0.045em;
+}
+.app-shell {
+  max-width: 1380px;
+  grid-template-columns: 214px minmax(0, 1fr);
+}
+.sidebar {
+  background: #091b2a;
+  border-right-color: #244052;
+  padding-top: 30px;
+}
+.brand {
+  font-size: 18px;
+  color: #f6f7f4;
+}
+.brand-second {
+  font-size: 12px;
+  color: #91a9b8;
+  letter-spacing: 0.01em;
+}
+.brand-mark {
+  border: 1px solid #b7904d;
+  box-shadow: 0 0 0 3px #d4ad6215;
+}
+.nav-label {
+  color: #7991a1;
+}
+.nav-item {
+  border: 1px solid transparent;
+  color: #a4b7c2;
+}
+.nav-item.active,
+.nav-item:hover {
+  background: #143149;
+  border-color: #31526a;
+  color: #f4f8f8;
+}
+.nav-item.active > svg {
+  color: #4eb2fb;
+}
+.sidebar-card {
+  background: linear-gradient(150deg, #183b55, #10283b);
+  border-color: #38566b;
+}
+.sidebar-card > svg,
+.sidebar-card button {
+  color: #7bc9ff;
+}
+.topbar {
+  height: 69px;
+  background: #071825eb;
+  border-bottom-color: #244052;
+}
+.breadcrumb {
+  color: #91a7b6;
+}
+.connection,
+.feedback-link {
+  min-height: 35px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  color: #b9cbd5;
+  background: #10273b;
+  border: 1px solid #2b485e;
+  border-radius: 10px;
+  font-size: 11px;
+}
+.connection:hover,
+.feedback-link:hover {
+  border-color: #5c9bc4;
+  color: #f6f7f4;
+}
+.connection > svg:first-child,
+.feedback-link > svg {
+  color: #63bcfa;
+}
+.citizen-main {
+  padding-top: 28px;
+}
+.intro {
+  margin-bottom: 20px;
+}
+.intro .eyebrow {
+  color: #d4ad62;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+.intro h1 {
+  margin: 8px 0;
+  font-size: clamp(30px, 3.3vw, 43px);
+}
+.intro h1 span,
+html[data-theme='light'] .intro h1 span {
+  color: #d4ad62;
+}
+.intro p:not(.eyebrow) {
+  color: #aebfc9;
+  line-height: 1.55;
+}
+.demo-note {
+  background: #102a3e;
+  border-color: #2c4960;
+  padding: 11px 13px;
+}
+.demo-note > svg {
+  color: #d4ad62;
+}
+.panel,
+.admin-card {
+  background: linear-gradient(155deg, #112b40, #0e2234 82%);
+  border-color: #2a475b;
+  box-shadow: 0 12px 30px #0002;
+}
+.panel-heading h3 {
+  font-size: 16px;
+}
+.panel-heading svg {
+  color: #79bfe9;
+}
+.button {
+  border-radius: 12px;
+  min-height: 43px;
+  font-weight: 720;
+}
+.button.primary {
+  background: linear-gradient(180deg, #2997f0, #0872d9);
+  border-color: #39a1f7;
+  box-shadow: 0 7px 16px #0872d937;
+}
+.button.secondary {
+  background: #173249;
+  border-color: #31536a;
+  color: #e5eef4;
+}
+.button.secondary:hover:not(:disabled) {
+  background: #1d405c;
+}
+.button.danger {
+  background: #512d38;
+  border-color: #af5a65;
+  color: #ffd6d6;
+}
+.text-button {
+  color: #8ed2ff;
+}
+.eyebrow {
+  color: #d3ac66;
+  font-weight: 750;
+}
+.election-switcher {
+  gap: 10px;
+}
+.election-option {
+  background: #102a3e;
+  border-color: #2a4559;
+  border-radius: 13px;
+}
+.election-option.selected {
+  background: #173a54;
+  border-color: #54a9e7;
+  box-shadow: inset 0 0 0 1px #54a9e733;
+}
+.election-symbol {
+  background: #1c405a;
+  color: #d4ad62;
+}
+.election-detail {
+  border-bottom-color: #2a4559;
+  margin-bottom: 20px;
+}
+.state-badge,
+.open-badge,
+.live-tag,
+.mock-badge {
+  font-weight: 750;
+}
+.tabs {
+  gap: 20px;
+}
+.tabs button {
+  color: #a3b6c3;
+}
+.tabs button[aria-selected='true'] {
+  color: #f3f9fc;
+  border-bottom-color: #42adf7;
+}
+.search-field,
+.search-row select {
+  background: #112b3e;
+  border-color: #2c495d;
+  color: #dce8ef;
+}
+.candidate-grid {
+  gap: 13px;
+}
+.candidate-card {
+  padding: 17px;
+  background: linear-gradient(145deg, #15344b, #10273b);
+  border: 1px solid #2d4a5e;
+  border-radius: 15px;
+}
+.candidate-card:hover {
+  border-color: #4c8ab5;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px #0003;
+}
+.candidate-card h3 {
+  font-size: 17px;
+}
+.candidate-bio {
+  min-height: 46px;
+  line-height: 1.55;
+}
+.candidate-support strong {
+  font-size: 20px;
+}
+.avatar {
+  border-radius: 50%;
+  overflow: hidden;
+}
+.avatar.large {
+  border-radius: 50%;
+}
+.avatar.has-portrait {
+  padding: 0;
+  background: #385369;
+}
+.avatar.has-portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+.ideology {
+  border: 1px solid color-mix(in srgb, var(--candidate-color) 25%, #284358);
+}
+.live-panel {
+  background: linear-gradient(150deg, #112c42, #0a1e30);
+}
+.donut-label strong {
+  font-size: 27px;
+}
+.results-stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.results-stats .panel {
+  padding: 16px 13px;
+  text-align: center;
+}
+.results-stats strong {
+  font-size: 21px;
+}
+.results-panel {
+  padding-top: 17px;
+}
+.result-row {
+  border-top-color: #2b4658;
+}
+.result-value strong {
+  color: #f5f9fa;
+}
+.ballot-panel {
+  background: linear-gradient(150deg, #17374f, #0e2539);
+}
+.ballot-candidate,
+.confirmation-candidate {
+  background: #17344b;
+  border-color: #31536a;
+}
+.balance strong {
+  color: #f4f7f5;
+}
+.support-meter {
+  background: #294458;
+}
+.recall-panel {
+  border-top-color: #35556a;
+}
+.recall-options .button {
+  border-radius: 10px;
+}
+.share-invite {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 15px;
+  border: 1px solid #48657a;
+  background: linear-gradient(145deg, #1a3a52, #102c42);
+}
+.share-invite-kicker {
+  color: #d6b571;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+.share-invite h3 {
+  margin: 5px 0 7px;
+  font-size: 18px;
+}
+.share-invite > p {
+  color: #bacad3;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.share-invite-link {
+  margin-top: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 9px 8px 12px;
+  color: #9ed6fa;
+  background: #0a2033;
+  border-radius: 8px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.share-invite-link button {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  flex: none;
+  border-radius: 7px;
+  color: #a7d9fa;
+  background: #173a55;
+}
+.share-invite-status {
+  display: block;
+  margin-top: 6px;
+  color: #b7dccd;
+  font-size: 11px;
+}
+.share-invite-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.share-invite-options a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 9px;
+  border: 1px solid #3a6079;
+  border-radius: 8px;
+  background: #153a55;
+  color: #d4e8f5;
+  font-size: 11px;
+}
+.share-invite-options a:hover {
+  border-color: #81c7f8;
+}
+.modal-backdrop {
+  background: #020a13d6;
+  backdrop-filter: blur(10px);
+}
+.modal {
+  background: linear-gradient(160deg, #133249, #0b1f31 75%);
+  border-color: #34536b;
+  border-radius: 20px;
+  box-shadow: 0 30px 80px #0008;
+}
+.close-modal {
+  background: #1c3c53;
+  color: #d4e5ee;
+}
+.modal-symbol {
+  border-radius: 50%;
+  background: #1c4d70;
+  color: #9ad6fc;
+}
+.profile-modal {
+  padding-top: 0;
+  overflow-y: auto;
+}
+.profile-photo {
+  position: relative;
+  height: 235px;
+  margin: 0 -30px 18px;
+  overflow: hidden;
+}
+.profile-photo img {
+  object-fit: cover;
+  object-position: center 28%;
+}
+.profile-photo::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 0;
+  background: linear-gradient(transparent, #133249);
+  pointer-events: none;
+}
+.profile-modal:has(.profile-photo) .profile-header {
+  position: relative;
+  margin-top: -70px;
+  padding: 0 0 8px;
+  z-index: 1;
+}
+.profile-modal:has(.profile-photo) .profile-header h2 {
+  font-size: 28px;
+}
+.profile-stats {
+  border-color: #31516a;
+}
+.profile-stats strong {
+  color: #f4f8f8;
+}
+.platform-preview,
+.platform-detail {
+  background: #17344b;
+  border-color: #36556b;
+}
+.profile-cta {
+  background: #0e273a;
+  border-color: #35536a;
+}
+.wallet-preview {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 12px 0 18px;
+  padding: 13px;
+  border: 1px solid #426079;
+  border-radius: 13px;
+  background: #18364c;
+}
+.wallet-preview > svg {
+  color: #e0bb77;
+  flex: none;
+}
+.wallet-preview > div {
+  flex: 1;
+  min-width: 0;
+}
+.wallet-preview strong {
+  display: block;
+  font-size: 12px;
+}
+.wallet-preview p {
+  margin-top: 3px;
+  color: #aabfcb;
+  font-size: 10px;
+  line-height: 1.35;
+}
+.wallet-preview > span {
+  color: #e7c788;
+  background: #473a2b;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 8px;
+  font-weight: 800;
+}
+.powered-by {
+  margin: 12px 0;
+  color: #9cb3c1;
+  font-size: 11px;
+  text-align: center;
+}
+.powered-by a {
+  color: #b4dbf7;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.main-footer {
+  border-color: #2c475b;
+}
+.mobile-nav {
+  background: #081b2aef;
+  border-color: #284358;
+}
+.mobile-nav button.active {
+  background: #143b57;
+  color: #7cccff;
+}
+@media (max-width: 760px) {
+  .app-shell[data-telegram='true'] .topbar {
+    justify-content: flex-end;
+    min-height: 52px;
+  }
+  .app-shell[data-telegram='true'] .mobile-brand {
+    display: none;
+  }
+  .topbar {
+    min-height: 60px;
+    background: #081a2a;
+  }
+  .citizen-main {
+    padding-top: 21px;
+  }
+  .intro h1 {
+    font-size: 31px;
+  }
+  .feedback-link {
+    width: 35px;
+    justify-content: center;
+    padding: 8px;
+  }
+  .feedback-link span {
+    display: none;
+  }
+  .connection {
+    min-height: 35px;
+  }
+  .candidate-grid {
+    grid-template-columns: 1fr;
+  }
+  .candidate-card {
+    padding: 15px;
+  }
+  .candidate-card .candidate-head {
+    margin-bottom: 9px;
+  }
+  .candidate-card .candidate-bio {
+    min-height: 0;
+    margin: 11px 0;
+  }
+  .results-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .profile-modal {
+    padding-top: 0;
+  }
+  .profile-photo {
+    margin: 0 -18px 18px;
+  }
+  .profile-modal:has(.profile-photo) .profile-header {
+    margin-top: -62px;
+  }
+  .share-invite {
+    padding: 15px;
+  }
+}
+@media (max-width: 380px) {
+  .topbar-actions {
+    gap: 5px;
+  }
+  .connection {
+    font-size: 9px;
+  }
+  .connection > span {
+    max-width: 84px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .wallet-preview > span {
+    display: none;
+  }
+}

@@ -12,7 +12,6 @@ export function permittedRecallAmount(
   castAt: Date,
   previousRecalls: Date[],
   now: Date,
-  requestedUnits?: number,
 ) {
   if (balance <= 0) throw new ApiError(409, 'Your ballot is already fully recalled', 'RECALL_EMPTY');
   if (!policy.recallEnabled) throw new ApiError(409, 'Recall is disabled for this election', 'RECALL_DISABLED');
@@ -27,10 +26,7 @@ export function permittedRecallAmount(
   const last = previousRecalls[0];
   if (last && now.getTime() - last.getTime() < policy.recallCooldownSeconds * 1000)
     throw new ApiError(409, 'Recall cooldown has not elapsed', 'RECALL_COOLDOWN');
-  if (requestedUnits !== undefined && (mode !== 'partial' || !Number.isInteger(requestedUnits) ||
-    ![25, 50, 75].includes(requestedUnits) || requestedUnits % policy.partialRecallAmount !== 0))
-    throw new ApiError(400, 'Choose a permitted recall amount', 'RECALL_AMOUNT');
-  const amount = mode === 'full' ? balance : requestedUnits ?? policy.partialRecallAmount;
+  const amount = mode === 'full' ? balance : policy.partialRecallAmount;
   if (amount > balance) throw new ApiError(409, 'Remaining balance is below the partial recall amount', 'RECALL_AMOUNT');
   return amount;
 }

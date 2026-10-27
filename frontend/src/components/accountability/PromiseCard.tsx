@@ -23,12 +23,10 @@ export default function PromiseCard({
 }) {
   const color =
     promise.status === 'DELIVERED'
-      ? 'var(--color-success)'
+      ? 'var(--success)'
       : promise.status === 'DELAYED'
-        ? 'var(--color-warning)'
-        : promise.status === 'PLANNED'
-          ? 'var(--color-text-muted)'
-          : 'var(--color-accent)';
+        ? 'var(--warning)'
+        : 'var(--primary)';
   return (
     <article className="promise-item">
       <div className="promise-title">

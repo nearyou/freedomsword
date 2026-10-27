@@ -27,7 +27,7 @@ export default function BallotPanel({
   busy: boolean;
   privateError: boolean;
   now: number;
-  onRecall: (mode: 'partial' | 'full', units?: number) => void;
+  onRecall: (mode: 'partial' | 'full') => void;
   onExplore: () => void;
   onPassport: () => void;
 }) {
@@ -84,7 +84,7 @@ export default function BallotPanel({
                 <i
                   style={{
                     width: `${segment.fill}%`,
-                    background: candidate?.color ?? 'var(--color-accent)',
+                    background: candidate?.color ?? 'var(--primary)',
                   }}
                 />
               </span>

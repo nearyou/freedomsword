@@ -2,11 +2,10 @@ import type { Metadata } from 'next';
 import type { Viewport } from 'next';
 import '@fontsource-variable/inter';
 import '@fontsource-variable/playfair-display';
-import './tokens.css';
 import './globals.css';
-import './shell.css';
-import './screens.css';
-import './admin.css';
+import './theme.css';
+import './redesign.css';
+import './elections-clarity.css';
 export const metadata: Metadata = {
   title: 'FreedomSword',
   description: 'FreedomSword: your voice, continuously. A fictional Telegram democracy demo.',
@@ -16,8 +15,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#151719',
-  colorScheme: 'dark',
+  themeColor: '#071522',
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

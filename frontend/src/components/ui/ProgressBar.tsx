@@ -1,7 +1,7 @@
 export default function ProgressBar({
   value,
   label,
-  color = 'var(--color-accent)',
+  color = 'var(--primary)',
 }: {
   value: number;
   label: string;

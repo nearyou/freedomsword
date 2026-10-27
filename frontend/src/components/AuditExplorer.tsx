@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { AlertTriangle, CheckCircle2, LockKeyhole } from 'lucide-react';
+import { CheckCircle2, LockKeyhole } from 'lucide-react';
 import Dialog from './ui/Dialog';
 import type { AuditView } from '@frontend/lib/contracts';
 interface AuditPage {
@@ -49,8 +49,8 @@ export default function AuditExplorer({ onClose }: { onClose: () => void }) {
       {page && (
         <div className="audit-summary">
           <span>{page.total} commitments</span>
-          <span className={`signed-badge ${page.verifiedRange ? '' : 'failed'}`}>
-            {page.verifiedRange ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
+          <span className="signed-badge">
+            <CheckCircle2 size={14} />
             {page.verifiedRange ? 'Page links verified' : 'Integrity check failed'}
           </span>
         </div>

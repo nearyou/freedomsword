@@ -10,7 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import type { CandidateView } from '@frontend/lib/contracts';
-import { dateLabel, type AppTab } from '@frontend/lib/ui';
+import type { AppTab } from '@frontend/lib/ui';
 import { useCitizen } from '@frontend/hooks/useCitizen';
 import { useElections } from '@frontend/hooks/useElections';
 import { telegramHaptic, useTelegram, useTelegramBackButton } from '@frontend/hooks/useTelegram';
@@ -38,15 +38,7 @@ const headings: Record<AppTab, string> = {
   'My ballot': 'My ballot',
   Accountability: 'Promises',
 };
-const subtitles: Record<AppTab, string> = {
-  Candidates: 'Choose an election to meet its candidates, read their platforms and follow public commitments.',
-  'Live results': 'Aggregate support for each candidate, refreshed while you watch.',
-  'My ballot': 'Your choice, your remaining support and what you can still change.',
-  Accountability: 'Published commitments, their progress and the evidence behind them.',
-};
-export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates', initialElectionId }: {
-  demoEnabled: boolean; initialTab?: AppTab; initialElectionId?: string;
-}) {
+export default function FreedomSwordApp({ demoEnabled }: { demoEnabled: boolean }) {
   const citizenState = useCitizen();
   const electionState = useElections();
   const telegram = useTelegram();
@@ -59,8 +51,8 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
     [refreshCitizen, refreshElections],
   );
   const actions = useVoting(() => refresh(true));
-  const [activeId, setActiveId] = useState(initialElectionId ?? 'council-2026');
-  const [tab, setTab] = useState<AppTab>(initialTab);
+  const [activeId, setActiveId] = useState('council-2026');
+  const [tab, setTab] = useState<AppTab>('Candidates');
   const [showElectionList, setShowElectionList] = useState(true);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('support');
@@ -149,15 +141,15 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
       },
     });
   }
-  function recall(mode: 'partial' | 'full', units?: number) {
+  function recall(mode: 'partial' | 'full') {
     setModal({
       type: 'confirm',
       action: {
         path: 'recall',
-        payload: { electionId: election.id, mode, ...(units === undefined ? {} : { units }), requestId: crypto.randomUUID() },
+        payload: { electionId: election.id, mode, requestId: crypto.randomUUID() },
         success:
           mode === 'partial'
-            ? `${units ?? election.recallPolicy?.partialAmount ?? 25} units recalled. Your support balance has been updated.`
+            ? `${election.recallPolicy?.partialAmount ?? 25} units recalled. Your support balance has been updated.`
             : 'All remaining support recalled. Your initial ballot remains recorded.',
       },
     });
@@ -203,22 +195,8 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
               </button>
             )}
             <h1>{tab === 'Candidates' && !showElectionList ? election?.title : headings[tab]}</h1>
-            {tab === 'Candidates' && !showElectionList && election ? (
-              <p className="page-subtitle">
-                <span className={`state-badge state-${election.status.toLowerCase()}`}>
-                  {election.status}
-                </span>
-                <span>Closes {dateLabel(election.closesAt)}</span>
-                <span>{election.candidates.length} candidates</span>
-              </p>
-            ) : (
-              <p className="page-subtitle">{subtitles[tab]}</p>
-            )}
           </div>
-          <span
-            className={`network-status ${stale ? 'interrupted' : ''}`}
-            data-state={source === 'preview' ? 'sample' : stale ? 'paused' : 'live'}
-          >
+          <span className={`network-status ${stale ? 'interrupted' : ''}`}>
             <span className="mini-dot" />
             {source === 'preview' ? 'Sample' : stale ? 'Refresh paused' : 'Updated live'}
           </span>

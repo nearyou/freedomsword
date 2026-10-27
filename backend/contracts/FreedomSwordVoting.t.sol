@@ -54,22 +54,6 @@ contract FreedomSwordVotingTest {
         require(balance == 0 && recalls == 4, "partial recall state");
     }
 
-    function testSelectableRecallIsOneOperationAndCannotExceedBalance() public {
-        _cast(ELECTION, VOTER, CAST);
-        voting.recallVoteAmount(ELECTION, VOTER, 75, keccak256("selected75"));
-        (,,uint8 balance,uint8 recalls,) = voting.ballots(ELECTION, VOTER);
-        require(balance == 25 && recalls == 1, "selected amount must be one recall");
-        (bool oversized,) = address(voting).call(abi.encodeCall(voting.recallVoteAmount,
-            (ELECTION, VOTER, 50, keccak256("oversized"))));
-        require(!oversized, "cannot recall more than remaining support");
-        (bool invalid,) = address(voting).call(abi.encodeCall(voting.recallVoteAmount,
-            (ELECTION, VOTER, 10, keccak256("invalid"))));
-        require(!invalid, "must follow policy step");
-        voting.recallVote(ELECTION, VOTER, true, keccak256("remaining25"));
-        (,,balance,recalls,) = voting.ballots(ELECTION, VOTER);
-        require(balance == 0 && recalls == 2, "full recall remains compatible");
-    }
-
     function testCooldownAndWindow() public {
         bytes32 timed = keccak256("timed");
         voting.registerElection(timed, uint64(block.timestamp), uint64(block.timestamp + 200),

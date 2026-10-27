@@ -4,8 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "feedback:bot": "node --env-file=.env scripts/feedback-bot.mjs",
-    "bot:description": "tsx scripts/configure-bot-description.ts",
     "dev": "tsx watch bin/server.ts",
     "build": "prisma generate --schema prisma/schema.prisma && esbuild bin/server.ts src/application.ts scripts/outbox-worker.ts prisma/seed.ts --bundle --platform=node --format=esm --packages=external --outdir=dist --entry-names=[name]",
     "start": "node dist/server.js",

@@ -39,7 +39,6 @@ export default function CandidateProfile({
   const portrait = candidatePortrait(candidate.fullName);
   return (
     <Dialog titleId="profile-title" onClose={onClose} busy={busy} className="profile-modal">
-      <div className={`profile-hero ${portrait ? 'has-portrait' : ''}`}>
       {portrait && (
         <div className="profile-photo">
           <Image src={portrait} alt="" fill sizes="(max-width: 760px) 100vw, 640px" />
@@ -52,7 +51,6 @@ export default function CandidateProfile({
           <p className="party">{candidate.party}</p>
           <IdeologyBadge label={candidate.ideology} color={candidate.color} />
         </div>
-      </div>
       </div>
       {(election.protocol !== 'MACI_PRIVATE' || election.privatePoll?.resultsPublishedAt) && <div className="profile-stats">
         <div>

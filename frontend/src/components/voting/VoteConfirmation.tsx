@@ -23,7 +23,7 @@ export default function VoteConfirmation({
 }) {
   const cast = action.path === 'vote';
   const partial = action.payload.mode === 'partial';
-  const amount = partial ? Number(action.payload.units ?? election.recallPolicy?.partialAmount ?? 25) : (ballot?.balance ?? 0);
+  const amount = partial ? (election.recallPolicy?.partialAmount ?? 25) : (ballot?.balance ?? 0);
   return (
     <Dialog titleId="confirm-title" onClose={onCancel} busy={busy} className="confirm-modal">
       <div className={`modal-symbol ${cast ? '' : 'destructive'}`}>
@@ -50,7 +50,6 @@ export default function VoteConfirmation({
         <>
           <p className="modal-copy">
             {amount} units will be permanently removed. They cannot be reassigned.
-            {' '}{Math.max(0, (ballot?.balance ?? 0) - amount)} units will keep supporting this candidate.
           </p>
         </>
       )}

@@ -77,7 +77,7 @@ export function useTelegramBackButton(launch: Launch, enabled: boolean, onBack: 
   }, [launch, enabled]);
 }
 
-export function useTelegram(color = '#151719') {
+export function useTelegram(color = '#071522') {
   const [launch, setLaunch] = useState<Launch>('loading');
   const onReady = useCallback(() => {
     const webapp = window.Telegram?.WebApp;
@@ -102,10 +102,9 @@ export function useTelegram(color = '#151719') {
     const webapp = window.Telegram?.WebApp;
     const updateColors = () => {
       if (!webapp?.isVersionAtLeast('6.1')) return;
-      const background = getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim() || color;
-      webapp.setHeaderColor(webapp.isVersionAtLeast('6.9') ? background : 'bg_color');
-      webapp.setBackgroundColor(background);
-      if (webapp.isVersionAtLeast('7.10')) webapp.setBottomBarColor?.(background);
+      webapp.setHeaderColor(webapp.isVersionAtLeast('6.9') ? color : 'bg_color');
+      webapp.setBackgroundColor(color);
+      if (webapp.isVersionAtLeast('7.10')) webapp.setBottomBarColor?.(color);
     };
     const update = () => {
       for (const edge of ['top', 'bottom', 'left', 'right'] as const) {

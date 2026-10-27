@@ -12,7 +12,6 @@ import { permittedRecallAmount } from './recall-policy';
 import { voteIdempotencyStore } from './idempotency-store';
 import { chainElectionKey, chainNullifier, chainCandidateCommitment, electionChainConfig } from './chain/action';
 import { requireLegacyBallotProtocol } from './core/protocol';
-import { requireSelectableRecallContract } from './sepolia';
 export async function requireOpenElection(tx: Prisma.TransactionClient, electionId: string) {
   const locked = await tx.election.updateMany({
     where: { id: electionId }, data: { revision: { increment: 1 } },
@@ -91,10 +90,8 @@ export async function castVote(
 }
 export async function recallVote(
   user: User,
-  input: { electionId: string; mode: 'partial' | 'full'; units?: number; requestId: string },
+  input: { electionId: string; mode: 'partial' | 'full'; requestId: string },
 ) {
-  if (input.units !== undefined && process.env.BLOCKCHAIN_ADAPTER === 'sepolia')
-    await requireSelectableRecallContract();
   const requestHash = sha256(JSON.stringify({ type: 'RECALL', ...input }));
   return serializable(async (tx) => {
     await lockCitizen(tx, user.id);
@@ -125,7 +122,7 @@ export async function recallVote(
     });
     const amount = permittedRecallAmount(
       election, vote.balance, input.mode, vote.createdAt,
-      prior.map((event) => event.createdAt), await databaseNow(tx), input.units,
+      prior.map((event) => event.createdAt), await databaseNow(tx),
     );
     const updated = await tx.vote.updateMany({
       where: { id: vote.id, balance: vote.balance },
@@ -142,13 +139,9 @@ export async function recallVote(
       },
     });
     await appendAudit(tx, JSON.stringify({ action: 'RECALL', voteId: vote.id, units: -amount }), input.electionId,
-      input.units === undefined
-        ? { kind: 'RECALL', electionKey: chainElectionKey(input.electionId),
-          nullifier: chainNullifier(input.electionId, pseudonym), full: input.mode === 'full',
-          config: electionChainConfig(election) }
-        : { kind: 'RECALL_AMOUNT', electionKey: chainElectionKey(input.electionId),
-          nullifier: chainNullifier(input.electionId, pseudonym), units: amount,
-          config: electionChainConfig(election) });
+      { kind: 'RECALL', electionKey: chainElectionKey(input.electionId),
+        nullifier: chainNullifier(input.electionId, pseudonym), full: input.mode === 'full',
+        config: electionChainConfig(election) });
     await assertWindowAtFinalCheck(tx, input.electionId);
     return { balance: vote.balance - amount, recalled: amount, replayed: false };
   });

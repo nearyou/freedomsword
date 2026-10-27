@@ -59,7 +59,7 @@ export default function RarimoRegistration({ electionId, publicKeyX, publicKeyY,
     {request && <>
       <ZkPassportQrCode key={requestId} requestId={requestId}
         apiUrl="https://api.app.rarime.com"
-        verificationOptions={request} qrProps={{ size: 210, bgColor: '#ffffff', fgColor: '#292722' }}
+        verificationOptions={request} qrProps={{ size: 210, bgColor: '#ffffff', fgColor: '#102238' }}
         onStatusChange={(next) => {
           if (next === ProofRequestStatuses.VerificationRequested)
             setStatus('Scan with RariMe, or tap the code on this phone.');
