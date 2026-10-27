@@ -16,7 +16,7 @@ const id = z.string().min(1).max(100);
 const text = z.string().trim().min(1).max(2000);
 const date = z.iso.datetime({ offset: true });
 const type = z.enum(['COUNCIL', 'BUDGET', 'COMMUNITY']);
-const protocol = z.enum(['LEGACY_RECALL', 'MACI_PRIVATE']);
+const protocol = z.enum(['LEGACY_RECALL', 'MACI_PRIVATE', 'CONTINUOUS_SUPPORT']);
 export const adminCommand = z.discriminatedUnion('action', [
   z.object({ action: z.literal('create'), title: text.max(160), description: text, type, protocol: protocol.optional(), opensAt: date, closesAt: date }).strict(),
   z.object({ action: z.literal('edit'), electionId: id, title: text.max(160), description: text, type, opensAt: date, closesAt: date }).strict(),
@@ -247,7 +247,7 @@ export async function administer(userId: string, input: AdminCommand) {
           break;
         }
         case 'recallPolicy':
-          if (election.protocol === 'MACI_PRIVATE') throw new ApiError(409, 'MACI polls do not use recall policies');
+          if (election.protocol !== 'LEGACY_RECALL') throw new ApiError(409, 'This voting mode has its own fixed recall rules');
           await tx.election.update({ where: { id: election.id }, data: {
             recallEnabled: input.recallEnabled,
             fullRecallEnabled: input.fullRecallEnabled,

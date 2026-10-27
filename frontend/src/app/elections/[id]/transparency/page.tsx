@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { fetchTransparency } from '@frontend/lib/transparency';
 import ThemeControl from '@frontend/components/ThemeControl';
 import BrandMark from '@frontend/components/ui/BrandMark';
+import { personalBallotHref } from '@frontend/lib/citizen-location';
 export const dynamic = 'force-dynamic';
 export default async function TransparencyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -20,18 +21,18 @@ export default async function TransparencyPage({ params }: { params: Promise<{ i
         </div>
         <div className="admin-actions">
           <ThemeControl />
-          <Link href="/">Back to app</Link>
+          <Link href={personalBallotHref(id)}>Back to my ballot</Link>
         </div>
       </div>
       <p>{data.election.description}</p>
       <div className="transparency-stats">
         <div className="admin-card">
           <strong>{data.totals.participation}</strong>
-          <span>Ballots cast</span>
+          <span>{data.election.protocol === 'CONTINUOUS_SUPPORT' ? 'Participants' : 'Ballots cast'}</span>
         </div>
         <div className="admin-card">
           <strong>{data.totals.voteUnitsCast}</strong>
-          <span>Units cast</span>
+          <span>{data.election.protocol === 'CONTINUOUS_SUPPORT' ? 'Units allocated · all cycles' : 'Units cast'}</span>
         </div>
         <div className="admin-card">
           <strong>{data.totals.recalledUnits}</strong>
@@ -49,13 +50,15 @@ export default async function TransparencyPage({ params }: { params: Promise<{ i
           {new Date(data.election.opensAt).toLocaleString()} –{' '}
           {new Date(data.election.closesAt).toLocaleString()}
         </p>
-        <p>
+        {data.election.protocol === 'CONTINUOUS_SUPPORT' ? <p>100 units per participant. Recall any whole amount.
+          Each withdrawal unlocks six calendar months later and can then support any candidate again.
+          Budgets are enforced by the application; blockchain anchors contain audit commitments.</p> : <p>
           Recall: {data.election.recallPolicy.enabled ? 'enabled' : 'disabled'} · Partial{' '}
           {data.election.recallPolicy.partialAmount} units · First delay{' '}
           {data.election.recallPolicy.firstDelaySeconds}s · Cooldown{' '}
           {data.election.recallPolicy.cooldownSeconds}s · Maximum{' '}
           {data.election.recallPolicy.maxOperations ?? 'unlimited'}
-        </p>
+        </p>}
       </section>
       <section className="admin-card">
         <h2>Candidates and platforms</h2>

@@ -1,5 +1,7 @@
 # FreedomSword
 
+Latest client upgrade and deployment notes: [27 October prototype-9 update](docs/CLIENT_UPGRADE_2026-10-27.md).
+
 FreedomSword is a Telegram Mini App MVP for **fictional elections**. Citizens can browse candidates, cast one 100-unit ballot, recall support under each election's policy, inspect aggregate results, and follow public audit commitments. The app is a demonstration: its current eligibility provider is a mock and it must not be used for binding elections.
 
 The interface uses an ivory launch and Citizen Passport, followed by a restrained navy election area. Telegram launch data is validated on the server; opening the site in a browser provides a local preview only when development demo authentication is explicitly enabled.
@@ -76,6 +78,8 @@ Deploy the contract first with `npm run contract:deploy:sepolia` using a funded 
 Vercel does not run `npm run outbox:worker` continuously. Each successful backend write attempts a bounded outbox flush and reconciliation; authenticated `POST /api/blockchain/retry` can process another batch. `backend/vercel.json` schedules an authenticated backend `/api/cron/outbox` run once per day, which is compatible with the [Vercel Hobby minimum interval](https://vercel.com/docs/cron-jobs/usage-and-pricing). Vercel adds the `CRON_SECRET` bearer header for scheduled calls as described in its [cron security guide](https://vercel.com/docs/cron-jobs/manage-cron-jobs). Pending, submitted, and confirmed are distinct states. Failed contract actions require investigation and reconciliation; a MongoDB commit and an Ethereum transaction are not atomic.
 
 ## Data and trust boundaries
+
+The [24 October client corrections](docs/CLIENT_UPDATES_2026-10-24.md) add a `CONTINUOUS_SUPPORT` mode for new elections: a 100-unit budget, arbitrary whole-unit allocations and recalls, and reuse six calendar months after each withdrawal. Existing legacy ballots retain their published rules. This new mode is enforced by MongoDB transactions; only its audit commitments are anchored on-chain. Run `npm run db:seed:support` after applying the Prisma schema to add its separate fictional demonstration. The same guide covers the separate feedback bot, broader sharing, bot welcome copy and wallet decision.
 
 MongoDB stores accounts, sessions, eligibility records, ballots, audit events, and outbox state. Multi-document transactions and unique indexes enforce the app's ballot workflow. The contract enforces one 100-unit ballot per opaque nullifier, immutable recall policy, remaining balance, delays, operation limits, and election windows. Its public storage and events reveal each nullifier's cast and recall timing, balance changes, and a salted choice commitment. Candidate membership and person eligibility remain server-side checks. Generic audit actions are anchored by commitment. MongoDB is the application ledger; Ethereum is an eventual, independently visible mirror. An administrator with database write access can alter records, and the relayer controls submissions. Do not claim a secret ballot or production-grade decentralized election.
 

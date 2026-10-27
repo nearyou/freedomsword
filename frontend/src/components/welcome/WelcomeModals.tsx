@@ -319,11 +319,13 @@ export function InfoModal({
   kind,
   onClose,
   onWelcome,
+  onPreview,
 }: {
   t: WelcomeCopy;
   kind: 'about' | 'privacy' | 'exit';
   onClose: () => void;
   onWelcome: () => void;
+  onPreview?: () => void;
 }) {
   return (
     <Dialog titleId="welcome-info-title" onClose={onClose} className="civic-modal civic-info-modal">
@@ -338,6 +340,9 @@ export function InfoModal({
       <GoldButton type="button" onClick={onClose}>
         {t.keepExploring}
       </GoldButton>
+      {kind === 'about' && onPreview && <button type="button" className="civic-text-button" onClick={onPreview}>
+        {t.backWelcome === 'Back to Welcome' ? 'Preview the demo' : 'Переглянути демонстрацію'}
+      </button>}
       {kind === 'exit' && (
         <button type="button" className="civic-text-button" onClick={onWelcome}>
           {t.backWelcome}

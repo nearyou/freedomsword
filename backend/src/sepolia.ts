@@ -9,8 +9,19 @@ import votingAbiJson from './chain/abi.json';
 import { chainActionSchema } from './chain/action';
 import { classifyRevert } from './chain/rejection';
 import type { BlockchainAdapter } from './blockchain';
+import { ApiError } from './errors';
 
 const abi = votingAbiJson as Abi;
+export async function requireSelectableRecallContract() {
+  try {
+    const client = createPublicClient({ chain: sepolia,
+      transport: http(process.env.BLOCKCHAIN_SEPOLIA_RPC_URL) });
+    const supported = await client.readContract({ address: getAddress(process.env.BLOCKCHAIN_CONTRACT_ADDRESS!),
+      abi, functionName: 'selectableRecallSupported' });
+    if (supported === true) return;
+  } catch { /* Older contracts do not expose the capability. */ }
+  throw new ApiError(503, 'Selectable recall requires the upgraded voting contract');
+}
 const commitmentHex = (value: string): Hex => {
   if (!/^[a-f0-9]{64}$/.test(value)) throw new Error('Invalid audit commitment');
   return `0x${value}`;
@@ -31,6 +42,10 @@ export function encodeChainAction(commitment: string, actionJson?: string | null
   if (action.kind === 'CLOSE')
     return encodeFunctionData({ abi, functionName: 'closeElection', args: [
       action.electionKey as Hex, auditCommitment,
+    ] });
+  if (action.kind === 'RECALL_AMOUNT')
+    return encodeFunctionData({ abi, functionName: 'recallVoteAmount', args: [
+      action.electionKey as Hex, action.nullifier as Hex, action.units, auditCommitment,
     ] });
   return encodeFunctionData({ abi, functionName: 'recallVote', args: [
     action.electionKey as Hex, action.nullifier as Hex, action.full, auditCommitment,
@@ -66,7 +81,7 @@ export class SepoliaBlockchainAdapter implements BlockchainAdapter {
   private async existingHash(commitment: Hex, actionJson?: string | null): Promise<Hex | null> {
     const action = actionJson ? chainActionSchema.parse(JSON.parse(actionJson)) : null;
     const eventName = action?.kind === 'CAST' ? 'VoteCast'
-      : action?.kind === 'RECALL' ? 'VoteRecalled'
+      : action?.kind === 'RECALL' || action?.kind === 'RECALL_AMOUNT' ? 'VoteRecalled'
         : action?.kind === 'CLOSE' ? 'ElectionClosed' : 'AuditAnchored';
     const logs = await this.publicClient().getContractEvents({
       address: this.address, abi, eventName, args: { auditCommitment: commitment },

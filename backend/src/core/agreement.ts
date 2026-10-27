@@ -1,3 +1,3 @@
-export const AGREEMENT_VERSION = 1;
+export const AGREEMENT_VERSION = 2;
 export const AGREEMENT_TEXT =
-  'I agree to participate respectfully, use one verified citizen account, and accept that my 100-unit ballot may be recalled in 25-unit steps or in full. I understand this is a fictional demonstration, the mock verifier does not prove real eligibility, and the server operator can correlate my private account and ballot. I have read the privacy explanation.';
+  'I agree to participate respectfully and use one eligible citizen account. In reusable-support elections I have 100 units to allocate across candidates. I may withdraw part or all of my support; each withdrawal becomes reusable six calendar months later, and may then be allocated to the same candidate or others. Withdrawing again starts a new six-month period. Original demo ballots keep their published election rules. I understand this is a fictional demonstration: the mock verifier does not prove real eligibility, and the operator can correlate accounts with legacy ballots and reusable allocations. Private elections explain their separate coordinator trust model. I have read the privacy explanation.';

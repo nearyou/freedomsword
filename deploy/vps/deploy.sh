@@ -62,8 +62,15 @@ chown -R freedomsword:freedomsword "${release_dir}"
     node --env-file=backend/.env --import tsx --input-type=module \
     -e "import { loadConfig } from './backend/src/config.ts'; loadConfig();"
   runuser -u freedomsword -- env HOME="${base_dir}" npm run build -w @freedomsword/backend
+  feedback_bot_username=$(env -i PATH="${PATH}" node --env-file=backend/.env -e '
+const name = process.env.FEEDBACK_BOT_USERNAME || "";
+if (name && (!/^[a-z][a-z0-9_]{4,31}$/i.test(name) || !/bot$/i.test(name) || name.toLowerCase() === "freedomswordbot"))
+  throw Error("FEEDBACK_BOT_USERNAME must identify a separate Telegram feedback bot");
+process.stdout.write(name);
+')
   runuser -u freedomsword -- env HOME="${base_dir}" NODE_ENV=production APP_ENV=production \
-    BACKEND_URL=http://127.0.0.1:3001 npm run build -w @freedomsword/frontend
+    BACKEND_URL=http://127.0.0.1:3001 NEXT_PUBLIC_FEEDBACK_BOT_USERNAME="${feedback_bot_username}" \
+    npm run build -w @freedomsword/frontend
 )
 
 previous_release=''
@@ -72,9 +79,13 @@ if [[ -L ${base_dir}/current ]]; then
 fi
 ln -sfnT "${release_dir}" "${base_dir}/current.next"
 mv -Tf "${base_dir}/current.next" "${base_dir}/current"
-systemctl enable freedomsword-api freedomsword-frontend freedomsword-worker
+services=(freedomsword-api freedomsword-frontend freedomsword-worker)
+if [[ -f /etc/systemd/system/freedomsword-feedback.service ]]; then
+  services+=(freedomsword-feedback)
+fi
+systemctl enable "${services[@]}"
 restart_ok=true
-if ! systemctl restart freedomsword-api freedomsword-frontend freedomsword-worker; then
+if ! systemctl restart "${services[@]}"; then
   restart_ok=false
 fi
 
@@ -83,7 +94,7 @@ if [[ ${restart_ok} == true ]]; then
   for _ in $(seq 1 20); do
     if curl -fsS --max-time 5 http://127.0.0.1:3001/api/ready >/dev/null &&
       curl -fsS --max-time 5 -o /dev/null http://127.0.0.1:3000/ &&
-      systemctl is-active --quiet freedomsword-worker; then
+      systemctl is-active --quiet "${services[@]}"; then
       ready=true
       break
     fi
@@ -95,7 +106,7 @@ if [[ ${ready} != true ]]; then
   if [[ -n ${previous_release} ]]; then
     ln -sfnT "${previous_release}" "${base_dir}/current.next"
     mv -Tf "${base_dir}/current.next" "${base_dir}/current"
-    systemctl restart freedomsword-api freedomsword-frontend freedomsword-worker || true
+    systemctl restart "${services[@]}" || true
     echo 'Local health check failed; restored the previous release.' >&2
   else
     echo 'Local health check failed on the first release.' >&2

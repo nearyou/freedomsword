@@ -2,6 +2,8 @@
 
 This is a review concept based on Arsen's feedback of 10 and 13–14 October 2026 and the twelve marked screenshots. The visual preview is [client-design-preview.html](./client-design-preview.html), with an [updated review board](./FreedomSword-client-feedback-2026-10-14.png). It does not connect new services. The selected Rarimo and MACI architecture is recorded in [PRIVATE_VOTING_DECISION.md](./PRIVATE_VOTING_DECISION.md).
 
+The [24 October corrections](CLIENT_UPDATES_2026-10-24.md) supersede the earlier wallet, sharing, opening-copy and recall proposals below. They document the implemented reusable-support mode and distinguish current functionality from integrations awaiting credentials.
+
 ## What the client chose
 
 - Use a **dark navy interface after the first two screens**. The logo and opening message may remain light and patriotic. Keep later screens quiet and functional, with only occasional blue/gold accents and no repeated flag or landscape treatment.

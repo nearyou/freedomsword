@@ -60,7 +60,7 @@ export function ElectionGallery({
   const activeFilter = showFilters ? filter : 'All';
   const visible = elections.filter(
     (election) => activeFilter === 'All' || election.status === activeFilter.toUpperCase(),
-  );
+  ).sort((a, b) => Number(b.protocol === 'CONTINUOUS_SUPPORT') - Number(a.protocol === 'CONTINUOUS_SUPPORT'));
 
   return (
     <section className="election-gallery" aria-label="Browse elections">
@@ -98,6 +98,9 @@ export function ElectionGallery({
                 {election.status}
               </span>
               <strong>{election.title}</strong>
+              <span className="election-gallery-type">{election.protocol === 'CONTINUOUS_SUPPORT'
+                ? 'Reusable support · six-month return' : election.protocol === 'MACI_PRIVATE'
+                  ? 'Private voting' : 'Original demo ballot rules'}</span>
               <span className="election-gallery-type">{election.candidates.length} candidates</span>
               <span className="election-gallery-action">
                 View candidates <ArrowRight size={15} aria-hidden="true" />

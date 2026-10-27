@@ -7,15 +7,13 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ArrowRight,
-  ArrowUpRight,
   BarChart3,
+  Bird,
   Check,
   ChevronDown,
   FileText,
   Globe2,
   History,
-  ListChecks,
-  MessageCircle,
   MoreHorizontal,
   Send,
   ShieldCheck,
@@ -23,7 +21,6 @@ import {
   Wallet,
 } from 'lucide-react';
 import {
-  openTelegramLink,
   telegramHaptic,
   useTelegram,
   useTelegramBackButton,
@@ -32,32 +29,39 @@ import { nextWelcomeStep } from '@frontend/lib/welcome';
 import { copy, type Language } from './copy';
 import { useWelcomeFlow } from './useWelcomeFlow';
 import { AgreementModal, InfoModal, VerificationModal } from './WelcomeModals';
+import FeedbackLink from '../FeedbackLink';
 
 type Modal = 'verification' | 'agreement' | 'about' | 'privacy' | 'exit' | null;
 type Stage = 'launch' | 'mission' | 'connect';
 
 const stageCopy = {
   en: {
-    launchTitle: 'Your voice. Your choice.',
-    launchDetail: 'Explore candidates. Make your choice.',
+    launchTitle: 'Your voice.\nYour choice.',
+    launchDetail: 'Take back control.',
+    launchEmphasis: 'Manage your vote.',
+    launchClosing: 'Shape what comes next.',
+    launchFooter: 'A modern democracy for a stronger tomorrow.',
+    telegramStart: 'Continue in Telegram',
+    previewStart: 'Preview the demo',
+    feedbackPending: 'Feedback bot coming soon',
     motto: 'PEOPLE · VOICE · ACTION',
     start: 'Get started',
     missionKicker: 'WELCOME',
-    missionTitle: 'Real people. Real influence.',
-    missionIntro: 'See the people, ideas and progress behind each election.',
+    missionTitle: 'A new era\nof democracy',
+    missionIntro: 'Not just one vote every 5 years. Stay in control. Recall your support when it no longer represents you.',
     missionSteps: [
+      'Verify your identity',
       'Explore candidates',
-      'Read their platforms',
-      'See election results',
-      'Track public promises',
-      'Inspect the audit trail',
+      'Cast your vote',
+      'Recall anytime',
+      'Track promises',
     ],
     missionDetails: [
-      'Get to know each person before choosing',
-      'Compare published proposals',
-      'Follow aggregate support',
-      'Review progress and evidence',
-      'See recorded election actions',
+      'Citizen Passport · mock verification in this demo',
+      'Read their platforms',
+      '100 units to allocate',
+      'Partial or full recall while voting is open',
+      'See real progress',
     ],
     readyKicker: 'GETTING READY',
     connectTitle: 'Connect to FreedomSword',
@@ -89,26 +93,32 @@ const stageCopy = {
     viewElections: 'Explore elections',
   },
   uk: {
-    launchTitle: 'Ваш голос. Ваш вибір.',
-    launchDetail: 'Знайомтеся з кандидатами. Зробіть вибір.',
+    launchTitle: 'Ваш голос.\nВаш вибір.',
+    launchDetail: 'Поверни собі вплив.',
+    launchEmphasis: 'Керуй своїм голосом.',
+    launchClosing: 'Формуй те, що буде далі.',
+    launchFooter: 'Сучасна демократія заради сильнішого майбутнього.',
+    telegramStart: 'Продовжити в Telegram',
+    previewStart: 'Переглянути демонстрацію',
+    feedbackPending: 'Бот зворотного зв’язку — незабаром',
     motto: 'ЛЮДИ · ГОЛОС · ДІЯ',
     start: 'Почати',
     missionKicker: 'ЛАСКАВО ПРОСИМО',
-    missionTitle: 'Реальні люди. Реальний вплив.',
-    missionIntro: 'Дізнайтеся про людей, ідеї та прогрес кожних виборів.',
+    missionTitle: 'Нова ера\nдемократії',
+    missionIntro: 'Не лише один голос кожні 5 років. Керуйте своєю підтримкою. Відкликайте її, коли вона більше вас не представляє.',
     missionSteps: [
+      'Підтвердьте особу',
       'Знайомтеся з кандидатами',
-      'Читайте їхні програми',
-      'Дивіться результати виборів',
+      'Віддайте свій голос',
+      'Відкликайте підтримку',
       'Стежте за обіцянками',
-      'Переглядайте журнал дій',
     ],
     missionDetails: [
-      'Дізнайтеся більше про кожного перед вибором',
-      'Порівнюйте опубліковані пропозиції',
-      'Стежте за загальною підтримкою',
-      'Переглядайте прогрес і підтвердження',
-      'Перевіряйте записані дії виборів',
+      'Паспорт громадянина · демонстраційна перевірка',
+      'Читайте їхні програми',
+      '100 одиниць для розподілу',
+      'Частково або повністю під час голосування',
+      'Дивіться реальний прогрес',
     ],
     readyKicker: 'ПІДГОТОВКА',
     connectTitle: 'Підключіться до FreedomSword',
@@ -238,7 +248,7 @@ export default function WelcomeScreen() {
             aria-label={t.menu}
             onClick={() => open('about')}
           >
-            <MoreHorizontal size={20} />
+            {stage === 'launch' ? <Bird size={20} /> : <MoreHorizontal size={20} />}
           </button>
         </header>
         <div className="welcome-language-row">
@@ -260,24 +270,29 @@ export default function WelcomeScreen() {
           <main className="fs-stage fs-launch" aria-labelledby="fs-launch-title">
             <Image
               className="fs-original-logo"
-              src="/brand/logo.jpg"
-              alt="FreedomSword original sword and laurel emblem"
-              width={1024}
-              height={1024}
-              sizes="(max-width: 480px) 60vw, 260px"
+              src="/brand/emblem-reference.png"
+              alt="FreedomSword sword, Ukrainian flag and laurel emblem"
+              width={1157}
+              height={1360}
+              sizes="(max-width: 560px) 90vw, 460px"
               loading="eager"
               fetchPriority="high"
               unoptimized
             />
             <h1 id="fs-launch-title">{s.launchTitle}</h1>
-            <p>{s.launchDetail}</p>
-            <span className="fs-launch-motto">{s.motto}</span>
+            <div className="fs-launch-statement">
+              <p><mark>{s.launchDetail}</mark></p>
+              <p><mark>{s.launchEmphasis}</mark></p>
+              <p>{s.launchClosing}</p>
+            </div>
             <div className="fs-stage-bottom">
-              <button type="button" className="fs-button fs-gold" onClick={() => go('mission')}>
-                {s.start}
-                <ArrowRight size={18} />
-              </button>
-              <small>{s.aboutDemo}</small>
+              {telegram.launch !== 'ready' ? <>
+                <a className="fs-button" href="https://t.me/freedomswordbot?startapp" target="_blank"
+                  rel="noopener noreferrer"><Send size={20} />{s.telegramStart}</a>
+              </> : <button type="button" className="fs-button" onClick={() => go('mission')}>
+                <Send size={20} />{s.telegramStart}
+              </button>}
+              <small>{s.launchFooter}</small>
             </div>
           </main>
         ) : stage === 'mission' ? (
@@ -286,7 +301,7 @@ export default function WelcomeScreen() {
             <h1 id="fs-mission-title">{s.missionTitle}</h1>
             <p className="fs-stage-intro">{s.missionIntro}</p>
             <ul className="fs-mission-list">
-              {[Users, FileText, BarChart3, ListChecks, History].map((Icon, index) => (
+              {[ShieldCheck, Users, Check, History, BarChart3].map((Icon, index) => (
                 <li className="fs-mission-card" key={s.missionSteps[index]}>
                   <span className="fs-mission-icon">
                     <Icon size={20} aria-hidden="true" />
@@ -356,19 +371,8 @@ export default function WelcomeScreen() {
               <span className="fs-passport-copy"><strong>{s.walletTitle}</strong><small>{s.walletDetail}</small></span>
               <span className="fs-passport-preview">{s.planned}</span>
             </div>
-            <a
-              className="fs-feedback"
-              href="https://t.me/freedomswordbot?start=feedback"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(event) => {
-                if (openTelegramLink(event.currentTarget.href)) event.preventDefault();
-              }}
-            >
-              <MessageCircle size={16} aria-hidden="true" />
-              <span>{s.feedback}</span>
-              <ArrowUpRight size={15} aria-hidden="true" />
-            </a>
+            <FeedbackLink className="fs-feedback" label={s.feedback}
+              unavailableLabel={s.feedbackPending} />
             {telegram.launch === 'failed' && (
               <p className="civic-field-error" role="alert">
                 {t.failed}
@@ -440,6 +444,7 @@ export default function WelcomeScreen() {
         <InfoModal
           t={t}
           kind={modal}
+          onPreview={telegram.launch === 'ready' ? undefined : () => { setModal(null); go('mission'); }}
           onClose={() => setModal(null)}
           onWelcome={() => {
             setModal(null);

@@ -13,6 +13,7 @@ export async function POST(request: Request) {
         .object({
           electionId: z.string().min(1).max(100),
           mode: z.enum(['partial', 'full']),
+          units: z.union([z.literal(25), z.literal(50), z.literal(75)]).optional(),
           requestId: z.string().uuid(),
         })
         .strict(),
