@@ -32,4 +32,6 @@ Apply the additive support schema without accepting destructive migrations, depl
 
 ## Validation
 
-`npm run check` passes type checks, lint, 138 Vitest cases, five Node cases and 18 Solidity cases. The isolated MongoDB run passes five integration cases covering the six-month lifecycle, concurrency, validation, withdrawn-candidate recalls and selectable legacy recalls. The long multi-cycle test has a five-minute allowance because it exercises many transactions against the remote test database. Backend and frontend production builds pass with the required backend origin. The opening screens and candidate portrait layout were visually reviewed at a 390 × 844 phone viewport.
+The feedback worker resolves its entry file's real path, so startup also works through the deployment's `current` symlink. A regression test launches it through a directory link and verifies that startup reaches configuration validation without using the network.
+
+`npm run check` passes type checks, lint, 138 Vitest cases, six Node cases and 18 Solidity cases. The isolated MongoDB run passes five integration cases covering the six-month lifecycle, concurrency, validation, withdrawn-candidate recalls and selectable legacy recalls. The long multi-cycle test has a five-minute allowance because it exercises many transactions against the remote test database. Backend and frontend production builds pass with the required backend origin. The opening screens and candidate portrait layout were visually reviewed at a 390 × 844 phone viewport.

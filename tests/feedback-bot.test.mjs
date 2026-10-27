@@ -1,5 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtempSync, rmdirSync, symlinkSync, unlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { processFeedbackUpdate } from '../backend/scripts/feedback-bot.mjs';
 
 const message = { update_id: 1, message: { message_id: 12, chat: { id: 21, type: 'private' },
@@ -27,4 +31,24 @@ test('explains feedback delivery on start and ignores group chatter', async () =
   assert.match(calls[0].body.text, /copied to the project team/);
   await processFeedbackUpdate({ message: { ...message.message, chat: { id: -10023, type: 'group' } } }, call, '-10023');
   assert.equal(calls.length, 1);
+});
+
+test('starts through the symlink used by release deployments instead of silently exiting', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'freedomsword-feedback-entry-'));
+  const link = join(directory, 'current');
+  let linked = false;
+  try {
+    symlinkSync(resolve('backend/scripts'), link, process.platform === 'win32' ? 'junction' : 'dir');
+    linked = true;
+    const result = spawnSync(process.execPath, [join(link, 'feedback-bot.mjs')], {
+      encoding: 'utf8', timeout: 10_000,
+      env: { ...process.env, FEEDBACK_BOT_TOKEN: '', FEEDBACK_CHAT_ID: '' },
+    });
+    // Reaching validation proves main ran; invalid empty credentials avoid all network calls.
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /FreedomSword feedback bot could not start/);
+  } finally {
+    if (linked) unlinkSync(link);
+    rmdirSync(directory);
+  }
 });
