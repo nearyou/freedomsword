@@ -281,8 +281,8 @@ export default function WelcomeScreen() {
             />
             <h1 id="fs-launch-title">{s.launchTitle}</h1>
             <div className="fs-launch-statement">
-              <p><mark>{s.launchDetail}</mark></p>
-              <p><mark>{s.launchEmphasis}</mark></p>
+              <p>{s.launchDetail}</p>
+              <p>{s.launchEmphasis}</p>
               <p>{s.launchClosing}</p>
             </div>
             <div className="fs-stage-bottom">

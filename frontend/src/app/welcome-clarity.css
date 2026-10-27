@@ -260,11 +260,6 @@ button.fs-passport-step:disabled {
 }
 .fs-launch-statement { color: #3d505b; font-size: clamp(18px, 5vw, 25px); line-height: 1.35; }
 .fs-launch-statement p { margin: 0; }
-.fs-launch-statement mark {
-  padding: 1px 9px; color: #086797; font-weight: 550;
-  background: linear-gradient(177deg, transparent 9%, #f5d44bc9 17%, #f5d44be6 83%, transparent 94%);
-  box-decoration-break: clone; -webkit-box-decoration-break: clone;
-}
 .fs-launch-statement p:last-child { margin-top: 4px; font-size: 0.85em; }
 .fs-launch .fs-stage-bottom { width: 100%; margin-top: auto; padding-top: clamp(28px, 5svh, 62px); gap: 14px; }
 .fs-launch .fs-button {
