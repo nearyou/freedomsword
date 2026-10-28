@@ -1,12 +1,12 @@
 /* A welcoming shared space, with restrained rounding and equal visual standing. */
 html[data-interface='refined'] {
-  --bg: #142b36;
-  --panel: #1b3540;
-  --panel-secondary: #24434e;
-  --border: #39535f;
-  --text: #f7f3e9;
-  --muted: #bdcccd;
-  --primary: #a6d3c5;
+  --bg: #0a1722;
+  --panel: #10212e;
+  --panel-secondary: #142936;
+  --border: #2b404d;
+  --text: #f1f3f2;
+  --muted: #a1b2bd;
+  --primary: #8ecff1;
   --radius: 8px;
   --radius-control: 6px;
   --radius-card: 8px;
@@ -62,25 +62,25 @@ html[data-interface='refined'] .button {
 
 html[data-interface='refined'] .button.primary {
   color: #fff;
-  background: #2c7478;
-  border-color: #2c7478;
+  background: #177daf;
+  border-color: #177daf;
   box-shadow: none;
 }
 
 html[data-interface='refined'] .button.primary:hover:not(:disabled) {
-  background: #2d7d80;
-  border-color: #2d7d80;
+  background: #2192c8;
+  border-color: #2192c8;
 }
 
 html[data-interface='refined'] .button.secondary {
-  color: #e5eeea;
+  color: #e2eaf0;
   background: transparent;
-  border-color: #6d8c91;
+  border-color: #47616f;
 }
 
 html[data-interface='refined'] .button.secondary:hover:not(:disabled) { background: #1b3342; }
 html[data-interface='refined'] .button.danger { background: #38252c; border-color: #8e5661; }
-html[data-interface='refined'] :is(input, select, textarea) { accent-color: #a6d3c5; }
+html[data-interface='refined'] :is(input, select, textarea) { accent-color: #8ecff1; }
 
 /* Navigation uses a rail and rules, with a single rectangular active marker. */
 html[data-interface='refined'] .app-shell {
@@ -90,8 +90,8 @@ html[data-interface='refined'] .app-shell {
 
 html[data-interface='refined'] .sidebar {
   padding: 30px 20px 24px;
-  background: #102731;
-  border-right: 1px solid #304b58;
+  background: #09151e;
+  border-right: 1px solid #253845;
 }
 
 html[data-interface='refined'] .brand { gap: 10px; font-size: 16px; letter-spacing: -0.04em; }
@@ -103,24 +103,24 @@ html[data-interface='refined'] .nav-item {
   padding: 12px;
   border: 0;
   border-left: 2px solid transparent;
-  color: #b9cccf;
+  color: #9bb0bd;
   font-size: 12px;
   background: transparent;
 }
 
 html[data-interface='refined'] .nav-item.active {
   color: #fff;
-  border-left-color: #a6d1c4;
-  background: #24424d;
+  border-left-color: #55b4df;
+  background: #152a38;
 }
 
-html[data-interface='refined'] .nav-item:hover { color: #fff; background: #203e49; }
+html[data-interface='refined'] .nav-item:hover { color: #fff; background: #132633; }
 html[data-interface='refined'] .nav-dot { display: none; }
 html[data-interface='refined'] .sidebar-card {
   margin-top: auto;
   padding: 25px 0 0;
   border: 0;
-  border-top: 1px solid #39535f;
+  border-top: 1px solid #2b404d;
   background: transparent;
   box-shadow: none;
 }
@@ -131,8 +131,8 @@ html[data-interface='refined'] .sidebar-footer { margin-top: 28px; padding-top: 
 html[data-interface='refined'] .topbar {
   height: 76px;
   padding-inline: 38px;
-  background: #142b36;
-  border-bottom: 1px solid #304b58;
+  background: #0a1722;
+  border-bottom: 1px solid #253845;
 }
 
 html[data-interface='refined'] :is(.connection, .feedback-link) {
@@ -148,7 +148,7 @@ html[data-interface='refined'] .elections-page-heading > div { min-width: 0; }
 html[data-interface='refined'] .page-kicker {
   display: block;
   margin-bottom: 16px;
-  color: #b8cfc9;
+  color: #8fa9b9;
   font-size: 9px;
   font-weight: 650;
   letter-spacing: 0.19em;
@@ -162,7 +162,7 @@ html[data-interface='refined'] .elections-page-heading h1 {
   line-height: 1.14;
 }
 
-html[data-interface='refined'] .elections-page-heading p { color: #bdcccd; font-size: 13px; }
+html[data-interface='refined'] .elections-page-heading p { color: #a1b2bd; font-size: 13px; }
 html[data-interface='refined'] .elections-page-heading .network-status {
   flex: none;
   margin-top: 34px;
@@ -190,12 +190,12 @@ html[data-interface='refined'] .election-gallery-card {
   display: flex;
   flex-direction: column;
   aspect-ratio: auto;
-  border: 1px solid #39535f;
-  background: #1b3540;
+  border: 1px solid #2b404d;
+  background: #10212e;
   transition: border-color 160ms ease;
 }
 
-html[data-interface='refined'] .election-gallery-card:hover { border-color: #9bc8bc; }
+html[data-interface='refined'] .election-gallery-card:hover { border-color: #6594ac; }
 html[data-interface='refined'] .election-gallery-card:hover img { transform: none; }
 html[data-interface='refined'] .election-gallery-art {
   position: relative;
@@ -203,7 +203,7 @@ html[data-interface='refined'] .election-gallery-art {
   width: 100%;
   height: 172px;
   overflow: hidden;
-  border-bottom: 1px solid #39535f;
+  border-bottom: 1px solid #2b404d;
 }
 
 html[data-interface='refined'] .election-gallery-shade { background: linear-gradient(#07131e30, #07131e00 60%); }
@@ -236,14 +236,14 @@ html[data-interface='refined'] .election-gallery-content {
 }
 
 html[data-interface='refined'] .election-gallery-category {
-  color: #bed3cd;
+  color: #8ba7b9;
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.16em;
 }
 
 html[data-interface='refined'] .election-gallery-content strong { font-size: 21px; font-weight: 550; line-height: 1.3; }
-html[data-interface='refined'] .election-gallery-type { color: #bdcccd; font-size: 11px; }
+html[data-interface='refined'] .election-gallery-type { color: #a1b2bd; font-size: 11px; }
 html[data-interface='refined'] .election-gallery-footer {
   display: flex;
   align-items: center;
@@ -251,18 +251,18 @@ html[data-interface='refined'] .election-gallery-footer {
   gap: 14px;
   margin-top: 9px;
   padding-top: 16px;
-  border-top: 1px solid #39535f;
-  color: #bdcccd;
+  border-top: 1px solid #2b404d;
+  color: #a1b2bd;
   font-size: 11px;
 }
 
 html[data-interface='refined'] .election-gallery-action { margin: 0; font-size: 11px; font-weight: 550; }
-html[data-interface='refined'] .election-gallery-filters { gap: 0; border-bottom: 1px solid #39535f; }
+html[data-interface='refined'] .election-gallery-filters { gap: 0; border-bottom: 1px solid #2b404d; }
 html[data-interface='refined'] .election-gallery-filters button { border-bottom: 2px solid transparent; background: transparent; }
-html[data-interface='refined'] .election-gallery-filters button[aria-pressed='true'] { color: #e7f3f9; border-bottom-color: #a6d3c5; background: transparent; }
+html[data-interface='refined'] .election-gallery-filters button[aria-pressed='true'] { color: #e7f3f9; border-bottom-color: #8ecff1; background: transparent; }
 
 /* Portraits, controls and data use the same rectangular rhythm. */
-html[data-interface='refined'] .candidate-card-clear { padding: 22px; background: #1b3540; border-color: #39535f; }
+html[data-interface='refined'] .candidate-card-clear { padding: 22px; background: #10212e; border-color: #2b404d; }
 html[data-interface='refined'] .candidate-card:hover { transform: none; box-shadow: none; }
 html[data-interface='refined'] .candidate-card-identity { gap: 16px; }
 html[data-interface='refined'] .candidate-card-identity .avatar { width: 58px; height: 68px; }
@@ -274,22 +274,22 @@ html[data-interface='refined'] .candidate-card-summary {
   overflow: hidden;
   min-height: 42px;
   margin: 18px 0 22px;
-  color: #bdcccd;
+  color: #a1b2bd;
   font-size: 12px;
   line-height: 1.75;
 }
 
-html[data-interface='refined'] .candidate-card-support { padding-top: 16px; border-top: 1px solid #39535f; }
+html[data-interface='refined'] .candidate-card-support { padding-top: 16px; border-top: 1px solid #2b404d; }
 html[data-interface='refined'] .candidate-card-support strong { font-size: 20px; font-weight: 500; }
 html[data-interface='refined'] .progress-track { height: 3px; background: #293e4b; }
 html[data-interface='refined'] .progress-track > span { border-radius: 0; }
 html[data-interface='refined'] .search-row { gap: 12px; margin-bottom: 24px; }
 html[data-interface='refined'] .search-field,
 html[data-interface='refined'] .search-row select { min-height: 48px; background: transparent; border-color: #3c5362; }
-html[data-interface='refined'] .panel { padding: 26px; background: #1b3540; border-color: #39535f; }
+html[data-interface='refined'] .panel { padding: 26px; background: #10212e; border-color: #2b404d; }
 html[data-interface='refined'] .panel h2 { font-size: 22px; font-weight: 500; margin-bottom: 10px; }
-html[data-interface='refined'] .election-picker { padding: 18px 22px; background: transparent; border-color: #39535f; }
-html[data-interface='refined'] .election-picker-control select { background: #1b3540; border-color: #3c5362; }
+html[data-interface='refined'] .election-picker { padding: 18px 22px; background: transparent; border-color: #2b404d; }
+html[data-interface='refined'] .election-picker-control select { background: #10212e; border-color: #3c5362; }
 html[data-interface='refined'] .support-budget,
 html[data-interface='refined'] .results-dashboard .snapshot-stats { gap: 0; border-block: 1px solid #344a59; margin-block: 24px; }
 html[data-interface='refined'] :is(.support-budget > div, .results-dashboard .snapshot-stats > div) {
@@ -304,23 +304,23 @@ html[data-interface='refined'] :is(.support-budget > div, .results-dashboard .sn
 html[data-interface='refined'] .support-budget dd { font-size: 32px; font-weight: 500; }
 html[data-interface='refined'] .results-dashboard .snapshot-stats strong { font-size: 28px; font-weight: 500; }
 html[data-interface='refined'] .result-ranking { gap: 0; }
-html[data-interface='refined'] .result-ranking li { min-height: 80px; border-bottom: 1px solid #39535f; }
+html[data-interface='refined'] .result-ranking li { min-height: 80px; border-bottom: 1px solid #2b404d; }
 html[data-interface='refined'] .result-ranking li:last-child { border-bottom: 0; }
 html[data-interface='refined'] .result-ranking-bar { height: 4px; background: #293e4b; }
 html[data-interface='refined'] .result-ranking-bar > span { border-radius: 0; }
 html[data-interface='refined'] .support-form :is(input, select) { min-height: 48px; }
-html[data-interface='refined'] .modal { background: #1b3540; border-color: #6d8c91; }
+html[data-interface='refined'] .modal { background: #10212e; border-color: #47616f; }
 html[data-interface='refined'] .modal-symbol { box-shadow: none; }
 html[data-interface='refined'] .ballot-hero-icon { border-radius: 50%; background: #205840; box-shadow: none; }
 html[data-interface='refined'] .share-invite-options { gap: 8px; }
 html[data-interface='refined'] .share-invite-options a { border-radius: var(--radius-control); }
 html[data-interface='refined'] .share-networks .button { text-align: left; justify-content: flex-start; }
-html[data-interface='refined'] .profile-photo::after { background: linear-gradient(transparent, #1b3540 95%); }
-html[data-interface='refined'] .main-footer { margin-top: 36px; padding-top: 24px; border-top: 1px solid #304b58; }
+html[data-interface='refined'] .profile-photo::after { background: linear-gradient(transparent, #10212e 95%); }
+html[data-interface='refined'] .main-footer { margin-top: 36px; padding-top: 24px; border-top: 1px solid #253845; }
 html[data-interface='refined'] .main-footer .text-button { font-size: 11px; font-weight: 500; }
-html[data-interface='refined'] .mobile-nav { background: #102731f5; border-top: 1px solid #3c5362; backdrop-filter: blur(16px); }
+html[data-interface='refined'] .mobile-nav { background: #09151ef5; border-top: 1px solid #3c5362; backdrop-filter: blur(16px); }
 html[data-interface='refined'] .mobile-nav button { border-top: 2px solid transparent; padding-top: 12px; }
-html[data-interface='refined'] .mobile-nav button.active { color: #b3dbd0; border-top-color: #a4d0c1; background: transparent; }
+html[data-interface='refined'] .mobile-nav button.active { color: #8dcde9; border-top-color: #5fb5d8; background: transparent; }
 
 /* The two ivory opening screens retain the city illustration without a rounded frame. */
 html[data-interface='refined'] .fs-welcome { padding: 0; background-image: none; }
@@ -344,8 +344,8 @@ html[data-interface='refined'] .fs-welcome .civic-modal { border-radius: var(--r
 
 html[data-interface='refined'] .fs-welcome .fs-sheet { box-shadow: none; border-inline: 1px solid #cfc8b72e; }
 html[data-interface='refined'] .fs-welcome.fs-light { background: #eeeae2; }
-html[data-interface='refined'] .fs-welcome.fs-dark { background: #142b36; }
-html[data-interface='refined'] .fs-welcome.fs-dark .fs-sheet { background: #142b36; }
+html[data-interface='refined'] .fs-welcome.fs-dark { background: #0a1722; }
+html[data-interface='refined'] .fs-welcome.fs-dark .fs-sheet { background: #0a1722; }
 html[data-interface='refined'] .fs-welcome.fs-light .fs-sheet {
   background-color: #f6f3ec;
   background-image: linear-gradient(#f6f3ec26 30%, #f6f3ecb3 78%, #f6f3ecee 100%), url('/illustrations/civic-parchment.webp');
@@ -453,10 +453,10 @@ html[data-interface='refined'] .community-welcome {
   max-width: 960px;
   margin: 0 0 30px;
   padding: 24px;
-  border: 1px solid #d9e5da;
+  border: 1px solid #31546d;
   border-radius: var(--radius-card);
-  color: #264c50;
-  background: #edf0e3;
+  color: #f1f3f2;
+  background: #132f43;
 }
 html[data-interface='refined'] .community-welcome-icon {
   display: grid;
@@ -464,38 +464,38 @@ html[data-interface='refined'] .community-welcome-icon {
   width: 42px;
   height: 42px;
   border-radius: var(--radius-control);
-  color: #366b67;
-  background: #dbe7dc;
+  color: #9ecfe8;
+  background: #1e4158;
 }
 html[data-interface='refined'] .community-welcome h2 { margin: 0 0 8px; font-size: 22px; font-weight: 550; line-height: 1.3; letter-spacing: -0.025em; }
-html[data-interface='refined'] .community-welcome p { max-width: 480px; margin: 0; color: #4c6462; font-size: 13px; line-height: 1.75; }
-html[data-interface='refined'] .community-people { width: 150px; height: 76px; color: #48736d; }
-html[data-interface='refined'] .nav-label { font-size: 11px; letter-spacing: 0; font-weight: 500; color: #b3cbc9; }
+html[data-interface='refined'] .community-welcome p { max-width: 480px; margin: 0; color: #aebfc9; font-size: 13px; line-height: 1.75; }
+html[data-interface='refined'] .community-people { width: 150px; height: 76px; color: #91b6c8; }
+html[data-interface='refined'] .nav-label { font-size: 11px; letter-spacing: 0; font-weight: 500; color: #a4b7c2; }
 html[data-interface='refined'] .nav-item { font-size: 13px; }
-html[data-interface='refined'] .nav-item.active { border-left-color: #b5d9ca; background: #294650; }
-html[data-interface='refined'] .nav-item.active > svg { color: #b5d9ca; }
-html[data-interface='refined'] .sidebar-card { border-top-color: #3a5660; border-radius: 0; }
-html[data-interface='refined'] .sidebar-card h3 { color: #f3e5c7; font-size: 20px; }
-html[data-interface='refined'] .sidebar-card p { color: #bacdcc; font-size: 13px; }
+html[data-interface='refined'] .nav-item.active { border-left-color: #79bfe9; background: #143149; }
+html[data-interface='refined'] .nav-item.active > svg { color: #79bfe9; }
+html[data-interface='refined'] .sidebar-card { border-top-color: #2b404d; border-radius: 0; }
+html[data-interface='refined'] .sidebar-card h3 { color: #f1f3f2; font-size: 20px; }
+html[data-interface='refined'] .sidebar-card p { color: #aebfc9; font-size: 13px; }
 html[data-interface='refined'] .sidebar-card > svg,
-html[data-interface='refined'] .sidebar-card button { color: #add5c7; }
-html[data-interface='refined'] .page-kicker { margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0; color: #bdd8cf; }
+html[data-interface='refined'] .sidebar-card button { color: #9bd1f1; }
+html[data-interface='refined'] .page-kicker { margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0; color: #a7c5d9; }
 html[data-interface='refined'] .elections-page-heading h1 { font-weight: 550; letter-spacing: -0.035em; }
 html[data-interface='refined'] .elections-page-heading p { font-size: 14px; line-height: 1.75; }
 html[data-interface='refined'] .elections-demo-note { font-size: 11px; line-height: 1.7; }
-html[data-interface='refined'] .elections-demo-note strong { font-size: 11px; letter-spacing: 0; color: #ddceb1; }
-html[data-interface='refined'] .election-gallery-category { font-size: 12px; letter-spacing: 0; font-weight: 500; color: #b9d4cb; }
-html[data-interface='refined'] .election-gallery-art .state-badge { letter-spacing: 0; font-size: 11px; font-weight: 550; color: #2c5749; background: #eff6eaf2; border-color: #c9dccb; }
+html[data-interface='refined'] .elections-demo-note strong { font-size: 11px; letter-spacing: 0; color: #e6c781; }
+html[data-interface='refined'] .election-gallery-category { font-size: 12px; letter-spacing: 0; font-weight: 500; color: #abc4d4; }
+html[data-interface='refined'] .election-gallery-art .state-badge { letter-spacing: 0; font-size: 11px; font-weight: 550; color: #a6cce4; background: #163247f2; border-color: #35566d; }
 html[data-interface='refined'] .election-gallery-type { font-size: 12px; line-height: 1.7; }
 html[data-interface='refined'] .election-gallery-content { gap: 11px; }
-html[data-interface='refined'] .election-gallery-action { color: #b8ddcf; }
+html[data-interface='refined'] .election-gallery-action { color: #9fd4f7; }
 html[data-interface='refined'] .candidate-card-summary { font-size: 13px; line-height: 1.75; }
-html[data-interface='refined'] .breadcrumb { color: #b3c9cb; }
-html[data-interface='refined'] :is(.connection, .feedback-link) { color: #d3e2dc; border-color: #54727b; }
-html[data-interface='refined'] :is(.connection > svg:first-child, .feedback-link > svg) { color: #b5d9ca; }
-html[data-interface='refined'] .participation-intro { margin-top: 12px; color: #d4e3dc; font-size: 14px; line-height: 1.8; }
-html[data-interface='refined'] .passport-modal > .eyebrow { font-size: 11px; text-transform: none; letter-spacing: 0; color: #dcd1b5; }
-html[data-interface='refined'] .reusable-support .panel > p:first-of-type { margin-top: 12px; color: #c0d3d1; font-size: 14px; line-height: 1.85; }
+html[data-interface='refined'] .breadcrumb { color: #91a7b6; }
+html[data-interface='refined'] :is(.connection, .feedback-link) { color: #b9cbd5; border-color: #314a5a; }
+html[data-interface='refined'] :is(.connection > svg:first-child, .feedback-link > svg) { color: #79bfe9; }
+html[data-interface='refined'] .participation-intro { margin-top: 12px; color: #d4e5ee; font-size: 14px; line-height: 1.8; }
+html[data-interface='refined'] .passport-modal > .eyebrow { font-size: 11px; text-transform: none; letter-spacing: 0; color: #e6c781; }
+html[data-interface='refined'] .reusable-support .panel > p:first-of-type { margin-top: 12px; color: #bdcdd8; font-size: 14px; line-height: 1.85; }
 html[data-interface='refined'] .reusable-support .panel > .button { margin-top: 18px; }
 html[data-interface='refined'] .fs-welcome .fs-stage-kicker { font-size: 12px; font-weight: 500; letter-spacing: 0; }
 html[data-interface='refined'] .fs-welcome :is(.fs-mission, .fs-connect) > .fs-stage-kicker {
@@ -505,7 +505,7 @@ html[data-interface='refined'] .fs-welcome :is(.fs-mission, .fs-connect) > .fs-s
   text-align: left;
 }
 html[data-interface='refined'] .fs-welcome .fs-mission-icon { color: #3d6b64; background: #dce5d8; }
-html[data-interface='refined'] .fs-welcome .fs-passport-icon { color: #c7e4d8; background: #2c4c55; }
+html[data-interface='refined'] .fs-welcome .fs-passport-icon { color: #b1e3ff; background: #1b394b; }
 html[data-interface='refined'] .fs-welcome .fs-stage-intro { line-height: 1.75; }
 @media (max-width: 760px) {
   html[data-interface='refined'] .community-welcome { grid-template-columns: 36px minmax(0, 1fr); gap: 14px; padding: 20px; margin-bottom: 24px; }
@@ -513,4 +513,17 @@ html[data-interface='refined'] .fs-welcome .fs-stage-intro { line-height: 1.75; 
   html[data-interface='refined'] .community-welcome h2 { font-size: 20px; }
   html[data-interface='refined'] .community-welcome p { font-size: 13px; }
   html[data-interface='refined'] .community-people { display: none; }
+}
+
+/* The connection screen begins the navy theme; the two opening screens stay light. */
+html[data-interface='refined'] .fs-welcome.fs-dark :is(.fs-button, .civic-gold-button) {
+  color: #fff;
+  background: #177daf;
+  border-color: #177daf;
+}
+html[data-interface='refined'] .community-people circle { fill: #244358; }
+html[data-interface='refined'] .election-gallery-art .state-badge.state-active {
+  color: #b3e3c6;
+  background: #133e32f2;
+  border-color: #426c5d;
 }

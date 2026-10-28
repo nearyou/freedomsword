@@ -158,7 +158,7 @@ export default function WelcomeScreen() {
   // The opening two screens are light; Telegram's chrome follows the dark modal backdrop.
   const lightStage = stage === 'launch' || stage === 'mission';
   const light = lightStage && !modal;
-  const telegram = useTelegram(light ? '#F6F3EC' : '#142B36');
+  const telegram = useTelegram(light ? '#F6F3EC' : '#0A1722');
   const flow = useWelcomeFlow(telegram.launch);
   const t = copy[lang];
   const s = stageCopy[lang];
@@ -183,7 +183,7 @@ export default function WelcomeScreen() {
   }, [lang]);
 
   useEffect(() => {
-    const color = light ? '#F6F3EC' : '#142B36';
+    const color = light ? '#F6F3EC' : '#0A1722';
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
   }, [light]);
 

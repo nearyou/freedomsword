@@ -4,7 +4,7 @@
 
 The service should feel like a shared community, with equal standing and an equal voice. Use welcoming, plain language rather than institutional or commanding labels. The community introduction says “Different people. Equal voices.” Its people illustration gives every figure the same size and baseline. New reusable-support copy explains the actual equal 100-unit starting budget within that election; it does not change eligibility, allocation, recall or private-poll rules.
 
-Keep the restrained 6/8/12px rounding below. Lift the dark palette toward softer slate and teal, add a warm ivory community introduction, and use sentence-case labels. Keep the existing brand and two light opening screens, with English and Ukrainian welcome copy. Preserve all demo, eligibility, cooldown and privacy disclosures. Avoid ranks, VIP presentation, privileged votes or unsupported anonymity claims.
+Keep the restrained 6/8/12px rounding below and the welcoming sentence-case labels. The user subsequently requested the earlier dark navy theme from “Let’s get you ready” onward: use navy surfaces and blue actions for connection, dialogs and the main app, including the community introduction. Keep the first two screens light with their existing teal actions, brand and city illustration. Keep the English and Ukrainian welcome copy, all demo/eligibility/cooldown/privacy disclosures, and equal standing. Avoid ranks, VIP presentation, privileged votes or unsupported anonymity claims.
 
 ## Current direction — 28 October 2026
 
