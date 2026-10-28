@@ -2,9 +2,9 @@
 
 ## Current direction — 28 October 2026
 
-The user explicitly rejected rounded styling. Use square corners for cards, buttons, fields, badges, dialogs, portraits and navigation. Keep thin borders, flat navy surfaces, restrained blue actions and more breathing room. Preserve the two ivory opening screens and their city illustration; the opening text has no colored highlight. The circular shapes within the existing brand illustration are artwork, not UI containers.
+The user clarified that rounding should be selective, not removed everywhere. Use restrained 6px corners on buttons and fields, 8px on cards and portraits, and 12px on dialogs. Small badges use 3px corners; status dots, step markers and confirmation symbols may be circular. Navigation, page frames, dividers and data rows remain straight. Avoid pill controls and oversized rounded containers. Preserve the two ivory opening screens and their city illustration; the opening text has no colored highlight.
 
-`frontend/src/app/precision.css` defines the shared geometry under `html[data-interface="square"]`. Election cards separate their image and readable text; candidate cards include a brief biography; results use a ranking with straight bars instead of a donut. The existing verification, voting, recall, agreement and feedback behavior stays intact. These geometry and layout decisions supersede the older rounded concepts below.
+`frontend/src/app/precision.css` defines the shared geometry under `html[data-interface="refined"]`, with separate tokens for controls, cards, dialogs and badges. Election cards separate their image and readable text; candidate cards include a brief biography; results use a ranking with straight bars instead of a donut. The existing verification, voting, recall, agreement and feedback behavior stays intact. These geometry and layout decisions supersede the older concepts below.
 
 This is a review concept based on Arsen's feedback of 10 and 13–14 October 2026 and the twelve marked screenshots. The visual preview is [client-design-preview.html](./client-design-preview.html), with an [updated review board](./FreedomSword-client-feedback-2026-10-14.png). It does not connect new services. The selected Rarimo and MACI architecture is recorded in [PRIVATE_VOTING_DECISION.md](./PRIVATE_VOTING_DECISION.md).
 
