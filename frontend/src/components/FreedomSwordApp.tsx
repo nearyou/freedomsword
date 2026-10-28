@@ -38,6 +38,12 @@ const headings: Record<AppTab, string> = {
   'My ballot': 'My ballot',
   Accountability: 'Promises',
 };
+const descriptions: Record<AppTab, string> = {
+  Candidates: 'Explore the choices. Shape what comes next.',
+  'Live results': 'A clear view of where support stands.',
+  'My ballot': 'Your support. Your decision.',
+  Accountability: 'Follow the commitments. Examine the progress.',
+};
 export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates', initialElectionId }: {
   demoEnabled: boolean;
   initialTab?: AppTab;
@@ -195,12 +201,15 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
       >
         <div className="elections-page-heading">
           <div>
+            <span className="page-kicker">YOUR CITIZEN SPACE</span>
             {tab === 'Candidates' && !showElectionList && (
               <button className="elections-back" type="button" onClick={() => setShowElectionList(true)}>
                 <ArrowLeft size={16} aria-hidden="true" /> All elections
               </button>
             )}
             <h1>{tab === 'Candidates' && !showElectionList ? election?.title : headings[tab]}</h1>
+            <p>{tab === 'Candidates' && !showElectionList
+              ? 'Compare platforms and choose who represents you.' : descriptions[tab]}</p>
           </div>
           <span className={`network-status ${stale ? 'interrupted' : ''}`}>
             <span className="mini-dot" />

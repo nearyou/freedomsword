@@ -6,6 +6,7 @@ import './globals.css';
 import './theme.css';
 import './redesign.css';
 import './elections-clarity.css';
+import './precision.css';
 export const metadata: Metadata = {
   title: 'FreedomSword',
   description: 'FreedomSword: your voice, continuously. A fictional Telegram democracy demo.',
@@ -15,11 +16,11 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#071522',
+  themeColor: '#0A1722',
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="dark">
+    <html lang="en" data-theme="dark" data-interface="square">
       <body>{children}</body>
     </html>
   );

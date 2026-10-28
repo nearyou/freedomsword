@@ -79,31 +79,36 @@ export function ElectionGallery({
         </div>
       )}
       <div className="election-gallery-list">
-        {visible.map((election) => (
+        {visible.map((election, index) => (
           <button
             className="election-gallery-card"
             type="button"
             key={election.id}
             onClick={() => onSelect(election.id)}
           >
-            <Image
-              src={electionArtwork[election.type] ?? electionArtwork.COMMUNITY}
-              alt=""
-              fill
-              sizes="(max-width: 760px) 100vw, 360px"
-            />
-            <span className="election-gallery-shade" />
-            <span className="election-gallery-content">
+            <span className="election-gallery-art">
+              <Image
+                src={electionArtwork[election.type] ?? electionArtwork.COMMUNITY}
+                alt=""
+                fill
+                sizes="(max-width: 760px) 100vw, 460px"
+                loading={index === 0 ? 'eager' : 'lazy'}
+              />
+              <span className="election-gallery-shade" />
               <span className={`state-badge state-${election.status.toLowerCase()}`}>
                 {election.status}
               </span>
+            </span>
+            <span className="election-gallery-content">
+              <span className="election-gallery-category">{election.type === 'COUNCIL' ? 'LOCAL GOVERNANCE'
+                : election.type === 'BUDGET' ? 'PUBLIC BUDGET' : 'COMMUNITY'}</span>
               <strong>{election.title}</strong>
               <span className="election-gallery-type">{election.protocol === 'CONTINUOUS_SUPPORT'
                 ? 'Reusable support · six-month return' : election.protocol === 'MACI_PRIVATE'
                   ? 'Private voting' : 'Original demo ballot rules'}</span>
-              <span className="election-gallery-type">{election.candidates.length} candidates</span>
-              <span className="election-gallery-action">
-                View candidates <ArrowRight size={15} aria-hidden="true" />
+              <span className="election-gallery-footer">
+                <span>{election.candidates.length} candidates</span>
+                <span className="election-gallery-action">View candidates <ArrowRight size={15} aria-hidden="true" /></span>
               </span>
             </span>
           </button>

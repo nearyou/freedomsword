@@ -36,7 +36,8 @@ export default function AppShell({
             </div>
             <div className="topbar-actions">
               <FeedbackLink />
-              <button className="connection" onClick={onPassport}>
+              <button className="connection" onClick={onPassport}
+                aria-label={citizen.connected ? 'Open Citizen Passport' : 'Connect Telegram'}>
                 <ShieldCheck size={15} />
                 <span>
                   {citizen.connected

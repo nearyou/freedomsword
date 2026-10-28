@@ -1,4 +1,3 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import type { ElectionView } from '@frontend/lib/contracts';
 import { count, support } from '@frontend/lib/ui';
 export default function ElectionSnapshot({
@@ -11,13 +10,6 @@ export default function ElectionSnapshot({
   stale?: boolean;
 }) {
   const ranked = [...election.candidates].sort((a, b) => b.units - a.units);
-  const chart = election.activeUnits
-    ? ranked.map((candidate) => ({
-        name: candidate.fullName,
-        value: candidate.units,
-        color: candidate.color,
-      }))
-    : [{ name: 'No active support', value: 1, color: 'var(--border)' }];
   const sample = source === 'preview';
   return (
     <section className="panel live-panel" aria-labelledby="live-results-title">
@@ -44,44 +36,6 @@ export default function ElectionSnapshot({
         <div>
           <strong>{count(election.recalledUnits)}</strong>
           <span>{election.protocol === 'CONTINUOUS_SUPPORT' ? 'cooling units' : 'recalled units'}</span>
-        </div>
-      </div>
-      <div
-        className="donut"
-        role="img"
-        aria-label={`${count(election.activeUnits)} active units. ${ranked.map((candidate) => `${candidate.fullName}: ${support(candidate, election).toFixed(1)}%`).join(', ')}`}
-      >
-        <ResponsiveContainer width="100%" height={220}>
-          <PieChart>
-            <Pie
-              data={chart}
-              dataKey="value"
-              innerRadius={76}
-              outerRadius={98}
-              paddingAngle={2}
-              stroke="none"
-              isAnimationActive={false}
-            >
-              {chart.map((item, index) => (
-                <Cell key={index} fill={item.color} />
-              ))}
-            </Pie>
-            {!!election.activeUnits && (
-              <Tooltip
-                formatter={(value) => [`${count(Number(value))} units`, 'Support']}
-                contentStyle={{
-                  background: 'var(--panel)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 12,
-                  color: 'var(--text)',
-                }}
-              />
-            )}
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="donut-label">
-          <strong>{count(election.activeUnits)}</strong>
-          <span>active units</span>
         </div>
       </div>
       <ol className="result-ranking">
