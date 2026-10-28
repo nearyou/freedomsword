@@ -77,7 +77,7 @@ export function useTelegramBackButton(launch: Launch, enabled: boolean, onBack: 
   }, [launch, enabled]);
 }
 
-export function useTelegram(color = '#0A1722') {
+export function useTelegram(color = '#142B36') {
   const [launch, setLaunch] = useState<Launch>('loading');
   const onReady = useCallback(() => {
     const webapp = window.Telegram?.WebApp;

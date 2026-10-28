@@ -90,9 +90,10 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
 
   return <div className="reusable-support">
     <section className="panel" aria-labelledby="support-title">
-      <h2 id="support-title">Your reusable support</h2>
-      <p>100 units to allocate across candidates. Recall any whole amount, including all your
-        support, in one action. Each withdrawal becomes available again six calendar months later.</p>
+      <h2 id="support-title">Your voice, your choice</h2>
+      <p>You start with the same 100 support units as everyone else in this election.
+        Choose who to support, and change your mind when you need to. Each withdrawal
+        becomes available again six calendar months later.</p>
       {!connected ? <button className="button primary" onClick={onPassport}>Connect Telegram</button> : <>
         {state && <>
           <dl className="support-budget">
@@ -100,13 +101,13 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
             <div><dt>Supporting candidates</dt><dd>{state.activeUnits}</dd></div>
             <div><dt>Cooling down</dt><dd>{state.coolingUnits}</dd></div>
           </dl>
-          <h3>Your allocations</h3>
+          <h3>People you support</h3>
           {state.allocations.length ? <ul className="support-allocations">
             {state.allocations.map((entry) => <li key={entry.candidateId}>
               <span>{election.candidates.find((item) => item.id === entry.candidateId)?.fullName ?? 'Candidate'}</span>
               <strong>{entry.units} units</strong>
             </li>)}
-          </ul> : <p>You have no active allocations.</p>}
+          </ul> : <p>Ready when you are. Choose a candidate below to get started.</p>}
           <div className="support-form">
             <label>Candidate<select value={currentCandidate} disabled={busy || !!retry}
               onChange={(event) => setCandidateId(event.target.value)}>
@@ -130,14 +131,14 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
               {validAmount && units <= selectedUnits && <> After recalling {units}, keep {selectedUnits - units} units.</>}</p>
             <div className="support-actions">
               <button className="button primary" disabled={!canAct || !validAmount || !candidate || units > state.availableUnits}
-                onClick={() => prepare('allocate')}>Allocate {validAmount ? units : ''} units</button>
+                onClick={() => prepare('allocate')}>Support with {validAmount ? units : ''} units</button>
               <button className="button secondary" disabled={!canAct || !validAmount || units > selectedUnits}
                 onClick={() => prepare('withdraw')}>Recall {validAmount ? units : ''} units</button>
               <button className="button danger" disabled={!canAct || selectedUnits === 0}
                 onClick={() => prepare('withdraw', selectedUnits)}>Recall all {selectedUnits} units from this candidate</button>
             </div>
           </div>
-          {!ready && <button className="button secondary" onClick={onPassport}>Complete Citizen Passport</button>}
+          {!ready && <button className="button secondary" onClick={onPassport}>Get ready to take part</button>}
           {!electionOpen(election, now) && <p>Changes are available only while this election is open.</p>}
           {state.withdrawals.length > 0 && <section className="support-cooldowns">
             <h3>When your recalled units return</h3>

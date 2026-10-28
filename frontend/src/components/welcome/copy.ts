@@ -54,7 +54,7 @@ const en = {
   loadingAgreement: 'Loading the civic agreement…',
   agreementLanguage: 'The recorded agreement is in English. Its original wording is shown below.',
   about: 'About FreedomSword',
-  aboutTitle: 'People in control. Always.',
+  aboutTitle: 'Everyone has a place here.',
   aboutCopy:
     'FreedomSword is a fictional civic participation prototype. Its identity check and blockchain are mocked. Explore candidates, make a choice, and follow published progress.',
   privacyTitle: 'A considered approach to privacy',
@@ -123,7 +123,7 @@ const uk: typeof en = {
   loadingAgreement: 'Завантажуємо громадянську угоду…',
   agreementLanguage: 'Згода фіксується англійською мовою. Нижче наведено оригінальний текст.',
   about: 'Про FreedomSword',
-  aboutTitle: 'Люди керують. Завжди.',
+  aboutTitle: 'Тут є місце для всіх.',
   aboutCopy:
     'FreedomSword — вигаданий прототип громадянської участі. Перевірка особи й блокчейн імітуються. Знайомтеся з кандидатами, робіть вибір і стежте за опублікованим поступом.',
   privacyTitle: 'Зважений підхід до приватності',

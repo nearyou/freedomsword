@@ -1,5 +1,5 @@
 export const inviteUrl = 'https://freedomsword.org';
-export const inviteText = 'True democracy starts with your voice.\nDon’t wait to take part.\nVote now with me on FreedomSword, and help shape the country’s future.';
+export const inviteText = 'Your voice belongs here.\nDifferent people. Equal voices.\nJoin me on FreedomSword—let’s shape what comes next, together.';
 const url = encodeURIComponent(inviteUrl);
 const text = encodeURIComponent(inviteText);
 export const shareNetworks = [

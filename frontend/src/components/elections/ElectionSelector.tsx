@@ -4,6 +4,10 @@ import { ArrowRight, ChevronDown } from 'lucide-react';
 import type { ElectionView } from '@frontend/lib/contracts';
 import { dateLabel } from '@frontend/lib/ui';
 
+const stateLabels: Record<string, string> = {
+  ACTIVE: 'Open now', UPCOMING: 'Coming soon', FINISHED: 'Closed', ARCHIVED: 'Archived', DRAFT: 'Draft',
+};
+
 export default function ElectionSelector({
   elections,
   selected,
@@ -31,7 +35,7 @@ export default function ElectionSelector({
       <div className="election-picker-meta">
         <span className={`state-badge state-${election.status.toLowerCase()}`}>
           <span className="mini-dot" />
-          {election.status}
+          {stateLabels[election.status] ?? election.status}
         </span>
         <span>Closes {dateLabel(election.closesAt)}</span>
       </div>
@@ -92,23 +96,23 @@ export function ElectionGallery({
                 alt=""
                 fill
                 sizes="(max-width: 760px) 100vw, 460px"
-                loading={index === 0 ? 'eager' : 'lazy'}
+                loading={index < 2 ? 'eager' : 'lazy'}
               />
               <span className="election-gallery-shade" />
               <span className={`state-badge state-${election.status.toLowerCase()}`}>
-                {election.status}
+                {stateLabels[election.status] ?? election.status}
               </span>
             </span>
             <span className="election-gallery-content">
-              <span className="election-gallery-category">{election.type === 'COUNCIL' ? 'LOCAL GOVERNANCE'
-                : election.type === 'BUDGET' ? 'PUBLIC BUDGET' : 'COMMUNITY'}</span>
+              <span className="election-gallery-category">{election.type === 'COUNCIL' ? 'Local decisions'
+                : election.type === 'BUDGET' ? 'Shared priorities' : 'Community life'}</span>
               <strong>{election.title}</strong>
               <span className="election-gallery-type">{election.protocol === 'CONTINUOUS_SUPPORT'
                 ? 'Reusable support · six-month return' : election.protocol === 'MACI_PRIVATE'
                   ? 'Private voting' : 'Original demo ballot rules'}</span>
               <span className="election-gallery-footer">
                 <span>{election.candidates.length} candidates</span>
-                <span className="election-gallery-action">View candidates <ArrowRight size={15} aria-hidden="true" /></span>
+                <span className="election-gallery-action">Meet candidates <ArrowRight size={15} aria-hidden="true" /></span>
               </span>
             </span>
           </button>

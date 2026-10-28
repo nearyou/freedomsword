@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ShieldCheck, ArrowUpRight } from 'lucide-react';
+import { Users, ArrowUpRight } from 'lucide-react';
 import BrandMark from '../ui/BrandMark';
 import { navigation } from './navigation';
 import type { AppTab } from '@frontend/lib/ui';
@@ -18,7 +18,7 @@ export default function Sidebar({
         <BrandMark />
         <span>FreedomSword</span>
       </Link>
-      <p className="nav-label">YOUR CITIZEN SPACE</p>
+      <p className="nav-label">Make yourself at home</p>
       <nav aria-label="Main navigation">
         {navigation.map(({ value, label, icon: Icon }) => (
           <button
@@ -35,11 +35,11 @@ export default function Sidebar({
         ))}
       </nav>
       <div className="sidebar-card">
-        <ShieldCheck size={25} />
-        <h3>People in control.</h3>
-        <p>Explore the choices and follow public progress.</p>
+        <Users size={25} />
+        <h3>Your voice matters.</h3>
+        <p>Different views belong here. There’s room for yours, too.</p>
         <button onClick={onPassport}>
-          Citizen Passport <ArrowUpRight size={15} />
+          Your participation <ArrowUpRight size={15} />
         </button>
       </div>
       <div className="sidebar-footer">

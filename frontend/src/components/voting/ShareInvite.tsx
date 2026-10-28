@@ -29,7 +29,7 @@ export default function ShareInvite() {
   }
   return <>
     <section className="panel share-invite" aria-labelledby="share-invite-title">
-      <h3 id="share-invite-title">Invite someone to take part</h3>
+      <h3 id="share-invite-title">There’s room for more voices</h3>
       <p>{inviteText}</p>
       <small className="fine-print">Fictional-election demo. Current ballots are not anonymous to the operator.</small>
       <div className="share-invite-link"><span>freedomsword.org</span>

@@ -1,5 +1,11 @@
 # FreedomSword — client design direction
 
+## Welcoming and equal — 29 October 2026
+
+The service should feel like a shared community, with equal standing and an equal voice. Use welcoming, plain language rather than institutional or commanding labels. The community introduction says “Different people. Equal voices.” Its people illustration gives every figure the same size and baseline. New reusable-support copy explains the actual equal 100-unit starting budget within that election; it does not change eligibility, allocation, recall or private-poll rules.
+
+Keep the restrained 6/8/12px rounding below. Lift the dark palette toward softer slate and teal, add a warm ivory community introduction, and use sentence-case labels. Keep the existing brand and two light opening screens, with English and Ukrainian welcome copy. Preserve all demo, eligibility, cooldown and privacy disclosures. Avoid ranks, VIP presentation, privileged votes or unsupported anonymity claims.
+
 ## Current direction — 28 October 2026
 
 The user clarified that rounding should be selective, not removed everywhere. Use restrained 6px corners on buttons and fields, 8px on cards and portraits, and 12px on dialogs. Small badges use 3px corners; status dots, step markers and confirmation symbols may be circular. Navigation, page frames, dividers and data rows remain straight. Avoid pill controls and oversized rounded containers. Preserve the two ivory opening screens and their city illustration; the opening text has no colored highlight.

@@ -49,9 +49,10 @@ export default function CitizenPassport({
       <div className="modal-symbol">
         <ShieldCheck size={27} />
       </div>
-      <p className="eyebrow">CITIZEN PASSPORT</p>
-      <h2 id="citizen-title">Get ready to vote</h2>
-      <p className="modal-copy">Mock verification. Your account and ballot can be linked.</p>
+      <p className="eyebrow">Welcome to FreedomSword</p>
+      <h2 id="citizen-title">Let’s get you ready</h2>
+      <p className="participation-intro">A few simple steps, then you can explore and make your own choices.</p>
+      <p className="modal-copy">This demo uses mock verification. Your account and ballot can be linked.</p>
       <div className="passport-progress">
         {states.filter(Boolean).length} of 3 steps complete
         <div className="passport-progress-bar">

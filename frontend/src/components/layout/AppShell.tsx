@@ -3,6 +3,7 @@ import FeedbackLink from '../FeedbackLink';
 import BrandMark from '../ui/BrandMark';
 import Sidebar from './Sidebar';
 import MobileNavigation from './MobileNavigation';
+import { navigation } from './navigation';
 import type { AppTab } from '@frontend/lib/ui';
 import type { CitizenView } from '@frontend/lib/contracts';
 export default function AppShell({
@@ -31,18 +32,18 @@ export default function AppShell({
               <span>FreedomSword</span>
             </div>
             <div className="breadcrumb">
-              Citizen space <ChevronRight size={14} />
-              <strong>{tab === 'Candidates' ? 'Elections' : tab}</strong>
+              Your space <ChevronRight size={14} />
+              <strong>{navigation.find((item) => item.value === tab)?.label}</strong>
             </div>
             <div className="topbar-actions">
               <FeedbackLink />
               <button className="connection" onClick={onPassport}
-                aria-label={citizen.connected ? 'Open Citizen Passport' : 'Connect Telegram'}>
+                aria-label={citizen.connected ? 'Open your participation steps' : 'Connect Telegram'}>
                 <ShieldCheck size={15} />
                 <span>
                   {citizen.connected
                     ? citizen.verified
-                      ? 'MOCK verified'
+                      ? 'Demo check complete'
                       : 'Connected'
                     : 'Connect Telegram'}
                 </span>

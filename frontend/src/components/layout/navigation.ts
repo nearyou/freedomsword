@@ -7,7 +7,7 @@ export const navigation: {
   icon: typeof Vote;
 }[] = [
   { value: 'Candidates', label: 'Elections', mobileLabel: 'Elections', icon: Vote },
-  { value: 'Live results', label: 'Live results', mobileLabel: 'Results', icon: BarChart3 },
-  { value: 'My ballot', label: 'My ballot', mobileLabel: 'My ballot', icon: WalletCards },
-  { value: 'Accountability', label: 'Accountability', mobileLabel: 'Promises', icon: CheckCheck },
+  { value: 'Live results', label: 'Results', mobileLabel: 'Results', icon: BarChart3 },
+  { value: 'My ballot', label: 'Your support', mobileLabel: 'Your support', icon: WalletCards },
+  { value: 'Accountability', label: 'Promises', mobileLabel: 'Promises', icon: CheckCheck },
 ];

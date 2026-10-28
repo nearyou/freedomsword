@@ -17,6 +17,7 @@ import { telegramHaptic, useTelegram, useTelegramBackButton } from '@frontend/ho
 import { useVoting, type Action } from '@frontend/hooks/useVoting';
 import AppShell from './layout/AppShell';
 import ElectionSelector, { ElectionGallery } from './elections/ElectionSelector';
+import CommunityWelcome from './elections/CommunityWelcome';
 import CandidateList from './candidates/CandidateList';
 import CandidateProfile from './candidates/CandidateProfile';
 import CitizenPassport from './onboarding/CitizenPassport';
@@ -35,14 +36,14 @@ type Modal =
 const headings: Record<AppTab, string> = {
   Candidates: 'Elections',
   'Live results': 'Results',
-  'My ballot': 'My ballot',
+  'My ballot': 'Your support',
   Accountability: 'Promises',
 };
 const descriptions: Record<AppTab, string> = {
-  Candidates: 'Explore the choices. Shape what comes next.',
-  'Live results': 'A clear view of where support stands.',
-  'My ballot': 'Your support. Your decision.',
-  Accountability: 'Follow the commitments. Examine the progress.',
+  Candidates: 'Meet the people and ideas shaping our shared future.',
+  'Live results': 'See how our choices come together.',
+  'My ballot': 'Choose what feels right for you. You can change your mind.',
+  Accountability: 'Let’s see how those promises are coming along.',
 };
 export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates', initialElectionId }: {
   demoEnabled: boolean;
@@ -201,7 +202,7 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
       >
         <div className="elections-page-heading">
           <div>
-            <span className="page-kicker">YOUR CITIZEN SPACE</span>
+            <span className="page-kicker">Your community, your voice</span>
             {tab === 'Candidates' && !showElectionList && (
               <button className="elections-back" type="button" onClick={() => setShowElectionList(true)}>
                 <ArrowLeft size={16} aria-hidden="true" /> All elections
@@ -209,7 +210,7 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
             )}
             <h1>{tab === 'Candidates' && !showElectionList ? election?.title : headings[tab]}</h1>
             <p>{tab === 'Candidates' && !showElectionList
-              ? 'Compare platforms and choose who represents you.' : descriptions[tab]}</p>
+              ? 'Get to know the candidates and find the ideas you believe in.' : descriptions[tab]}</p>
           </div>
           <span className={`network-status ${stale ? 'interrupted' : ''}`}>
             <span className="mini-dot" />
@@ -218,9 +219,10 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
         </div>
         <p className="elections-demo-note">
           {election?.protocol === 'MACI_PRIVATE' && election.privatePoll?.registrationMode === 'RARIMO'
-            ? <><strong>PRIVATE POLL</strong> Fictional election · Rarimo eligibility on chain 7368</>
-            : <><strong>DEMO</strong> Fictional elections · mock identity and blockchain</>}
+            ? <><strong>Private poll</strong> Fictional election · Rarimo eligibility on chain 7368</>
+            : <><strong>Demo space</strong> Fictional elections · mock identity and blockchain</>}
         </p>
+        {tab === 'Candidates' && showElectionList && <CommunityWelcome />}
         {refreshError && (
           <div className="refresh-banner" role="status">
             <div>
