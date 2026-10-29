@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 export function useModalAccessibility(key: string | null) {
   useEffect(() => {
     if (!key) return;
+    const dialog = document.getElementById(key)?.closest<HTMLElement>('[role="dialog"]');
+    if (!dialog) return;
     const previous = document.activeElement as HTMLElement | null;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -10,9 +12,9 @@ export function useModalAccessibility(key: string | null) {
       ...document.querySelectorAll<HTMLElement>(
         '.app-shell, .mobile-nav, .admin-grid, .admin-heading, [data-modal-background]',
       ),
-    ];
+    ].filter((element) => !element.contains(dialog));
+    const previousInert = backgrounds.map((element) => Boolean(element.inert));
     backgrounds.forEach((element) => (element.inert = true));
-    const dialog = [...document.querySelectorAll<HTMLElement>('[role="dialog"]')].at(-1);
     const focusable = () =>
       [
         ...(dialog?.querySelectorAll<HTMLElement>(
@@ -43,7 +45,7 @@ export function useModalAccessibility(key: string | null) {
     document.addEventListener('keydown', trap);
     return () => {
       document.body.style.overflow = overflow;
-      backgrounds.forEach((element) => (element.inert = false));
+      backgrounds.forEach((element, index) => (element.inert = previousInert[index]));
       document.removeEventListener('keydown', trap);
       if (previous?.isConnected) previous.focus();
     };

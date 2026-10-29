@@ -1,5 +1,6 @@
 'use client';
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useModalAccessibility } from '../useModalAccessibility';
 export default function Dialog({
@@ -8,12 +9,15 @@ export default function Dialog({
   onClose,
   busy = false,
   className = '',
+  portal = false,
 }: {
   children: React.ReactNode;
   titleId: string;
   onClose: () => void;
   busy?: boolean;
   className?: string;
+  /** Dialogs inside the app shell must escape its inert background and stacking context. */
+  portal?: boolean;
 }) {
   useModalAccessibility(titleId);
   useEffect(() => {
@@ -23,7 +27,7 @@ export default function Dialog({
     document.addEventListener('keydown', close);
     return () => document.removeEventListener('keydown', close);
   }, [busy, onClose]);
-  return (
+  const overlay = (
     <div className="modal-backdrop">
       <section
         className={`modal ${className}`}
@@ -44,4 +48,5 @@ export default function Dialog({
       </section>
     </div>
   );
+  return portal ? (typeof document === 'undefined' ? null : createPortal(overlay, document.body)) : overlay;
 }

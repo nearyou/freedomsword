@@ -158,7 +158,7 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
         The application enforces this budget; blockchain records anchor audit commitments.</p>
     </section>
     {!!state?.activeUnits && <ShareInvite />}
-    {confirm && <Dialog titleId="support-confirm-title" onClose={() => setConfirm(null)} busy={busy}>
+    {confirm && <Dialog portal titleId="support-confirm-title" onClose={() => setConfirm(null)} busy={busy}>
       <h2 id="support-confirm-title">{confirm.action === 'withdraw' ? 'Recall' : 'Allocate'} {confirm.units} units?</h2>
       <p>{election.candidates.find((item) => item.id === confirm.candidateId)?.fullName}</p>
       {confirm.action === 'withdraw' && <p>These units stop supporting this candidate immediately. You can use them

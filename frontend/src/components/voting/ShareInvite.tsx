@@ -42,7 +42,7 @@ export default function ShareInvite() {
       </div>
       {copyState !== 'idle' && <p role="status">{copyState === 'copied' ? 'Invitation and website link copied.' : 'Copy failed. Select a network to share.'}</p>}
     </section>
-    {more && <Dialog titleId="share-more-title" onClose={() => setMore(false)}>
+    {more && <Dialog portal titleId="share-more-title" onClose={() => setMore(false)}>
       <h2 id="share-more-title">Share FreedomSword</h2>
       <p>Choose a network or share through an app on your device.</p>
       <div className="share-networks">{shareNetworks.map((network) => link(network.name))}
