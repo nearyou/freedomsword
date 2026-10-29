@@ -1,5 +1,9 @@
 # FreedomSword — client design direction
 
+## Viewport correction — 30 October 2026
+
+The second opening screen fits Telegram's stable viewport, with safe-area padding included. Center the five benefit rows in the available content area, using smaller spacing and icons on shorter phones. Reserve separate rows for the forward button and demo disclosure so neither can scroll below the viewport or be covered by the city artwork. On very short screens or with enlarged text, only the benefit list scrolls; navigation stays visible. Keep the accepted first screen, language selector and later dark theme unchanged.
+
 ## Client correction — 29 October 2026
 
 Follow-up: the second screen has five matching left-icon rows. A ballot icon accompanies election types; a helping-hands icon accompanies issues for Ukraine. Keep the city background behind the lower rows. Both opening screens use a compact globe/language selector, with Change language retained as its accessible label. Support controls use a ring and horizontal scale split into four equal 25-unit sections: retained support is blue, draft additions are mint with a plus label, and draft recalls are amber with a minus label. The center shows support after the proposed change. The existing confirmation and cooldown rules remain authoritative; the visual changes do not submit actions.
