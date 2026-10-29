@@ -6,7 +6,8 @@ import type { ElectionView } from '@frontend/lib/contracts';
 import { electionOpen, timeLabel } from '@frontend/lib/ui';
 import Dialog from '../ui/Dialog';
 import ShareInvite from './ShareInvite';
-import { ArrowDownUp } from 'lucide-react';
+import SupportSlider from './SupportSlider';
+import { supportAdjustment } from '@frontend/lib/support-adjustment';
 
 interface SupportState {
   totalUnits: number;
@@ -32,18 +33,19 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [candidateId, setCandidateId] = useState(initialCandidateId ?? '');
-  const [amount, setAmount] = useState('100');
-  const [customAmount, setCustomAmount] = useState(false);
+  const [draft, setDraft] = useState<{ candidateId: string; current: number; available: number; target: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState<Command | null>(null);
   const [retry, setRetry] = useState<Command | null>(null);
   const lock = useRef(false);
-  const currentCandidate = candidateId || election.candidates[0]?.id || '';
+  const currentCandidate = candidateId || state?.allocations[0]?.candidateId || election.candidates[0]?.id || '';
   const candidate = election.candidates.find((item) => item.id === currentCandidate);
   const selectedUnits = state?.allocations.find((item) => item.candidateId === currentCandidate)?.units ?? 0;
-  const units = Number(amount);
-  const validAmount = Number.isInteger(units) && units >= 1 && units <= 100;
-  const canAct = ready && electionOpen(election, now) && !!state && !busy && !error && !retry;
+  const availableUnits = state?.availableUnits ?? 0;
+  const target = draft?.candidateId === currentCandidate && draft.current === selectedUnits && draft.available === availableUnits
+    ? draft.target : selectedUnits;
+  const adjustment = supportAdjustment(selectedUnits, target, availableUnits);
+  const canAct = ready && electionOpen(election, now) && !!state && !busy && !retry;
   const generation = useRef(0);
 
   const refresh = useCallback(async () => {
@@ -64,7 +66,8 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
     return () => { clearTimeout(initial); clearInterval(timer); revision.current++; };
   }, [refresh]);
 
-  function prepare(action: Command['action'], requestedUnits = units) {
+  function prepare(action: Command['action'], requestedUnits: number) {
+    if (!canAct || requestedUnits <= 0 || (action === 'withdraw' ? requestedUnits > selectedUnits : requestedUnits > availableUnits)) return;
     setConfirm({ electionId: election.id, candidateId: currentCandidate, action,
       units: requestedUnits, requestId: crypto.randomUUID() });
   }
@@ -75,15 +78,17 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
     setBusy(true); setError(''); setNotice('');
     try {
       const next = await api<SupportState>('support', command);
-      setState(next); setRetry(null); setConfirm(null);
+      setState(next); setRetry(null); setConfirm(null); setDraft(null);
       setNotice(command.action === 'withdraw'
         ? `${command.units} units recalled. Each withdrawal unlocks six calendar months later.`
         : `${command.units} units allocated.`);
-      await onRefresh();
+      // The mutation is committed. A failed public-results refresh must not offer it as a new action.
+      try { await onRefresh(); } catch { setNotice((message) => `${message} Public results could not refresh yet.`); }
     } catch (failure) {
-      setError(failure instanceof Error ? failure.message : 'The action could not be confirmed.');
       if (!(failure instanceof ClientApiError) || failure.status === 0 || failure.status >= 500)
         setRetry(command);
+      else await refresh();
+      setError(failure instanceof Error ? failure.message : 'The action could not be confirmed.');
       setConfirm(null);
     } finally { lock.current = false; setBusy(false); }
   }
@@ -115,25 +120,18 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
               {state.allocations.filter((entry) => !election.candidates.some((item) => item.id === entry.candidateId))
                 .map((entry) => <option key={entry.candidateId} value={entry.candidateId}>Withdrawn candidate · {entry.units} units</option>)}
             </select></label>
-            <label><span className="support-amount-label"><ArrowDownUp size={18} aria-hidden="true" /> Choose amount</span>
-              <select value={customAmount ? 'custom' : amount} disabled={busy || !!retry}
-                onChange={(event) => { const value = event.target.value; setCustomAmount(value === 'custom'); if (value !== 'custom') setAmount(value); }}>
-                <option value="25">0.25 · 25 units</option>
-                <option value="50">0.50 · 50 units</option>
-                <option value="75">0.75 · 75 units</option>
-                <option value="100">100 units · full ballot</option>
-                <option value="custom">Another amount</option>
-              </select>
-            </label>
-            {customAmount && <label>Amount · whole units<input type="number" min={1} max={100} step={1} value={amount}
-              disabled={busy || !!retry} onChange={(event) => setAmount(event.target.value)} /></label>}
+            <SupportSlider current={selectedUnits} maximum={selectedUnits + availableUnits} value={target}
+              disabled={busy || !!retry} onChange={(value) => setDraft({ candidateId: currentCandidate,
+                current: selectedUnits, available: availableUnits, target: value })} />
             <p className="support-keep">Currently supporting this candidate: {selectedUnits} units.
-              {validAmount && units <= selectedUnits && <> After recalling {units}, keep {selectedUnits - units} units.</>}</p>
+              {adjustment?.action === 'withdraw' && <> Recall {adjustment.units} units · Keep {target} units.</>}
+              {adjustment?.action === 'allocate' && <> Add {adjustment.units} units · Keep {target} units.</>}</p>
+            {!adjustment && <p className="fine-print">Move the slider left to recall support, or right to add available units.</p>}
+            {state.coolingUnits > 0 && <p className="fine-print">{state.coolingUnits} recalled units are cooling down. They can only be added again after their six-month timers end.</p>}
             <div className="support-actions">
-              <button className="button primary" disabled={!canAct || !validAmount || !candidate || units > state.availableUnits}
-                onClick={() => prepare('allocate')}>Support with {validAmount ? units : ''} units</button>
-              <button className="button secondary" disabled={!canAct || !validAmount || units > selectedUnits}
-                onClick={() => prepare('withdraw')}>Recall {validAmount ? units : ''} units</button>
+              <button className="button primary" disabled={!canAct || !adjustment || (adjustment.action === 'allocate' && !candidate)}
+                onClick={() => { if (adjustment) prepare(adjustment.action, adjustment.units); }}>
+                {adjustment ? `${adjustment.action === 'withdraw' ? 'Recall' : 'Add'} ${adjustment.units} units` : 'Choose a change above'}</button>
               <button className="button danger" disabled={!canAct || selectedUnits === 0}
                 onClick={() => prepare('withdraw', selectedUnits)}>Recall all {selectedUnits} units from this candidate</button>
             </div>

@@ -1,24 +1,23 @@
 import { mkdir, readFile, realpath, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-
-const welcome = 'Send your FreedomSword feedback or a screenshot here. Your message will be copied to the project team. Please do not send passwords, wallet keys or identity documents.';
+import { feedbackWelcome, feedbackUnsupported, feedbackThanks } from './feedback-copy.mjs';
 
 export async function processFeedbackUpdate(update, call, destination) {
   const message = update.message;
   if (!message || message.chat?.type !== 'private' || message.from?.is_bot) return;
   const chat_id = String(message.chat.id);
   if (message.text === '/start' || message.text === '/help') {
-    await call('sendMessage', { chat_id, text: welcome });
+    await call('sendMessage', { chat_id, text: feedbackWelcome });
     return;
   }
   if (!message.text && !message.photo && !message.document && !message.video && !message.voice) {
-    await call('sendMessage', { chat_id, text: 'Please send a message or a screenshot describing the issue.' });
+    await call('sendMessage', { chat_id, text: feedbackUnsupported });
     return;
   }
   // Copying omits the original sender's profile. No username or chat ID is added to the team's copy.
   await call('copyMessage', { chat_id: destination, from_chat_id: chat_id, message_id: message.message_id });
-  await call('sendMessage', { chat_id, text: 'Thank you. Your feedback has been sent to the FreedomSword team.' });
+  await call('sendMessage', { chat_id, text: feedbackThanks });
 }
 
 async function main() {

@@ -21,7 +21,10 @@ export function useVoting(refresh: () => Promise<void>) {
     try {
       await api(action.path, action.payload);
       setNotice({ message: action.success, success: true });
-      await refresh();
+      // A results refresh cannot undo an already committed vote or recall.
+      try { await refresh(); } catch {
+        setNotice({ message: `${action.success} Results could not refresh yet. Please refresh the page.`, success: true });
+      }
       return true;
     } catch (error) {
       setNotice({

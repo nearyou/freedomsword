@@ -7,16 +7,15 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ArrowRight,
-  BarChart3,
   Check,
   ChevronDown,
   FileText,
   Globe2,
-  History,
+  Landmark,
   MoreHorizontal,
   Send,
   ShieldCheck,
-  Users,
+  Radio,
   Wallet,
 } from 'lucide-react';
 import {
@@ -36,32 +35,32 @@ type Stage = 'launch' | 'mission' | 'connect';
 const stageCopy = {
   en: {
     launchTitle: 'Your voice.\nYour choice.',
-    launchDetail: 'Everyone belongs here.',
-    launchEmphasis: 'Every voice counts equally.',
-    launchClosing: 'Let’s shape what comes next, together.',
-    launchFooter: 'Different perspectives. Equal voices.',
+    launchDetail: 'Take back control.',
+    launchEmphasis: 'Manage your vote.',
+    launchClosing: 'Shape what comes next.',
+    launchFooter: 'A modern democracy for a stronger tomorrow.',
+    changeLanguage: 'Change language',
+    skip: 'Skip',
     telegramStart: 'Continue in Telegram',
     previewStart: 'Preview the demo',
     feedbackPending: 'Feedback bot coming soon',
     motto: 'PEOPLE · VOICE · ACTION',
     start: 'Get started',
-    missionKicker: 'A place for everyone',
-    missionTitle: 'Different people.\nEqual voices.',
-    missionIntro: 'Explore different ideas, choose what matters to you, and help shape our shared future.',
+    missionTitle: 'A new generation\nof democracy',
     missionSteps: [
-      'Get ready to take part',
-      'Meet the candidates',
-      'Choose your support',
-      'Change your mind',
-      'Follow their progress',
+      'Verified citizens',
+      'Real-time updates',
+      'Transparent and accountable',
     ],
     missionDetails: [
-      'A simple eligibility step · mock check in this demo',
-      'Get to know their ideas',
-      'Make your own choice',
-      'Recall some or all support while voting is open',
-      'See how promises become actions',
+      'One person, one vote. Mock verification in this demo.',
+      'Manage your vote over time.',
+      'Candidate platforms, progress tracking and public audit records.',
     ],
+    electionTypes: 'All types of elections',
+    electionTypesDetail: 'Presidential, parliamentary, local and more',
+    ukraineIssues: 'Issues that matter\nfor Ukraine',
+    missionDemo: 'Fictional demo · identity and blockchain mocked; anonymity is not guaranteed.',
     readyKicker: 'Let’s get started',
     connectTitle: 'Connect to FreedomSword',
     connectDetail: 'Connect your Telegram account to continue. Wallet support is planned.',
@@ -93,32 +92,32 @@ const stageCopy = {
   },
   uk: {
     launchTitle: 'Ваш голос.\nВаш вибір.',
-    launchDetail: 'Тут раді всім.',
-    launchEmphasis: 'Усі голоси рівні.',
-    launchClosing: 'Формуймо спільне майбутнє разом.',
-    launchFooter: 'Різні погляди. Рівні голоси.',
+    launchDetail: 'Поверни собі вплив.',
+    launchEmphasis: 'Керуй своїм голосом.',
+    launchClosing: 'Формуй те, що буде далі.',
+    launchFooter: 'Сучасна демократія заради сильнішого майбутнього.',
+    changeLanguage: 'Змінити мову',
+    skip: 'Пропустити',
     telegramStart: 'Продовжити в Telegram',
     previewStart: 'Переглянути демонстрацію',
     feedbackPending: 'Бот зворотного зв’язку — незабаром',
     motto: 'ЛЮДИ · ГОЛОС · ДІЯ',
     start: 'Почати',
-    missionKicker: 'Місце для кожного',
-    missionTitle: 'Різні люди.\nРівні голоси.',
-    missionIntro: 'Знайомтеся з різними ідеями, обирайте важливе для себе й допомагайте творити спільне майбутнє.',
+    missionTitle: 'Нове покоління\nдемократії',
     missionSteps: [
-      'Підготуйтеся до участі',
-      'Познайомтеся з кандидатами',
-      'Оберіть, кого підтримати',
-      'Змінюйте свій вибір',
-      'Стежте за поступом',
+      'Перевірені громадяни',
+      'Оновлення в реальному часі',
+      'Прозорість і підзвітність',
     ],
     missionDetails: [
-      'Простий крок перевірки · у демо вона імітується',
-      'Дізнайтеся про їхні ідеї',
-      'Зробіть власний вибір',
-      'Відкликайте частину або всю підтримку під час голосування',
-      'Дивіться, як обіцянки стають діями',
+      'Одна людина — один голос. У цьому демо перевірка імітується.',
+      'Керуйте своїм голосом із часом.',
+      'Програми кандидатів, відстеження поступу та відкриті записи аудиту.',
     ],
+    electionTypes: 'Усі види виборів',
+    electionTypesDetail: 'Президентські, парламентські, місцеві та інші',
+    ukraineIssues: 'Питання, важливі\nдля України',
+    missionDemo: 'Вигадане демо · перевірка особи й блокчейн імітуються; анонімність не гарантується.',
     readyKicker: 'Почнімо разом',
     connectTitle: 'Підключіться до FreedomSword',
     connectDetail: 'Підключіть Telegram, щоб продовжити. Підтримку гаманця заплановано.',
@@ -155,8 +154,8 @@ export default function WelcomeScreen() {
   const [lang, setLang] = useState<Language>('en');
   const [stage, setStage] = useState<Stage>('launch');
   const [modal, setModal] = useState<Modal>(null);
-  // The opening two screens are light; Telegram's chrome follows the dark modal backdrop.
-  const lightStage = stage === 'launch' || stage === 'mission';
+  // The restored launch is light; the client's benefits reference and later screens are navy.
+  const lightStage = stage === 'launch';
   const light = lightStage && !modal;
   const telegram = useTelegram(light ? '#F6F3EC' : '#0A1722');
   const flow = useWelcomeFlow(telegram.launch);
@@ -253,10 +252,10 @@ export default function WelcomeScreen() {
         <div className="welcome-language-row">
           <label className="welcome-language">
             <Globe2 size={17} aria-hidden="true" />
-            <span className="sr-only">{t.language}</span>
+            <span className="welcome-language-label">{s.changeLanguage}</span>
             <select
               value={lang}
-              aria-label={t.language}
+              aria-label={s.changeLanguage}
               onChange={(event) => setLang(event.target.value as Language)}
             >
               <option value="en" lang="en">English</option>
@@ -296,11 +295,10 @@ export default function WelcomeScreen() {
           </main>
         ) : stage === 'mission' ? (
           <main className="fs-stage fs-mission" aria-labelledby="fs-mission-title">
-            <span className="fs-stage-kicker">{s.missionKicker}</span>
+            <button type="button" className="fs-mission-skip" onClick={() => go('connect')}>{s.skip}</button>
             <h1 id="fs-mission-title">{s.missionTitle}</h1>
-            <p className="fs-stage-intro">{s.missionIntro}</p>
             <ul className="fs-mission-list">
-              {[ShieldCheck, Users, Check, History, BarChart3].map((Icon, index) => (
+              {[ShieldCheck, Radio, Landmark].map((Icon, index) => (
                 <li className="fs-mission-card" key={s.missionSteps[index]}>
                   <span className="fs-mission-icon">
                     <Icon size={20} aria-hidden="true" />
@@ -312,10 +310,13 @@ export default function WelcomeScreen() {
                 </li>
               ))}
             </ul>
+            <div className="fs-mission-city">
+              <p className="fs-election-types"><strong>{s.electionTypes}</strong><span>{s.electionTypesDetail}</span></p>
+              <p className="fs-ukraine-issues">{s.ukraineIssues}</p>
+            </div>
             <div className="fs-stage-bottom">
-              <button type="button" className="fs-button" onClick={() => go('connect')}>
-                {s.next}
-                <ArrowRight size={18} />
+              <button type="button" className="fs-mission-next" aria-label={s.next} onClick={() => go('connect')}>
+                <ArrowRight size={28} aria-hidden="true" />
               </button>
               <span className="fs-dots" aria-hidden="true">
                 <i />
@@ -323,6 +324,7 @@ export default function WelcomeScreen() {
                 <i />
               </span>
             </div>
+            <p className="fs-mission-demo">{s.missionDemo}</p>
           </main>
         ) : (
           <main className="fs-stage fs-connect" aria-labelledby="fs-connect-title">

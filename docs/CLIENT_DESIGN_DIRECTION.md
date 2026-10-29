@@ -1,5 +1,11 @@
 # FreedomSword — client design direction
 
+## Client correction — 29 October 2026
+
+The latest reference supersedes the two-light-screen treatment: restore the original large-emblem, light city launch with “Take back control. Manage your vote. Shape what comes next.” and its blue Telegram button, without yellow text highlighting. Show a visible Change language control on both opening screens, including inside Telegram. The second screen is navy, with the three requested benefits (verified citizens, real-time updates, transparency/accountability), city illustration, election types, Ukraine issues, and a circular gold forward button. Preserve explicit mock-verification and privacy disclosures. Later screens retain the navy theme and welcoming language.
+
+Support adjustments use a slider and a swipe row: left subtracts 0.25 vote (25 of 100 units), right adds 0.25, clamped to the available budget. The user confirmed this interpretation. Gestures only edit a draft; a separate confirmation saves it. Reusable-support recalls become available six calendar months after each withdrawal; cooling units cannot be added early. Original ballots keep their published recall policy. Feedback bot descriptions, help and acknowledgments are Ukrainian.
+
 ## Welcoming and equal — 29 October 2026
 
 The service should feel like a shared community, with equal standing and an equal voice. Use welcoming, plain language rather than institutional or commanding labels. The community introduction says “Different people. Equal voices.” Its people illustration gives every figure the same size and baseline. New reusable-support copy explains the actual equal 100-unit starting budget within that election; it does not change eligibility, allocation, recall or private-poll rules.

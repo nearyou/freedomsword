@@ -1,9 +1,11 @@
 'use client';
 import { useState } from 'react';
-import { ArrowDownLeft, ArrowDownUp } from 'lucide-react';
+import { ArrowDownLeft } from 'lucide-react';
 import type { ElectionView } from '@frontend/lib/contracts';
 import { timeLabel, type BallotView } from '@frontend/lib/ui';
 import { recallAvailability } from '@frontend/lib/ballot-ui';
+import { legacyRecallSelection } from '@frontend/lib/support-adjustment';
+import SupportSlider from './SupportSlider';
 export default function RecallPanel({
   election,
   ballot,
@@ -23,13 +25,10 @@ export default function RecallPanel({
 }) {
   const policy = election.recallPolicy;
   const availability = recallAvailability(election, ballot, now);
-  const [selection, setSelection] = useState('25');
-  const step = policy?.partialAmount ?? 25;
-  const choices = [...new Set([step, 25, 50, 75])].sort((a, b) => a - b)
-    .filter((amount) => amount > 0 && amount <= ballot.balance && amount % step === 0 && policy?.partialEnabled !== false);
-  const selected = selection === 'all' || choices.includes(Number(selection)) ? selection : choices[0]?.toString() ?? 'all';
-  const all = selected === 'all';
-  const amount = all ? ballot.balance : Number(selected);
+  const [draft, setDraft] = useState<{ balance: number; target: number } | null>(null);
+  const target = draft?.balance === ballot.balance ? draft.target : ballot.balance;
+  const amount = ballot.balance - target;
+  const selection = legacyRecallSelection(ballot.balance, target, policy);
   const reason = busy
     ? 'An action is being recorded.'
     : privateError
@@ -37,25 +36,27 @@ export default function RecallPanel({
       : !ready
         ? 'Complete or renew your Citizen Passport before recalling.'
         : '';
-  const selectedReason = reason || (all ? availability.fullReason : availability.partialReason);
+  const selectedReason = reason || availability.common || (amount === 0
+    ? 'Move the slider left to choose how much support to recall.'
+    : !selection ? 'Choose an amount permitted by this election’s recall rules.'
+      : selection.mode === 'full' ? availability.fullReason : availability.partialReason);
   const remainingDays = Math.max(
     0,
     Math.ceil((new Date(election.closesAt).getTime() - now) / 86400000),
   );
   return (
     <section className="recall-panel" aria-label="Recall support">
-      <label className="recall-amount"><span><ArrowDownUp size={17} aria-hidden="true" /> Choose how much to recall</span>
-        <select value={selected} disabled={busy || ballot.balance === 0} onChange={(event) => setSelection(event.target.value)}>
-          {choices.map((value) => <option key={value} value={String(value)}>{(value / 100).toFixed(2)} · {value} units</option>)}
-          <option value="all" disabled={policy?.fullEnabled === false}>All remaining · {ballot.balance} units</option>
-        </select>
-      </label>
-      <p className="fine-print">Recall {amount} units · Keep {Math.max(0, ballot.balance - amount)} units supporting this candidate.</p>
+      <SupportSlider key={`${election.id}-${ballot.candidateId}`} current={ballot.balance} maximum={ballot.balance}
+        value={target} disabled={busy || ballot.balance === 0}
+        onChange={(value) => setDraft({ balance: ballot.balance, target: value })} />
+      <p className="fine-print">Recall {amount} units · Keep {target} units supporting this candidate.</p>
       <button className="button recall-partial full" disabled={!!selectedReason}
         aria-describedby={selectedReason ? 'recall-reason' : undefined}
-        onClick={() => onRecall(all ? 'full' : 'partial', all || amount === step ? undefined : amount)}>
-        <ArrowDownLeft size={17} /> Recall {amount} units
+        onClick={() => { if (selection && !selectedReason) onRecall(selection.mode, 'units' in selection ? selection.units : undefined); }}>
+        <ArrowDownLeft size={17} /> {amount ? `Recall ${amount} units` : 'Choose a recall amount'}
       </button>
+      <button className="button secondary full" disabled={!!reason || !!availability.fullReason}
+        onClick={() => onRecall('full')}>Recall all {ballot.balance} units</button>
       {selectedReason && <p className="disabled-reason" id="recall-reason">{selectedReason}</p>}
       <p className="fine-print">Recalled support cannot be reassigned.</p>
       <details className="recall-policy-details">

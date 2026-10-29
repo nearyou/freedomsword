@@ -102,3 +102,25 @@ it('allows recalling existing support after a candidate withdraws, but rejects n
   await expect(changeSupport(racing, command('allocate', a, 1))).rejects.toThrow('Candidate');
   expect((await changeSupport(citizen, command('withdraw', a, 30))).activeUnits).toBe(0);
 });
+
+it('recalls a quarter at a time to zero and restores those units only after their six-month timers', async () => {
+  const user = await enroll();
+  const withdrawnAt = new Date(now);
+  await changeSupport(user, command('allocate', b, 100));
+  for (const expected of [75, 50, 25, 0]) {
+    const request = command('withdraw', b, 25);
+    expect((await changeSupport(user, request)).activeUnits).toBe(expected);
+    expect((await changeSupport(user, request)).replayed).toBe(true);
+  }
+  expect(await readSupport(user, electionId)).toMatchObject({ activeUnits: 0, coolingUnits: 100, availableUnits: 0 });
+  await expect(changeSupport(user, command('allocate', b, 25))).rejects.toThrow('Not enough');
+  const unlock = new Date(withdrawnAt);
+  unlock.setUTCMonth(unlock.getUTCMonth() + 6);
+  now = new Date(unlock.getTime() - 1);
+  expect((await readSupport(user, electionId)).availableUnits).toBe(0);
+  now = unlock;
+  for (const expected of [25, 50, 75, 100])
+    expect((await changeSupport(user, command('allocate', b, 25))).activeUnits).toBe(expected);
+  expect((await changeSupport(user, command('withdraw', b, 100))).activeUnits).toBe(0);
+  expect((await readSupport(user, electionId)).availableUnits).toBe(0);
+});
