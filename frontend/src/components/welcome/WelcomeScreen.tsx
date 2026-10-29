@@ -154,8 +154,8 @@ export default function WelcomeScreen() {
   const [lang, setLang] = useState<Language>('en');
   const [stage, setStage] = useState<Stage>('launch');
   const [modal, setModal] = useState<Modal>(null);
-  // The restored launch is light; the client's benefits reference and later screens are navy.
-  const lightStage = stage === 'launch';
+  // Both opening screens are light; connection and later screens use navy.
+  const lightStage = stage === 'launch' || stage === 'mission';
   const light = lightStage && !modal;
   const telegram = useTelegram(light ? '#F6F3EC' : '#0A1722');
   const flow = useWelcomeFlow(telegram.launch);

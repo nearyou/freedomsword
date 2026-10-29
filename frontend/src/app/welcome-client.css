@@ -1,4 +1,4 @@
-/* Client reference: original light launch, then the navy benefits screen. */
+/* Both opening screens retain the light city palette; navy starts at connection. */
 html[data-interface='refined'] .fs-welcome[data-stage='launch'] .fs-header {
   inset: 18px auto auto 22px; width: 34px; height: 34px; padding: 0; border: 0;
 }
@@ -34,7 +34,7 @@ html[data-interface='refined'] .fs-launch .fs-button {
 html[data-interface='refined'] .fs-launch .fs-button svg { width: 25px; height: 25px; fill: currentColor; }
 html[data-interface='refined'] .fs-launch .fs-stage-bottom small { font-size: clamp(11px, 3vw, 15px); color: #3b4b53; }
 html[data-interface='refined'] .fs-welcome[data-stage='mission'] .fs-sheet {
-  background: #071b29; border-color: #233f50;
+  background-color: #f6f3ec; border-color: #d7ceba;
 }
 html[data-interface='refined'] .fs-welcome .fs-mission {
   padding: 76px 26px 20px !important;
@@ -43,43 +43,42 @@ html[data-interface='refined'] .fs-welcome .fs-mission {
 html[data-interface='refined'] .fs-welcome[data-telegram='true'] .fs-mission {
   min-height: calc(100svh - var(--tg-safe-top) - var(--tg-safe-bottom));
 }
-.fs-mission-skip { align-self: flex-end; color: #e2e9ee; background: transparent; font-size: 13px; padding: 8px 0 8px 16px; }
+.fs-mission-skip { align-self: flex-end; color: #334d5b; background: transparent; font-size: 13px; padding: 8px 0 8px 16px; }
 html[data-interface='refined'] .fs-welcome .fs-mission h1 {
   max-width: 410px; margin: 20px 0 30px; text-align: left;
-  color: #f6f7f4; font-size: clamp(29px, 7.7vw, 40px); font-weight: 700; line-height: 1.2;
+  color: #102541; font-size: clamp(29px, 7.7vw, 40px); font-weight: 700; line-height: 1.2;
 }
 html[data-interface='refined'] .fs-welcome .fs-mission-list { gap: 22px; margin: 0; }
 html[data-interface='refined'] .fs-welcome .fs-mission-card { gap: 18px; padding: 0; border: 0; }
 html[data-interface='refined'] .fs-welcome .fs-mission-icon {
   width: 72px; height: 72px; border-radius: 50%;
-  color: #d6b76a; border: 1px solid #b89a535c; background: #d5b45b0c;
+  color: #87682c; border: 1px solid #c4ab74; background: #ece4d3;
 }
 html[data-interface='refined'] .fs-welcome .fs-mission-icon svg { width: 32px; height: 32px; stroke-width: 1.4; }
-html[data-interface='refined'] .fs-welcome .fs-mission-card strong { color: #f1f3f2; font-size: 14px; line-height: 1.5; }
-html[data-interface='refined'] .fs-welcome .fs-mission-card p { color: #afc0cb; font-size: 13px; line-height: 1.6; margin-top: 4px; }
+html[data-interface='refined'] .fs-welcome .fs-mission-card strong { color: #183142; font-size: 14px; line-height: 1.5; }
+html[data-interface='refined'] .fs-welcome .fs-mission-card p { color: #526575; font-size: 13px; line-height: 1.6; margin-top: 4px; }
 .fs-mission-city {
   position: relative; isolation: isolate; display: grid; place-content: center; gap: 16px;
   min-height: 230px; margin: 25px -26px 0; padding: 28px 26px; text-align: center;
 }
 .fs-mission-city::before {
   content: ''; position: absolute; z-index: -1; inset: 0;
-  background: linear-gradient(#071b29, #071b2933 30%, #071b2977 65%, #071b29), url('/illustrations/civic-parchment.webp') center bottom / cover;
-  background-color: #0b304b;
-  background-blend-mode: normal, luminosity; opacity: .55;
+  background: linear-gradient(#f6f3ec, #f6f3ec55 30%, #f6f3ec99 65%, #f6f3ec), url('/illustrations/civic-parchment.webp') center bottom / cover;
+  opacity: .65;
 }
-.fs-election-types { max-width: 260px; justify-self: center; color: #e2bc79; font-size: 19px; line-height: 1.4; }
+.fs-election-types { max-width: 260px; justify-self: center; color: #75552b; font-size: 19px; line-height: 1.4; }
 .fs-election-types strong { display: block; font-weight: 500; }
 .fs-election-types span { display: block; }
-.fs-ukraine-issues { color: #fff; white-space: pre-line; font-size: 23px; line-height: 1.3; }
+.fs-ukraine-issues { color: #102541; white-space: pre-line; font-size: 23px; line-height: 1.3; }
 html[data-interface='refined'] .fs-mission .fs-stage-bottom {
   display: flex; flex-direction: row-reverse; align-items: center; justify-content: space-between; gap: 20px; padding-top: 12px;
 }
 .fs-mission-next { width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; flex: none; color: #112b39; background: #edc65f; }
 .fs-mission-next:hover { background: #f8d77f; }
 html[data-interface='refined'] .fs-mission .fs-dots { gap: 8px; margin-left: 38%; }
-html[data-interface='refined'] .fs-mission .fs-dots i { width: 7px; height: 7px; border-radius: 50%; background: #5d737f; }
-html[data-interface='refined'] .fs-mission .fs-dots i.active { width: 7px; background: #f2dfad; }
-.fs-mission-demo { color: #a2b5c2; font-size: 10px; line-height: 1.5; margin-top: 16px !important; text-align: center; }
+html[data-interface='refined'] .fs-mission .fs-dots i { width: 7px; height: 7px; border-radius: 50%; background: #b0b3ad; }
+html[data-interface='refined'] .fs-mission .fs-dots i.active { width: 7px; background: #7e683b; }
+.fs-mission-demo { color: #5a6c76; font-size: 10px; line-height: 1.5; margin-top: 16px !important; text-align: center; }
 @media (max-height: 760px) {
   html[data-interface='refined'] .fs-launch .fs-original-logo { height: 36svh; min-height: 210px; }
   html[data-interface='refined'] .fs-launch h1 { margin-top: 12px; font-size: 30px; }
