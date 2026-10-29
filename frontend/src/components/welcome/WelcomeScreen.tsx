@@ -11,12 +11,14 @@ import {
   ChevronDown,
   FileText,
   Globe2,
+  HeartHandshake,
   Landmark,
   MoreHorizontal,
   Send,
   ShieldCheck,
   Radio,
   Wallet,
+  Vote,
 } from 'lucide-react';
 import {
   telegramHaptic,
@@ -252,7 +254,7 @@ export default function WelcomeScreen() {
         <div className="welcome-language-row">
           <label className="welcome-language">
             <Globe2 size={17} aria-hidden="true" />
-            <span className="welcome-language-label">{s.changeLanguage}</span>
+            <span className="sr-only">{s.changeLanguage}</span>
             <select
               value={lang}
               aria-label={s.changeLanguage}
@@ -309,11 +311,15 @@ export default function WelcomeScreen() {
                   </div>
                 </li>
               ))}
+              <li className="fs-mission-card">
+                <span className="fs-mission-icon"><Vote size={20} aria-hidden="true" /></span>
+                <div><strong>{s.electionTypes}</strong><p>{s.electionTypesDetail}</p></div>
+              </li>
+              <li className="fs-mission-card">
+                <span className="fs-mission-icon"><HeartHandshake size={20} aria-hidden="true" /></span>
+                <div><strong className="fs-mission-issues">{s.ukraineIssues}</strong></div>
+              </li>
             </ul>
-            <div className="fs-mission-city">
-              <p className="fs-election-types"><strong>{s.electionTypes}</strong><span>{s.electionTypesDetail}</span></p>
-              <p className="fs-ukraine-issues">{s.ukraineIssues}</p>
-            </div>
             <div className="fs-stage-bottom">
               <button type="button" className="fs-mission-next" aria-label={s.next} onClick={() => go('connect')}>
                 <ArrowRight size={28} aria-hidden="true" />

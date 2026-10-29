@@ -1,5 +1,21 @@
 export const QUARTER_VOTE_UNITS = 25;
 
+/** Four equal visual sections distinguish saved support from a pending addition or recall. */
+export function supportScale(current: number, target: number, maximum: number) {
+  const overlap = (from: number, to: number, start: number, end: number) =>
+    Math.max(0, Math.min(to, end) - Math.max(from, start));
+  return Array.from({ length: 4 }, (_, index) => {
+    const start = index * 25, end = start + 25;
+    return {
+      retained: overlap(0, Math.min(current, target), start, end),
+      added: overlap(current, target, start, end),
+      removed: overlap(target, current, start, end),
+      available: overlap(Math.max(current, target), maximum, start, end),
+      unavailable: overlap(maximum, 100, start, end),
+    };
+  });
+}
+
 export function clampSupport(value: number, maximum: number) {
   return Math.max(0, Math.min(Math.max(0, maximum), Math.round(value)));
 }

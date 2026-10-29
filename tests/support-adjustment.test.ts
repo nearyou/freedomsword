@@ -1,5 +1,25 @@
 import { expect, it } from 'vitest';
-import { legacyRecallSelection, supportAdjustment, swipedSupport } from '../frontend/src/lib/support-adjustment';
+import { legacyRecallSelection, supportAdjustment, supportScale, swipedSupport } from '../frontend/src/lib/support-adjustment';
+
+it('shows four equal quarters with the exact kept, added, recalled and unavailable units', () => {
+  const adding = supportScale(50, 75, 100);
+  expect(adding).toHaveLength(4);
+  expect(adding[0].retained).toBe(25);
+  expect(adding[1].retained).toBe(25);
+  expect(adding[2].added).toBe(25);
+  expect(adding[3].available).toBe(25);
+  const recalling = supportScale(100, 75, 100);
+  expect(recalling[3].removed).toBe(25);
+  expect(recalling.reduce((sum, section) => sum + section.retained, 0)).toBe(75);
+  expect(supportScale(75, 75, 75)[3].unavailable).toBe(25);
+  for (const [current, target, maximum] of [[0, 0, 100], [0, 100, 100], [100, 0, 100], [73, 27, 100], [40, 55, 55]]) {
+    const sections = supportScale(current, target, maximum);
+    expect(sections).toHaveLength(4);
+    for (const section of sections) expect(Object.values(section).reduce((sum, units) => sum + units, 0)).toBe(25);
+    expect(sections.reduce((sum, section) => sum + section.retained + section.added, 0)).toBe(target);
+    expect(sections.reduce((sum, section) => sum + section.removed, 0)).toBe(Math.max(0, current - target));
+  }
+});
 
 it('uses each horizontal swipe to subtract or add one quarter vote, down to zero', () => {
   let support = 100;

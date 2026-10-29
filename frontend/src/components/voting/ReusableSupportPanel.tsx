@@ -129,7 +129,8 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
             {!adjustment && <p className="fine-print">Move the slider left to recall support, or right to add available units.</p>}
             {state.coolingUnits > 0 && <p className="fine-print">{state.coolingUnits} recalled units are cooling down. They can only be added again after their six-month timers end.</p>}
             <div className="support-actions">
-              <button className="button primary" disabled={!canAct || !adjustment || (adjustment.action === 'allocate' && !candidate)}
+              <button className="button primary support-submit" data-action={adjustment?.action}
+                disabled={!canAct || !adjustment || (adjustment.action === 'allocate' && !candidate)}
                 onClick={() => { if (adjustment) prepare(adjustment.action, adjustment.units); }}>
                 {adjustment ? `${adjustment.action === 'withdraw' ? 'Recall' : 'Add'} ${adjustment.units} units` : 'Choose a change above'}</button>
               <button className="button danger" disabled={!canAct || selectedUnits === 0}
