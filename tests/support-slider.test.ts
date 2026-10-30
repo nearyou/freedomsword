@@ -41,6 +41,19 @@ it('distinguishes adding and recalling with words, icons and four visible scale 
   expect(container.querySelectorAll('.support-ring-removed')).toHaveLength(1);
 });
 
+it('changes the diagram color at each remaining-support quarter in both directions', async () => {
+  await mount(100, 100);
+  const tone = () => container.querySelector('.support-adjuster')?.getAttribute('data-support-tone');
+  expect(tone()).toBe('blue');
+  for (const [units, color] of [[75, 'green'], [50, 'yellow'], [25, 'red'], [0, 'gray']] as const) {
+    await act(async () => { control('Subtract').click(); });
+    expect(range().value).toBe(String(units)); expect(tone()).toBe(color);
+  }
+  for (const color of ['red', 'yellow', 'green', 'blue']) {
+    await act(async () => { control('Add').click(); }); expect(tone()).toBe(color);
+  }
+});
+
 it('keeps the visual scale at 100 while keyboard changes cannot spend unavailable units', async () => {
   await mount(40, 55);
   expect(range().max).toBe('100');

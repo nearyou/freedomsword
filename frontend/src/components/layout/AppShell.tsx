@@ -1,4 +1,6 @@
-import { ChevronRight, ShieldCheck } from 'lucide-react';
+import { ChevronRight, Globe2, ShieldCheck } from 'lucide-react';
+import { useLanguage } from '@frontend/hooks/useLanguage';
+import type { Language } from '../welcome/copy';
 import FeedbackLink from '../FeedbackLink';
 import BrandMark from '../ui/BrandMark';
 import Sidebar from './Sidebar';
@@ -21,6 +23,9 @@ export default function AppShell({
   onPassport: () => void;
   inTelegram: boolean;
 }) {
+  const [language, setLanguage] = useLanguage();
+  const uk = language === 'uk';
+  const item = navigation.find((item) => item.value === tab);
   return (
     <>
       <div className="app-shell" data-telegram={inTelegram}>
@@ -32,20 +37,26 @@ export default function AppShell({
               <span>FreedomSword</span>
             </div>
             <div className="breadcrumb">
-              Your space <ChevronRight size={14} />
-              <strong>{navigation.find((item) => item.value === tab)?.label}</strong>
+              {uk ? 'Ваш простір' : 'Your space'} <ChevronRight size={14} />
+              <strong>{uk ? item?.labelUk : item?.label}</strong>
             </div>
             <div className="topbar-actions">
+              <label className="menu-language"><Globe2 size={15} aria-hidden="true" />
+                <select aria-label={uk ? 'Змінити мову' : 'Change language'} value={language}
+                  onChange={(event) => setLanguage(event.target.value as Language)}>
+                  <option value="en">EN</option><option value="uk">УК</option>
+                </select>
+              </label>
               <FeedbackLink />
               <button className="connection" onClick={onPassport}
-                aria-label={citizen.connected ? 'Open your participation steps' : 'Connect Telegram'}>
+                aria-label={uk ? citizen.connected ? 'Відкрити кроки участі' : 'Підключіть Telegram' : citizen.connected ? 'Open your participation steps' : 'Connect Telegram'}>
                 <ShieldCheck size={15} />
                 <span>
                   {citizen.connected
                     ? citizen.verified
-                      ? 'Demo check complete'
-                      : 'Connected'
-                    : 'Connect Telegram'}
+                      ? uk ? 'Демо перевірку завершено' : 'Demo check complete'
+                      : uk ? 'Підключено' : 'Connected'
+                    : uk ? 'Підключіть Telegram' : 'Connect Telegram'}
                 </span>
                 <ChevronRight size={14} />
               </button>

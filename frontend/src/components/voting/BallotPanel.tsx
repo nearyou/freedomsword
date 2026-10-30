@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import type { CitizenView, ElectionView } from '@frontend/lib/contracts';
 import type { BallotView } from '@frontend/lib/ui';
 import { supportSegments } from '@frontend/lib/ballot-ui';
+import { supportColors, supportTone } from '@frontend/lib/support-adjustment';
 import RecallPanel from './RecallPanel';
 import ShareInvite from './ShareInvite';
 const PrivateBallotPanel = dynamic(() => import('./PrivateBallotPanel'), { ssr: false });
@@ -90,7 +91,7 @@ export default function BallotPanel({
                 <i
                   style={{
                     width: `${segment.fill}%`,
-                    background: candidate?.color ?? 'var(--primary)',
+                    background: supportColors[supportTone(ballot.balance)],
                   }}
                 />
               </span>

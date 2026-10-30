@@ -1,5 +1,15 @@
 # FreedomSword — client design direction
 
+## Language, sharing and review — 30 October 2026
+
+Remember the language selected on either opening screen for the main desktop/mobile menu, page headings, feedback links and invitation controls. English and Ukrainian use the same stored preference; it can also be changed in the app header. Candidate content retains its published language.
+
+The support diagram and remaining-support bar use the projected/saved amount: 100 blue, 75 green, 50 yellow, 25 red, 0 gray. Exact values between quarter marks use the next quarter's color. Keep four sections and explicit adding/recalling labels; gestures still edit a draft until confirmation.
+
+The invitation uses the client's approved three English lines beginning “True democracy starts with your anonymous vote.”, or their Ukrainian translation. Show it during connection onboarding and after voting. Retain a visible current-demo disclosure, including in text-sharing payloads. Instagram is an explicit network choice: copy the invitation and open Instagram for pasting. Every listed network has a recognizable icon.
+
+The ordered static review is published at `/review/user-flows/index.html`, with screens 3–18 and full-size links for each. Run `node scripts/generate-user-flow-review.mjs` to regenerate it from the app components and sample states. The agreement, cooldown and audit examples are labeled as illustrations. These review pages make no API calls and cannot submit votes or consent.
+
 ## Viewport correction — 30 October 2026
 
 The second opening screen fits Telegram's stable viewport, with safe-area padding included. Center the five benefit rows in the available content area, using smaller spacing and icons on shorter phones. Reserve separate rows for the forward button and demo disclosure so neither can scroll below the viewport or be covered by the city artwork. On very short screens or with enlarged text, only the benefit list scrolls; navigation stays visible. Keep the accepted first screen, language selector and later dark theme unchanged.

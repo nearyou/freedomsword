@@ -44,6 +44,16 @@ const config: NextConfig = {
           },
         ],
       },
+      {
+        source: '/review/user-flows/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex' },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; frame-ancestors 'self' https://web.telegram.org https://*.telegram.org; base-uri 'self'; form-action 'none'; object-src 'none'",
+          },
+        ],
+      },
     ];
   },
 };

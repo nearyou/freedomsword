@@ -1,12 +1,14 @@
 import { Users } from 'lucide-react';
+import { useLanguage } from '@frontend/hooks/useLanguage';
 
 export default function CommunityWelcome() {
+  const [language] = useLanguage();
   return (
     <section className="community-welcome" aria-labelledby="community-welcome-title">
       <span className="community-welcome-icon"><Users size={25} aria-hidden="true" /></span>
       <div>
-        <h2 id="community-welcome-title">Different people. Equal voices.</h2>
-        <p>You belong here. Take your time, explore different ideas, and choose what matters to you.</p>
+        <h2 id="community-welcome-title">{language === 'uk' ? 'Різні люди. Рівні голоси.' : 'Different people. Equal voices.'}</h2>
+        <p>{language === 'uk' ? 'Вам тут раді. Знайомтеся з різними ідеями у власному темпі й обирайте те, що важливе для вас.' : 'You belong here. Take your time, explore different ideas, and choose what matters to you.'}</p>
       </div>
       <svg className="community-people" viewBox="0 0 180 80" aria-hidden="true" fill="none">
         <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

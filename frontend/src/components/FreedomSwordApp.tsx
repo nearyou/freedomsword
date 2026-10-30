@@ -27,6 +27,8 @@ import ResultsPanel from './results/ResultsPanel';
 import AccountabilityPanel from './accountability/AccountabilityPanel';
 import LoadingCards from './ui/LoadingCards';
 import AuditExplorer from './AuditExplorer';
+import { useLanguage } from '@frontend/hooks/useLanguage';
+import { navigation } from './layout/navigation';
 type Modal =
   | { type: 'passport' }
   | { type: 'profile'; id: string }
@@ -50,6 +52,8 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
   initialTab?: AppTab;
   initialElectionId?: string;
 }) {
+  const [language] = useLanguage();
+  const uk = language === 'uk';
   const citizenState = useCitizen();
   const electionState = useElections();
   const telegram = useTelegram();
@@ -65,6 +69,13 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
   const [activeId, setActiveId] = useState(initialElectionId ?? 'reusable-support-demo');
   const [supportCandidateId, setSupportCandidateId] = useState<string>();
   const [tab, setTab] = useState<AppTab>(initialTab);
+  const heading = uk ? navigation.find((item) => item.value === tab)!.labelUk : headings[tab];
+  const detail = uk ? {
+    Candidates: 'Знайомтеся з людьми та ідеями, що формують наше спільне майбутнє.',
+    'Live results': 'Дивіться, як поєднуються наші рішення.',
+    'My ballot': 'Оберіть те, що підходить вам. Ви можете змінити думку.',
+    Accountability: 'Погляньмо, як виконуються ці обіцянки.',
+  }[tab] : descriptions[tab];
   const [showElectionList, setShowElectionList] = useState(true);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('support');
@@ -202,25 +213,25 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
       >
         <div className="elections-page-heading">
           <div>
-            <span className="page-kicker">Your community, your voice</span>
+            <span className="page-kicker">{uk ? 'Ваша спільнота, ваш голос' : 'Your community, your voice'}</span>
             {tab === 'Candidates' && !showElectionList && (
               <button className="elections-back" type="button" onClick={() => setShowElectionList(true)}>
-                <ArrowLeft size={16} aria-hidden="true" /> All elections
+                <ArrowLeft size={16} aria-hidden="true" /> {uk ? 'Усі вибори' : 'All elections'}
               </button>
             )}
-            <h1>{tab === 'Candidates' && !showElectionList ? election?.title : headings[tab]}</h1>
+            <h1>{tab === 'Candidates' && !showElectionList ? election?.title : heading}</h1>
             <p>{tab === 'Candidates' && !showElectionList
-              ? 'Get to know the candidates and find the ideas you believe in.' : descriptions[tab]}</p>
+              ? uk ? 'Познайомтеся з кандидатами та знайдіть ідеї, у які вірите.' : 'Get to know the candidates and find the ideas you believe in.' : detail}</p>
           </div>
           <span className={`network-status ${stale ? 'interrupted' : ''}`}>
             <span className="mini-dot" />
-            {source === 'preview' ? 'Sample' : stale ? 'Refresh paused' : 'Updated live'}
+            {source === 'preview' ? uk ? 'Зразок' : 'Sample' : stale ? uk ? 'Оновлення призупинено' : 'Refresh paused' : uk ? 'Оновлюється наживо' : 'Updated live'}
           </span>
         </div>
         <p className="elections-demo-note">
           {election?.protocol === 'MACI_PRIVATE' && election.privatePoll?.registrationMode === 'RARIMO'
             ? <><strong>Private poll</strong> Fictional election · Rarimo eligibility on chain 7368</>
-            : <><strong>Demo space</strong> Fictional elections · mock identity and blockchain</>}
+            : <><strong>{uk ? 'Демо простір' : 'Demo space'}</strong> {uk ? 'Вигадані вибори · імітація перевірки особи та блокчейну' : 'Fictional elections · mock identity and blockchain'}</>}
         </p>
         {tab === 'Candidates' && showElectionList && <CommunityWelcome />}
         {refreshError && (
@@ -262,7 +273,7 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
                 }}
               />
             ) : null}
-            <div className="elections-content" aria-label={headings[tab]}>
+            <div className="elections-content" aria-label={heading}>
               {tab === 'Candidates' && !showElectionList && (
                 <CandidateList
                   election={election}
@@ -315,7 +326,7 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
         )}
         <footer className="main-footer">
           <button className="text-button" onClick={() => setModal({ type: 'audit' })}>
-            Inspect public audit trail <ArrowUpRight size={14} />
+            {uk ? 'Переглянути відкритий журнал аудиту' : 'Inspect public audit trail'} <ArrowUpRight size={14} />
           </button>
         </footer>
       </AppShell>

@@ -1,5 +1,6 @@
 import { navigation } from './navigation';
 import type { AppTab } from '@frontend/lib/ui';
+import { useLanguage } from '@frontend/hooks/useLanguage';
 export default function MobileNavigation({
   tab,
   onTab,
@@ -7,9 +8,10 @@ export default function MobileNavigation({
   tab: AppTab;
   onTab: (tab: AppTab) => void;
 }) {
+  const [language] = useLanguage();
   return (
-    <nav className="mobile-nav" aria-label="Mobile navigation">
-      {navigation.map(({ value, mobileLabel, icon: Icon }) => (
+    <nav className="mobile-nav" aria-label={language === 'uk' ? 'Мобільне меню' : 'Mobile navigation'}>
+      {navigation.map(({ value, mobileLabel, labelUk, icon: Icon }) => (
         <button
           type="button"
           key={value}
@@ -18,7 +20,7 @@ export default function MobileNavigation({
           onClick={() => onTab(value)}
         >
           <Icon size={21} />
-          <span>{mobileLabel}</span>
+          <span>{language === 'uk' ? labelUk : mobileLabel}</span>
         </button>
       ))}
     </nav>

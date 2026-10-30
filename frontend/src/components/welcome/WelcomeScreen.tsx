@@ -30,6 +30,8 @@ import { copy, type Language } from './copy';
 import { useWelcomeFlow } from './useWelcomeFlow';
 import { AgreementModal, InfoModal, VerificationModal } from './WelcomeModals';
 import FeedbackLink from '../FeedbackLink';
+import { useLanguage } from '@frontend/hooks/useLanguage';
+import ShareInvite from '../voting/ShareInvite';
 
 type Modal = 'verification' | 'agreement' | 'about' | 'privacy' | 'exit' | null;
 type Stage = 'launch' | 'mission' | 'connect';
@@ -153,7 +155,7 @@ const stageCopy = {
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const [lang, setLang] = useState<Language>('en');
+  const [lang, setLang] = useLanguage();
   const [stage, setStage] = useState<Stage>('launch');
   const [modal, setModal] = useState<Modal>(null);
   // Both opening screens are light; connection and later screens use navy.
@@ -174,14 +176,6 @@ export default function WelcomeScreen() {
       else go(stage === 'connect' ? 'mission' : 'launch');
     },
   );
-
-  useEffect(() => {
-    const previous = document.documentElement.lang;
-    document.documentElement.lang = lang;
-    return () => {
-      document.documentElement.lang = previous;
-    };
-  }, [lang]);
 
   useEffect(() => {
     const color = light ? '#F6F3EC' : '#0A1722';
@@ -380,6 +374,7 @@ export default function WelcomeScreen() {
             </div>
             <FeedbackLink className="fs-feedback" label={s.feedback}
               unavailableLabel={s.feedbackPending} />
+            <ShareInvite />
             {telegram.launch === 'failed' && (
               <p className="civic-field-error" role="alert">
                 {t.failed}

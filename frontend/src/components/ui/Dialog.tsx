@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useModalAccessibility } from '../useModalAccessibility';
+import { useLanguage } from '@frontend/hooks/useLanguage';
 export default function Dialog({
   children,
   titleId,
@@ -19,6 +20,7 @@ export default function Dialog({
   /** Dialogs inside the app shell must escape its inert background and stacking context. */
   portal?: boolean;
 }) {
+  const [language] = useLanguage();
   useModalAccessibility(titleId);
   useEffect(() => {
     const close = (event: KeyboardEvent) => {
@@ -38,7 +40,7 @@ export default function Dialog({
         <button
           className="close-modal"
           type="button"
-          aria-label="Close dialog"
+          aria-label={language === 'uk' ? 'Закрити вікно' : 'Close dialog'}
           onClick={onClose}
           disabled={busy}
         >

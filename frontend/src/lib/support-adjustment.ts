@@ -1,5 +1,12 @@
 export const QUARTER_VOTE_UNITS = 25;
 
+/** Exact amounts between quarter marks use the next quarter's color. */
+export function supportTone(units: number) {
+  return units <= 0 ? 'gray' : units <= 25 ? 'red' : units <= 50 ? 'yellow' : units <= 75 ? 'green' : 'blue';
+}
+
+export const supportColors = { blue: '#55b4df', green: '#69d4b1', yellow: '#f1cc60', red: '#ef7b80', gray: '#788994' } as const;
+
 /** Four equal visual sections distinguish saved support from a pending addition or recall. */
 export function supportScale(current: number, target: number, maximum: number) {
   const overlap = (from: number, to: number, start: number, end: number) =>

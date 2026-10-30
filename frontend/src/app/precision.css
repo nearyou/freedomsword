@@ -530,17 +530,21 @@ html[data-interface='refined'] .election-gallery-art .state-badge.state-active {
 
 /* A draft support control. Gestures never send an allocation or recall themselves. */
 .support-adjuster { display: grid; gap: 12px; margin-block: 22px; }
+.support-adjuster[data-support-tone='blue'] { --support-color: #55b4df; }
+.support-adjuster[data-support-tone='green'] { --support-color: #69d4b1; }
+.support-adjuster[data-support-tone='yellow'] { --support-color: #f1cc60; }
+.support-adjuster[data-support-tone='red'] { --support-color: #ef7b80; }
+.support-adjuster[data-support-tone='gray'] { --support-color: #788994; }
 .support-adjuster > label { font-size: 14px; font-weight: 600; }
 .support-gauge { position: relative; width: min(196px, 100%); justify-self: center; }
 .support-gauge-ring { display: block; width: 100%; height: auto; }
 .support-gauge-ring path { fill: none; stroke-width: 14; }
-.support-ring-track { stroke: #263f50; }
-.support-ring-retained { stroke: #55b4df; }
-.support-ring-added { stroke: #69d4b1; }
-.support-ring-removed { stroke: #e6bf67; }
-.support-ring-unavailable { stroke: #172b38; }
+.support-ring-track { stroke: #788994; opacity: .4; }
+.support-ring-retained, .support-ring-added { stroke: var(--support-color); }
+.support-ring-removed { stroke: #788994; opacity: .55; }
+.support-ring-unavailable { stroke: #788994; opacity: .25; }
 .support-gauge-value { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; pointer-events: none; }
-.support-gauge-value strong { font-size: 36px; font-weight: 600; line-height: 1.2; color: var(--text); }
+.support-gauge-value strong { font-size: 36px; font-weight: 600; line-height: 1.2; color: var(--support-color); }
 .support-gauge-value strong small { font-size: 18px; color: #b7c9d4; font-weight: 400; }
 .support-gauge-value > span { font-size: 11px; color: var(--muted); }
 .support-gauge-value > small { font-size: 11px; color: #d2e2eb; }
@@ -550,9 +554,8 @@ html[data-interface='refined'] .election-gallery-art .state-badge.state-active {
 .support-gauge-key { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; font-size: 11px; color: var(--muted); }
 .support-gauge-key > span { display: inline-flex; align-items: center; gap: 6px; }
 .support-gauge-key i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
-.support-key-retained { background: #55b4df; }
-.support-key-added { background: #69d4b1; }
-.support-key-removed { background: #e6bf67; }
+.support-key-retained, .support-key-added { background: var(--support-color); }
+.support-key-removed { background: #788994; }
 .support-slider-row { display: flex; align-items: center; gap: 12px; }
 html[data-interface='refined'] .support-slider-row .button { width: 44px; height: 44px; min-height: 44px; flex: none; padding: 10px; }
 html[data-interface='refined'] .support-slider-row .support-remove { color: #efd18d; border-color: #8c774c; }
@@ -561,7 +564,7 @@ html[data-interface='refined'] .support-slider-row .support-add { color: #8be0c2
 .support-quarter-track { position: absolute; inset: 14px 10px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; pointer-events: none; }
 .support-quarter { display: flex; min-width: 0; overflow: hidden; border: 1px solid #3a566a; border-radius: 3px; }
 .support-quarter > i { display: block; height: 100%; flex-shrink: 0; }
-.support-quarter-empty { background: #263f50; }
+.support-quarter-empty { background: #78899466; }
 .support-quarter-unavailable { background: repeating-linear-gradient(135deg, #162a37, #162a37 3px, #213745 3px, #213745 5px); }
 html[data-interface='refined'] .support-quarter-rail input[type='range'] {
   position: absolute; inset: 0; width: 100%; height: 44px; min-height: 44px; padding: 0; margin: 0; border: 0; border-radius: 0;
@@ -583,3 +586,12 @@ html[data-interface='refined'] .button.primary.support-submit[data-action='alloc
 html[data-interface='refined'] .button.primary.support-submit[data-action='allocate']:hover:not(:disabled) { background: #8be0c2; border-color: #8be0c2; }
 html[data-interface='refined'] .button.primary.support-submit[data-action='withdraw'] { color: #2b2517; background: #e6bf67; border-color: #e6bf67; }
 html[data-interface='refined'] .button.primary.support-submit[data-action='withdraw']:hover:not(:disabled) { background: #f0d28c; border-color: #f0d28c; }
+.invitation-message { white-space: pre-line; }
+.fs-connect .share-invite { margin-block: 20px; padding: 16px; text-align: left; }
+.fs-connect .share-invite h3 { font: 600 16px/1.4 'Inter Variable', Inter, sans-serif; }
+.fs-connect .share-invite .invitation-message { font-size: 13px; line-height: 1.65; margin-block: 12px; }
+.share-networks :is(a, button), .share-invite-options a { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.share-networks svg, .share-invite-options svg { flex: none; }
+.menu-language { display: inline-flex; align-items: center; gap: 5px; color: #b9cbd5; }
+.menu-language select { width: 52px; min-width: 0; padding: 5px; font-size: 11px; }
+@media (max-width: 380px) { .menu-language > svg { display: none; } }

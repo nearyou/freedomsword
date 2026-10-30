@@ -2,7 +2,7 @@
 
 import { useId, useRef } from 'react';
 import { ArrowLeftRight, Minus, Plus } from 'lucide-react';
-import { clampSupport, QUARTER_VOTE_UNITS, supportScale, swipedSupport } from '@frontend/lib/support-adjustment';
+import { clampSupport, QUARTER_VOTE_UNITS, supportScale, supportTone, swipedSupport } from '@frontend/lib/support-adjustment';
 
 function quarterArc(index: number) {
   const point = (degrees: number) => {
@@ -20,7 +20,7 @@ export default function SupportSlider({ current, maximum, value, disabled, onCha
   const delta = value - current;
   const change = delta > 0 ? 'add' : delta < 0 ? 'subtract' : 'unchanged';
   const sections = supportScale(current, value, maximum);
-  return <div className="support-adjuster" data-change={change}>
+  return <div className="support-adjuster" data-change={change} data-support-tone={supportTone(value)}>
     <label htmlFor={id}>Support to keep with this candidate</label>
     <div className="support-gauge">
       <svg viewBox="0 0 200 200" aria-hidden="true" className="support-gauge-ring">
