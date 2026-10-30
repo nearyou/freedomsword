@@ -1,14 +1,15 @@
 import type { Language } from '@frontend/components/welcome/copy';
 
-export const inviteUrl = 'https://freedomsword.org';
+export const inviteUrl = 'https://t.me/freedomswordbot?startapp';
 export const invitationCopy = {
   en: {
     text: 'True democracy starts with your anonymous vote.\nDon’t wait until you’re allowed to vote in an election.\nVote now with me, and influence the country’s future.',
     disclosure: 'Fictional demo. Votes are visible to the operator.',
     title: 'There’s room for more voices', more: 'More', share: 'Share FreedomSword',
     choose: 'Choose a network or share through an app on your device.',
-    copy: 'Copy invitation', copyLabel: 'Copy invitation and website link',
-    copied: 'Invitation and website link copied.', failed: 'Copy failed. You can select and copy the invitation above.',
+    copy: 'Copy invitation', copyLabel: 'Copy invitation and Telegram Mini App link',
+    open: 'Open FreedomSword in Telegram',
+    copied: 'Invitation and Telegram Mini App link copied.', failed: 'Copy failed. You can select and copy the invitation above.',
     other: 'Other apps', email: 'Email', subject: 'Join me on FreedomSword',
     instagram: 'For Instagram, we copy the invitation and open Instagram. Paste it into your post or message.',
     instagramCopied: 'Invitation copied. Paste it into your Instagram post or message.',
@@ -18,8 +19,9 @@ export const invitationCopy = {
     disclosure: 'Вигадане демо. Голоси доступні оператору.',
     title: 'Тут є місце для нових голосів', more: 'Більше', share: 'Поділитися FreedomSword',
     choose: 'Обери соціальну мережу або застосунок на своєму пристрої.',
-    copy: 'Копіювати запрошення', copyLabel: 'Копіювати запрошення та посилання на сайт',
-    copied: 'Запрошення та посилання скопійовано.', failed: 'Не вдалося скопіювати. Виділи та скопіюй запрошення вище.',
+    copy: 'Копіювати запрошення', copyLabel: 'Копіювати запрошення та посилання на міні застосунок у Telegram',
+    open: 'Відкрити FreedomSword у Telegram',
+    copied: 'Запрошення та посилання на міні застосунок у Telegram скопійовано.', failed: 'Не вдалося скопіювати. Виділи та скопіюй запрошення вище.',
     other: 'Інші застосунки', email: 'Електронна пошта', subject: 'Приєднуйся до мене у FreedomSword',
     instagram: 'Для Instagram ми копіюємо запрошення та відкриваємо Instagram. Встав його у допис або повідомлення.',
     instagramCopied: 'Запрошення скопійовано. Встав його у допис або повідомлення в Instagram.',

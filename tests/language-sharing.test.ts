@@ -60,6 +60,7 @@ it('uses the selected language for the invitation, network payloads, and Instagr
   const write = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
   await act(async () => { setLanguage('uk'); root.render(createElement(ShareInvite)); });
   expect(container.querySelector('.invitation-message')!.textContent).toBe(invitationCopy.uk.text);
+  expect(container.querySelector<HTMLAnchorElement>('.share-invite-link a')!.href).toBe('https://t.me/freedomswordbot?startapp');
   await act(async () => { button('Більше').click(); });
   const networks = [...document.querySelectorAll<HTMLAnchorElement>('.share-networks a')];
   expect(networks).toHaveLength(8);
@@ -72,6 +73,18 @@ it('uses the selected language for the invitation, network payloads, and Instagr
   const telegram = new URL(getShareNetworks('uk').find((network) => network.name === 'Telegram')!.url);
   expect(telegram.searchParams.get('text')).toBe(invitationMessage('uk'));
   expect(telegram.searchParams.get('url')).toBe(inviteUrl);
+});
+
+it('sends every supported share payload to the Telegram Mini App instead of the website', () => {
+  expect(inviteUrl).toBe('https://t.me/freedomswordbot?startapp');
+  for (const language of ['en', 'uk'] as const) {
+    for (const network of getShareNetworks(language).filter((item) => item.name !== 'Instagram')) {
+      const url = new URL(network.url);
+      const key = { Telegram: 'url', WhatsApp: 'text', X: 'url', Facebook: 'u', LinkedIn: 'url', Reddit: 'url', Email: 'body' }[network.name]!;
+      expect(url.searchParams.get(key)).toContain('https://t.me/freedomswordbot?startapp');
+      expect(decodeURIComponent(network.url)).not.toContain('https://freedomsword.org');
+    }
+  }
 });
 
 it('restores a saved language after a new menu mounts and responds to another tab changing it', async () => {

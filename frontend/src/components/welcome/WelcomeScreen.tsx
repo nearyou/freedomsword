@@ -31,6 +31,7 @@ import { AgreementModal, InfoModal, VerificationModal } from './WelcomeModals';
 import FeedbackLink from '../FeedbackLink';
 import { useLanguage } from '@frontend/hooks/useLanguage';
 import ShareInvite from '../voting/ShareInvite';
+import { inviteUrl } from '@frontend/lib/share';
 
 type Modal = 'verification' | 'agreement' | 'about' | 'privacy' | 'exit' | null;
 type Stage = 'launch' | 'mission' | 'connect';
@@ -274,7 +275,7 @@ export default function WelcomeScreen() {
             </div>
             <div className="fs-stage-bottom">
               {telegram.launch !== 'ready' ? <>
-                <a className="fs-button" href="https://t.me/freedomswordbot?startapp" target="_blank"
+                <a className="fs-button" href={inviteUrl} target="_blank"
                   rel="noopener noreferrer"><Send size={20} />{s.telegramStart}</a>
               </> : <button type="button" className="fs-button" onClick={() => go('mission')}>
                 <Send size={20} />{s.telegramStart}

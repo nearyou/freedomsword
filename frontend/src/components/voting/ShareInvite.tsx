@@ -40,7 +40,8 @@ export default function ShareInvite() {
       <h3 id="share-invite-title">{copy.title}</h3>
       <p className="invitation-message">{copy.text}</p>
       <small className="fine-print">{copy.disclosure}</small>
-      <div className="share-invite-link"><span>freedomsword.org</span>
+      <div className="share-invite-link"><a href={inviteUrl} aria-label={copy.open} target="_blank" rel="noopener noreferrer"
+        onClick={(event) => { if (openTelegramLink(inviteUrl)) event.preventDefault(); }}>t.me/freedomswordbot?startapp</a>
         <button type="button" onClick={() => void copyInvitation()} aria-label={copy.copyLabel}>
           {copyState === 'copied' ? <Check size={16} /> : <Copy size={16} />}
         </button>

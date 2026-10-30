@@ -1,5 +1,9 @@
 # FreedomSword — client design direction
 
+## Telegram invitation destination — 30 October 2026
+
+New invitations link to `https://t.me/freedomswordbot?startapp`, opening FreedomSword's main Mini App through Telegram. Use this destination for the visible invitation link, copied invitation, Instagram copy action, device share and every network's URL/text payload. English/Ukrainian labels identify the destination as the Telegram Mini App. The website continues to host the app and review artifacts.
+
 ## Image exports and startup — 30 October 2026
 
 Each review step (3–18) now has a numbered PNG under `/review/user-flows/images/`, with full-content exports, initial phone views, an overview and a ZIP download. Regenerate with `node scripts/export-user-flow-images.mjs --runtime-modules <directory containing playwright and sharp>` after updating the HTML review. The renderer uses an isolated headless browser and serves local review assets directly; it does not use a signed-in desktop browser profile. Full-content exports expand long dialogs and move fixed navigation below the content so it does not cover review text.
