@@ -65,6 +65,7 @@ it('uses the selected language for the invitation, network payloads, and Instagr
   expect(networks).toHaveLength(8);
   expect(networks.every((network) => !!network.querySelector('svg[data-network]'))).toBe(true);
   const instagram = networks.find((network) => network.textContent === 'Instagram')!;
+  instagram.addEventListener('click', (event) => event.preventDefault());
   await act(async () => { instagram.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); });
   expect(write).toHaveBeenLastCalledWith(`${invitationMessage('uk')}\n${inviteUrl}`);
   expect(document.body.textContent).toContain(invitationCopy.uk.instagramCopied);

@@ -1,0 +1,122 @@
+{
+  "title": "FreedomSword user flows 3–18",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "scale": 2,
+  "steps": [
+    {
+      "title": "3. Let’s get you ready",
+      "file": "03-get-ready.html",
+      "slug": "03-get-ready",
+      "width": 780,
+      "height": 2420
+    },
+    {
+      "title": "4. Identity verification",
+      "file": "04-verification.html",
+      "slug": "04-verification",
+      "width": 780,
+      "height": 1832
+    },
+    {
+      "title": "5. Civic agreement",
+      "file": "05-agreement.html",
+      "slug": "05-agreement",
+      "width": 780,
+      "height": 1832
+    },
+    {
+      "title": "6. Explore elections",
+      "file": "06-elections.html",
+      "slug": "06-elections",
+      "width": 780,
+      "height": 3140
+    },
+    {
+      "title": "7. Meet the candidates",
+      "file": "07-candidates.html",
+      "slug": "07-candidates",
+      "width": 780,
+      "height": 2874
+    },
+    {
+      "title": "8. Candidate profile",
+      "file": "08-candidate-profile.html",
+      "slug": "08-candidate-profile",
+      "width": 780,
+      "height": 1694
+    },
+    {
+      "title": "9. Read a platform",
+      "file": "09-platform.html",
+      "slug": "09-platform",
+      "width": 780,
+      "height": 1688
+    },
+    {
+      "title": "10. Confirm support",
+      "file": "10-confirm-support.html",
+      "slug": "10-confirm-support",
+      "width": 780,
+      "height": 1688
+    },
+    {
+      "title": "11. Your support · 100",
+      "file": "11-your-support.html",
+      "slug": "11-your-support",
+      "width": 780,
+      "height": 2562
+    },
+    {
+      "title": "12. Recall preview · 75",
+      "file": "12-recall-preview.html",
+      "slug": "12-recall-preview",
+      "width": 780,
+      "height": 2562
+    },
+    {
+      "title": "13. After the recall",
+      "file": "13-cooldown.html",
+      "slug": "13-cooldown",
+      "width": 780,
+      "height": 2724
+    },
+    {
+      "title": "14. Invite someone",
+      "file": "14-invitation.html",
+      "slug": "14-invitation",
+      "width": 780,
+      "height": 1694
+    },
+    {
+      "title": "15. More social networks",
+      "file": "15-networks.html",
+      "slug": "15-networks",
+      "width": 780,
+      "height": 1688
+    },
+    {
+      "title": "16. Results",
+      "file": "16-results.html",
+      "slug": "16-results",
+      "width": 780,
+      "height": 1976
+    },
+    {
+      "title": "17. Track promises",
+      "file": "17-promises.html",
+      "slug": "17-promises",
+      "width": 780,
+      "height": 5218
+    },
+    {
+      "title": "18. Inspect public records",
+      "file": "18-audit.html",
+      "slug": "18-audit",
+      "width": 780,
+      "height": 1688
+    }
+  ]
+}

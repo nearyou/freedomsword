@@ -1,5 +1,11 @@
 # FreedomSword — client design direction
 
+## Image exports and startup — 30 October 2026
+
+Each review step (3–18) now has a numbered PNG under `/review/user-flows/images/`, with full-content exports, initial phone views, an overview and a ZIP download. Regenerate with `node scripts/export-user-flow-images.mjs --runtime-modules <directory containing playwright and sharp>` after updating the HTML review. The renderer uses an isolated headless browser and serves local review assets directly; it does not use a signed-in desktop browser profile. Full-content exports expand long dialogs and move fixed navigation below the content so it does not cover review text.
+
+The Mini App now loads the official Telegram SDK from the same site and signals native readiness once its server-rendered HTML is available, independently of React hydration and API requests. Client hooks recognize both preloaded and late SDK initialization. Server-side validation of Telegram launch data and voting eligibility remains required. This addresses a startup dependency that can hold Telegram's loading overlay open; the affected client's connection still needs a device check.
+
 ## Language, sharing and review — 30 October 2026
 
 Remember the language selected on either opening screen for the main desktop/mobile menu, page headings, feedback links and invitation controls. English and Ukrainian use the same stored preference; it can also be changed in the app header. Candidate content retains its published language.

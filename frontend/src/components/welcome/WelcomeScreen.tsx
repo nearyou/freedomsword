@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
@@ -214,12 +213,6 @@ export default function WelcomeScreen() {
       data-stage={stage}
       data-telegram={telegram.launch === 'ready'}
     >
-      <Script
-        src="https://telegram.org/js/telegram-web-app.js"
-        strategy="afterInteractive"
-        onReady={telegram.onReady}
-        onError={telegram.onError}
-      />
       <div className="welcome-sheet fs-sheet" data-modal-background>
         <header className="welcome-header fs-header">
           <button

@@ -1,6 +1,5 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import Script from 'next/script';
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -193,12 +192,6 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
   const refreshError = (source === 'database' && electionState.error) || citizenState.error;
   return (
     <>
-      <Script
-        src="https://telegram.org/js/telegram-web-app.js"
-        strategy="afterInteractive"
-        onReady={telegram.onReady}
-        onError={telegram.onError}
-      />
       <AppShell
         tab={tab}
         onTab={(value) => {

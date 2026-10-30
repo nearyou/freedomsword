@@ -91,6 +91,17 @@ export function useTelegram(color = '#0A1722') {
     setLaunch('ready');
   }, []);
   useEffect(() => {
+    window.addEventListener('fs-telegram-sdk-ready', onReady);
+    // Layout scripts may already have finished before this route hydrates.
+    const timer = setTimeout(() => {
+      if (window.Telegram?.WebApp) onReady();
+    }, 0);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('fs-telegram-sdk-ready', onReady);
+    };
+  }, [onReady]);
+  useEffect(() => {
     const timer = setTimeout(
       () => setLaunch((current) => (current === 'loading' ? 'failed' : current)),
       10_000,

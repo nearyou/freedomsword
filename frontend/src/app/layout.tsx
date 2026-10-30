@@ -21,6 +21,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" data-theme="dark" data-interface="refined">
+      <head>
+        <script src="/vendor/telegram-web-app.js" defer />
+        <script src="/telegram-startup.js" defer />
+      </head>
       <body>{children}</body>
     </html>
   );
