@@ -106,11 +106,11 @@ it('opens Telegram’s recipient picker with the prepared picture in the selecte
   expect(shareMessage).toHaveBeenCalledWith('prepared-picture');
 });
 
-it('shows the invitation after step 3 without bypassing verification when continuing', async () => {
+it.each(['Invite friends', 'Continue'])('shows the invitation after step 3 through %s without bypassing verification', async (entry) => {
   await act(async () => { root.render(createElement(WelcomeScreen)); });
   await act(async () => { container.querySelector<HTMLButtonElement>('.fs-launch .fs-button')!.click(); });
   await act(async () => { button('Skip').click(); });
-  await act(async () => { button('Invite friends').click(); });
+  await act(async () => { button(entry).click(); });
   expect(container.querySelector('.ready-to-vote h1')!.textContent).toBe('I’m ready to vote!');
   expect(container.querySelector('.invitation-message')!.textContent).toBe(invitationCopy.en.text);
   expect(container.textContent).toContain('Complete verification and the civic agreement before voting.');

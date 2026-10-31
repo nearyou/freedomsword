@@ -198,7 +198,8 @@ export default function WelcomeScreen() {
     const next = nextWelcomeStep(flow.verified, flow.accepted);
     if (next === 'dashboard') {
       setModal(null);
-      go('share');
+      if (stage === 'share') router.push('/elections');
+      else go('share');
     } else open(next);
   }
   function closeApp() {
@@ -320,10 +321,7 @@ export default function WelcomeScreen() {
             </div>
             <p className="fs-mission-demo">{s.missionDemo}</p>
           </main>
-        ) : stage === 'share' ? <ReadyToVote eligible={flow.verified && flow.accepted} onContinue={() => {
-          if (flow.verified && flow.accepted) router.push('/elections');
-          else { go('connect'); proceed(); }
-        }} /> : (
+        ) : stage === 'share' ? <ReadyToVote eligible={flow.verified && flow.accepted} onContinue={proceed} /> : (
           <main className="fs-stage fs-connect" aria-labelledby="fs-connect-title">
             <span className="fs-stage-kicker">
               {s.readyKicker} · {stepsDone} / 3
@@ -388,7 +386,7 @@ export default function WelcomeScreen() {
               <button
                 type="button"
                 className="fs-button"
-                onClick={proceed}
+                onClick={() => go('share')}
                 disabled={flow.busy || !available}
               >
                 {flow.verified && flow.accepted ? s.viewElections : s.next}
