@@ -9,12 +9,14 @@ const runtime = option('--runtime-modules', process.env.NODE_MODULES_PATH);
 const require = createRequire(runtime ? join(resolve(runtime), 'package.json') : import.meta.url);
 const { chromium } = require('playwright');
 const sharp = require('sharp');
+// Telegram InlineQueryResultPhoto requires JPEG; keep the share image derived from the same artwork.
+await sharp(resolve('frontend/public/brand/invitation-teaser.svg')).flatten({ background: '#102c3e' }).jpeg({ quality: 90 }).toFile(resolve('frontend/public/brand/invitation-teaser.jpg'));
 const origin = option('--origin', 'https://freedomsword.org');
 const source = resolve('frontend/public/review/user-flows');
 const destination = resolve(option('--output', join(source, 'images')));
 const index = await readFile(join(source, 'index.html'), 'utf8');
 const steps = [...index.matchAll(/<iframe title="([^"]+)" src="([^"]+)"/g)].map((match) => ({ title: match[1], file: match[2], slug: match[2].replace('.html', '') }));
-if (steps.length !== 16) throw new Error('Expected all 16 ordered review screens.');
+if (steps.length !== 18) throw new Error('Expected all 18 ordered review screens.');
 await mkdir(destination, { recursive: true });
 await mkdir(join(destination, 'phone-views'), { recursive: true });
 const browser = await chromium.launch({ headless: true });
@@ -69,7 +71,7 @@ for (let i = 0; i < exported.length; i++) {
   const left = gap + (i % columns) * (tileWidth + gap), top = gap + Math.floor(i / columns) * (tileHeight + gap);
   tiles.push({ input: Buffer.from(label), left, top }, { input: screenshot, left, top: top + 40 });
 }
-await sharp({ create: { width: columns * (tileWidth + gap) + gap, height: 4 * (tileHeight + gap) + gap, channels: 3, background: '#0a1722' } }).composite(tiles).png().toFile(join(destination, '00-all-steps.png'));
-await writeFile(join(destination, 'manifest.json'), JSON.stringify({ title: 'FreedomSword user flows 3–18', viewport: { width: 390, height: 844 }, scale: 2, steps: exported }, null, 2) + '\n');
-await writeFile(join(destination, 'README.txt'), 'FreedomSword — user flows 3–18\n\nNumbered PNGs show each step in full, including content below the initial viewport.\nphone-views/ contains the initial 390 × 844 phone views at 2× resolution.\n00-all-steps.png is the ordered overview. Sample agreement and audit entries are layout illustrations.\n\nSource: https://freedomsword.org/review/user-flows/index.html\n');
+await sharp({ create: { width: columns * (tileWidth + gap) + gap, height: Math.ceil(exported.length / columns) * (tileHeight + gap) + gap, channels: 3, background: '#0a1722' } }).composite(tiles).png().toFile(join(destination, '00-all-steps.png'));
+await writeFile(join(destination, 'manifest.json'), JSON.stringify({ title: 'FreedomSword user flows 3–20', viewport: { width: 390, height: 844 }, scale: 2, steps: exported }, null, 2) + '\n');
+await writeFile(join(destination, 'README.txt'), 'FreedomSword — user flows 3–20\n\nNumbered PNGs show each step in full, including content below the initial viewport.\nphone-views/ contains the initial 390 × 844 phone views at 2× resolution.\n00-all-steps.png is the ordered overview. Sample agreement and audit entries are layout illustrations.\n\nSource: https://freedomsword.org/review/user-flows/index.html\n');
 console.log(`All ${exported.length} steps exported to ${destination}`);

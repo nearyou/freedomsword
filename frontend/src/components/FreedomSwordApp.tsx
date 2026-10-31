@@ -21,6 +21,8 @@ import CandidateList from './candidates/CandidateList';
 import CandidateProfile from './candidates/CandidateProfile';
 import CitizenPassport from './onboarding/CitizenPassport';
 import VoteConfirmation from './voting/VoteConfirmation';
+import VoteSuccess from './voting/VoteSuccess';
+import Dialog from './ui/Dialog';
 import BallotPanel from './voting/BallotPanel';
 import ResultsPanel from './results/ResultsPanel';
 import AccountabilityPanel from './accountability/AccountabilityPanel';
@@ -33,6 +35,7 @@ type Modal =
   | { type: 'profile'; id: string }
   | { type: 'confirm'; action: Action }
   | { type: 'audit' }
+  | { type: 'vote-success'; name: string }
   | null;
 const headings: Record<AppTab, string> = {
   Candidates: 'Elections',
@@ -183,6 +186,7 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
     if (completed) {
       close();
       if (action.path === 'vote') {
+        setModal({ type: 'vote-success', name: election.candidates.find((item) => item.id === action.payload.candidateId)?.fullName ?? 'Candidate' });
         setTab('My ballot');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -296,6 +300,7 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
                     onRecall={recall}
                     initialCandidateId={supportCandidateId}
                     onExplore={() => { setTab('Candidates'); setShowElectionList(false); }}
+                    onElections={() => { setTab('Candidates'); setShowElectionList(true); window.scrollTo(0, 0); }}
                     onPassport={openPassport}
                   />
                 ))}
@@ -369,6 +374,10 @@ export default function FreedomSwordApp({ demoEnabled, initialTab = 'Candidates'
         />
       )}
       {modal?.type === 'audit' && <AuditExplorer onClose={close} />}
+      {modal?.type === 'vote-success' && <Dialog titleId="vote-success-title" onClose={close} className="vote-success-modal">
+        <VoteSuccess name={modal.name} units={100} reusable={false} onBallot={close}
+          onExplore={() => { close(); setTab('Candidates'); setShowElectionList(true); }} />
+      </Dialog>}
       {actions.notice && (
         <div
           className={`toast ${modal ? 'modal-toast' : ''} ${actions.notice.success ? 'success-toast' : 'error-toast'}`}

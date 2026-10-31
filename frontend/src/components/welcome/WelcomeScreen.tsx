@@ -30,11 +30,11 @@ import { useWelcomeFlow } from './useWelcomeFlow';
 import { AgreementModal, InfoModal, VerificationModal } from './WelcomeModals';
 import FeedbackLink from '../FeedbackLink';
 import { useLanguage } from '@frontend/hooks/useLanguage';
-import ShareInvite from '../voting/ShareInvite';
+import ReadyToVote from './ReadyToVote';
 import { inviteUrl } from '@frontend/lib/share';
 
 type Modal = 'verification' | 'agreement' | 'about' | 'privacy' | 'exit' | null;
-type Stage = 'launch' | 'mission' | 'connect';
+type Stage = 'launch' | 'mission' | 'connect' | 'share';
 
 const stageCopy = {
   en: {
@@ -173,7 +173,7 @@ export default function WelcomeScreen() {
     !flow.busy && (!!modal || stage !== 'launch'),
     () => {
       if (modal) setModal(null);
-      else go(stage === 'connect' ? 'mission' : 'launch');
+      else go(stage === 'share' ? 'connect' : stage === 'connect' ? 'mission' : 'launch');
     },
   );
 
@@ -198,7 +198,7 @@ export default function WelcomeScreen() {
     const next = nextWelcomeStep(flow.verified, flow.accepted);
     if (next === 'dashboard') {
       setModal(null);
-      router.push('/elections');
+      go('share');
     } else open(next);
   }
   function closeApp() {
@@ -220,7 +220,7 @@ export default function WelcomeScreen() {
             className="welcome-close"
             type="button"
             onClick={
-              stage === 'launch' ? closeApp : () => go(stage === 'mission' ? 'launch' : 'mission')
+              stage === 'launch' ? closeApp : () => go(stage === 'share' ? 'connect' : stage === 'mission' ? 'launch' : 'mission')
             }
           >
             <ArrowLeft size={19} />
@@ -320,7 +320,10 @@ export default function WelcomeScreen() {
             </div>
             <p className="fs-mission-demo">{s.missionDemo}</p>
           </main>
-        ) : (
+        ) : stage === 'share' ? <ReadyToVote eligible={flow.verified && flow.accepted} onContinue={() => {
+          if (flow.verified && flow.accepted) router.push('/elections');
+          else { go('connect'); proceed(); }
+        }} /> : (
           <main className="fs-stage fs-connect" aria-labelledby="fs-connect-title">
             <span className="fs-stage-kicker">
               {s.readyKicker} · {stepsDone} / 3
@@ -368,7 +371,9 @@ export default function WelcomeScreen() {
             </div>
             <FeedbackLink className="fs-feedback" label={s.feedback}
               unavailableLabel={s.feedbackPending} />
-            <ShareInvite />
+            <button type="button" className="button secondary" onClick={() => go('share')}>
+              {lang === 'uk' ? 'Запросити друзів' : 'Invite friends'}
+            </button>
             {telegram.launch === 'failed' && (
               <p className="civic-field-error" role="alert">
                 {t.failed}

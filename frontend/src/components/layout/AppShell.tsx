@@ -28,7 +28,7 @@ export default function AppShell({
   const item = navigation.find((item) => item.value === tab);
   return (
     <>
-      <div className="app-shell" data-telegram={inTelegram}>
+      <div className="app-shell" data-telegram={inTelegram} data-tab={tab}>
         <Sidebar tab={tab} onTab={onTab} onPassport={onPassport} />
         <div className="main-shell">
           <header className="topbar">

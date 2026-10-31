@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { ElectionView } from '@frontend/lib/contracts';
-import ElectionSnapshot from './ElectionSnapshot';
+import LiveResults from './LiveResults';
 
 export default function ResultsPanel({
   election,
@@ -38,7 +38,7 @@ export default function ResultsPanel({
         </div>
       ) : (
         <>
-      <ElectionSnapshot election={election} source={source} stale={stale} />
+      <LiveResults election={election} source={source} stale={stale} />
       <Link className="results-transparency-link" href={`/elections/${encodeURIComponent(election.id)}/transparency`}>
         View public transparency
         <ArrowRight size={17} aria-hidden="true" />

@@ -17,6 +17,7 @@ declare global {
         setBackgroundColor(color: string): void;
         setBottomBarColor?(color: string): void;
         openTelegramLink?(url: string): void;
+        shareMessage?(messageId: string, callback?: (sent: boolean) => void): void;
         BackButton?: {
           show(): void;
           hide(): void;

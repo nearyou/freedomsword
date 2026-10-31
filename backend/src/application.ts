@@ -25,6 +25,7 @@ import { POST as recallPost } from './routes/recall';
 import { POST as verifyPost } from './routes/verify';
 import { POST as votePost } from './routes/vote';
 import { GET as supportGet, POST as supportPost } from './routes/support';
+import { POST as invitationPost } from './routes/invitation';
 
 type Handler = (request: Request) => Promise<Response> | Response;
 type ParameterHandler = (request: Request, id: string) => Promise<Response>;
@@ -118,6 +119,7 @@ const routes: Array<[string, Partial<Record<'get' | 'post', Handler | ParameterH
   ['/api/verify', { post: verifyPost }],
   ['/api/vote', { post: votePost }],
   ['/api/support', { get: supportGet, post: supportPost }],
+  ['/api/invitation', { post: invitationPost }],
 ];
 for (const [path, methods] of routes) {
   if (methods.get) app.get(path, adapt(methods.get));

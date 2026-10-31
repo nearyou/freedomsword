@@ -1,20 +1,40 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Check, Copy, MoreHorizontal, Share2 } from 'lucide-react';
 import { openTelegramLink, telegramHaptic } from '@frontend/hooks/useTelegram';
 import { invitationCopy, invitationMessage, inviteUrl, getShareNetworks } from '@frontend/lib/share';
 import { useLanguage } from '@frontend/hooks/useLanguage';
 import SocialIcon from './SocialIcon';
 import Dialog from '../ui/Dialog';
+import { api } from '@frontend/lib/client-api';
 
-export default function ShareInvite() {
+export default function ShareInvite({ ready = false }: { ready?: boolean }) {
   const [language] = useLanguage();
   const copy = invitationCopy[language];
   const shareNetworks = getShareNetworks(language);
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
   const [more, setMore] = useState(false);
   const [instagram, setInstagram] = useState(false);
+  const [preparing, setPreparing] = useState(false);
+  const [shareFallback, setShareFallback] = useState(false);
+  async function shareTelegram() {
+    if (preparing) return;
+    const app = window.Telegram?.WebApp;
+    if (app?.initData && app.shareMessage && app.isVersionAtLeast('8.0')) {
+      setPreparing(true); setShareFallback(false);
+      try {
+        const message = await api<{ id: string }>('invitation', { language });
+        app.shareMessage(message.id);
+      } catch { setShareFallback(true); }
+      finally { setPreparing(false); }
+    } else {
+      setShareFallback(true);
+      const url = shareNetworks.find((network) => network.name === 'Telegram')!.url;
+      if (!openTelegramLink(url)) window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  }
   async function copyInvitation(forInstagram = false) {
     setInstagram(forInstagram);
     try {
@@ -36,8 +56,8 @@ export default function ShareInvite() {
       }}><SocialIcon name={name} />{name === 'Email' ? copy.email : name}</a>;
   }
   return <>
-    <section className="panel share-invite" aria-labelledby="share-invite-title">
-      <h3 id="share-invite-title">{copy.title}</h3>
+    <section className={`panel share-invite ${ready ? 'share-invite-ready' : ''}`} aria-labelledby="share-invite-title">
+      <h3 id="share-invite-title">{ready ? language === 'uk' ? 'Запросіть друзів' : 'Invite your friends' : copy.title}</h3>
       <p className="invitation-message">{copy.text}</p>
       <small className="fine-print">{copy.disclosure}</small>
       <div className="share-invite-link"><a href={inviteUrl} aria-label={copy.open} target="_blank" rel="noopener noreferrer"
@@ -46,7 +66,14 @@ export default function ShareInvite() {
           {copyState === 'copied' ? <Check size={16} /> : <Copy size={16} />}
         </button>
       </div>
-      <div className="share-invite-options">{link('Telegram')}{link('X')}{link('Facebook')}
+      <figure className="invitation-teaser"><Image src="/brand/invitation-teaser.svg" width={720} height={360}
+        alt={language === 'uk' ? 'Попередній перегляд FreedomSword: вибори та керування підтримкою' : 'A preview of FreedomSword: elections and managing your support'} unoptimized />
+        <figcaption>{language === 'uk' ? 'Один голос. Більше можливостей впливати.' : 'One voice. More ways to make it count.'}</figcaption></figure>
+      <button className="button primary share-telegram-picture" disabled={preparing} onClick={() => void shareTelegram()}>
+        <SocialIcon name="Telegram" />{preparing ? language === 'uk' ? 'Готуємо…' : 'Preparing…' : language === 'uk' ? 'Поділитися в Telegram' : 'Share to Telegram'}
+      </button>
+      {shareFallback && <p className="share-image-fallback" role="status">{language === 'uk' ? 'Зображення зараз недоступне. Поділіться текстом і посиланням:' : 'Image sharing is unavailable here. Share the text and link:'} {link('Telegram')}</p>}
+      <div className="share-invite-options">{link('X')}{link('Facebook')}{link('WhatsApp')}
         <button type="button" aria-haspopup="dialog" onClick={() => setMore(true)}><MoreHorizontal size={18} /> {copy.more}</button>
       </div>
       {copyState !== 'idle' && <p role="status">{copyState === 'copied' ? instagram ? copy.instagramCopied : copy.copied : copy.failed}</p>}

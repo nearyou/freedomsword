@@ -18,6 +18,7 @@ let container: HTMLDivElement;
 beforeEach(() => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.mocked(api).mockReset();
+  localStorage.clear();
   // Happy DOM has no layout; expose visible controls for the real dialog focus trap.
   vi.spyOn(HTMLElement.prototype, 'getClientRects').mockReturnValue([{}] as unknown as DOMRectList);
   container = document.createElement('div'); document.body.append(container);
@@ -62,7 +63,9 @@ it('keeps Confirm outside the inert page and records exactly one allocation whil
   });
   await act(async () => { button('Add 100 units').click(); });
   expectInteractiveDialog();
-  await act(async () => { button('Confirm').click(); });
+  expect(document.body.textContent).toContain('Confirm your vote');
+  expect(document.body.textContent).toContain('six calendar months after each withdrawal');
+  await act(async () => { button('Confirm vote').click(); });
   expect(button('Recording…').disabled).toBe(true);
   expect(button('Cancel').disabled).toBe(true);
   await act(async () => {
@@ -76,7 +79,14 @@ it('keeps Confirm outside the inert page and records exactly one allocation whil
   await act(async () => { finish({ ...empty, activeUnits: 100, availableUnits: 0, allocations: [{ candidateId, units: 100 }] }); });
   expect(document.querySelector('[role="dialog"]')).toBeNull();
   expect((document.querySelector('.app-shell') as HTMLElement).inert).toBe(false);
+  expect(document.body.textContent).toContain('Your vote is cast!');
+  expect(document.body.textContent).toContain('100 units allocated to');
+  expect(document.querySelector('.selected-ballot')).not.toBeNull();
+  expect(document.querySelectorAll('.ballot-confetti i')).toHaveLength(24);
+  await act(async () => { button('View my ballot').click(); });
+  expect(document.body.textContent).not.toContain('Your vote is cast!');
   expect(document.body.textContent).toContain('100 units allocated.');
+  expect(vi.mocked(api).mock.calls.filter(([, payload]) => payload)).toHaveLength(1);
 });
 
 it('confirms a quarter recall from the same nested support panel', async () => {
@@ -92,6 +102,21 @@ it('confirms a quarter recall from the same nested support panel', async () => {
   expect(api).toHaveBeenLastCalledWith('support', expect.objectContaining({ candidateId, action: 'withdraw', units: 25 }));
   expect(document.querySelector('[role="dialog"]')).toBeNull();
   expect(document.body.textContent).toContain('25 units recalled.');
+  expect(document.querySelector('.ballot-confetti')).toBeNull();
+});
+
+it('keeps a failed allocation retryable without showing success', async () => {
+  vi.mocked(api).mockImplementation(async (_path, payload) => {
+    if (payload) throw new Error('Connection interrupted');
+    return empty;
+  });
+  await mount();
+  await act(async () => { document.querySelector<HTMLButtonElement>('[aria-label="Add 0.25 vote (25 units)"]')!.click(); });
+  await act(async () => { button('Add 25 units').click(); });
+  await act(async () => { button('Confirm vote').click(); });
+  expect(document.body.textContent).toContain('Connection interrupted');
+  expect(button('Retry the same action safely')).toBeDefined();
+  expect(document.querySelector('.vote-success')).toBeNull();
 });
 
 it.each(['Cancel', 'Close dialog', 'Escape'])('dismisses using %s without saving an allocation', async (method) => {

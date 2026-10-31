@@ -8,6 +8,9 @@ import Dialog from '../ui/Dialog';
 import ShareInvite from './ShareInvite';
 import SupportSlider from './SupportSlider';
 import { supportAdjustment } from '@frontend/lib/support-adjustment';
+import AllocationConfirmation from './AllocationConfirmation';
+import VoteSuccess from './VoteSuccess';
+import { useLanguage } from '@frontend/hooks/useLanguage';
 
 interface SupportState {
   totalUnits: number;
@@ -20,7 +23,7 @@ interface SupportState {
 type Command = { electionId: string; candidateId: string; action: 'allocate' | 'withdraw';
   units: number; requestId: string };
 
-export default function ReusableSupportPanel({ election, connected, ready, now, onPassport, onRefresh, initialCandidateId }: {
+export default function ReusableSupportPanel({ election, connected, ready, now, onPassport, onRefresh, onExplore, initialCandidateId }: {
   election: ElectionView;
   connected: boolean;
   ready: boolean;
@@ -28,7 +31,11 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
   onPassport: () => void;
   onRefresh: () => Promise<void>;
   initialCandidateId?: string;
+  onExplore?: () => void;
 }) {
+  const [language] = useLanguage();
+  const uk = language === 'uk';
+  const [success, setSuccess] = useState<{ name: string; units: number } | null>(null);
   const [state, setState] = useState<SupportState | null>(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -79,6 +86,8 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
     try {
       const next = await api<SupportState>('support', command);
       setState(next); setRetry(null); setConfirm(null); setDraft(null);
+      if (command.action === 'allocate') setSuccess({ units: command.units,
+        name: election.candidates.find((item) => item.id === command.candidateId)?.fullName ?? 'Candidate' });
       setNotice(command.action === 'withdraw'
         ? `${command.units} units recalled. Each withdrawal unlocks six calendar months later.`
         : `${command.units} units allocated.`);
@@ -93,6 +102,7 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
     } finally { lock.current = false; setBusy(false); }
   }
 
+  if (success) return <VoteSuccess {...success} onBallot={() => setSuccess(null)} onExplore={() => { setSuccess(null); onExplore?.(); }} />;
   return <div className="reusable-support">
     <section className="panel" aria-labelledby="support-title">
       <h2 id="support-title">Your voice, your choice</h2>
@@ -160,12 +170,14 @@ export default function ReusableSupportPanel({ election, connected, ready, now, 
     </section>
     {!!state?.activeUnits && <ShareInvite />}
     {confirm && <Dialog portal titleId="support-confirm-title" onClose={() => setConfirm(null)} busy={busy}>
-      <h2 id="support-confirm-title">{confirm.action === 'withdraw' ? 'Recall' : 'Allocate'} {confirm.units} units?</h2>
-      <p>{election.candidates.find((item) => item.id === confirm.candidateId)?.fullName}</p>
+      <h2 id="support-confirm-title">{confirm.action === 'withdraw' ? `Recall ${confirm.units} units?` : uk ? 'Підтвердьте свій голос' : 'Confirm your vote'}</h2>
+      {confirm.action === 'allocate' ? <AllocationConfirmation units={confirm.units}
+        candidate={election.candidates.find((item) => item.id === confirm.candidateId)} />
+        : <p>{election.candidates.find((item) => item.id === confirm.candidateId)?.fullName}</p>}
       {confirm.action === 'withdraw' && <p>These units stop supporting this candidate immediately. You can use them
         again six calendar months after this withdrawal. {Math.max(0, selectedUnits - confirm.units)} units will remain supporting this candidate.</p>}
       <div className="dialog-actions"><button className="button secondary" disabled={busy} onClick={() => setConfirm(null)}>Cancel</button>
-        <button className="button primary" disabled={busy} onClick={() => void execute(confirm)}>{busy ? 'Recording…' : 'Confirm'}</button>
+        <button className="button primary" disabled={busy} onClick={() => void execute(confirm)}>{busy ? 'Recording…' : confirm.action === 'allocate' ? uk ? 'Підтвердити голос' : 'Confirm vote' : 'Confirm'}</button>
       </div>
     </Dialog>}
   </div>;

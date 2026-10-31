@@ -1,10 +1,10 @@
 import type { Language } from '@frontend/components/welcome/copy';
+import { invitationContent, telegramInviteUrl } from '../../../shared/invitation';
 
-export const inviteUrl = 'https://t.me/freedomswordbot?startapp';
+export const inviteUrl = telegramInviteUrl;
 export const invitationCopy = {
   en: {
-    text: 'True democracy starts with your anonymous vote.\nDon’t wait until you’re allowed to vote in an election.\nVote now with me, and influence the country’s future.',
-    disclosure: 'Fictional demo. Votes are visible to the operator.',
+    ...invitationContent.en,
     title: 'There’s room for more voices', more: 'More', share: 'Share FreedomSword',
     choose: 'Choose a network or share through an app on your device.',
     copy: 'Copy invitation', copyLabel: 'Copy invitation and Telegram Mini App link',
@@ -15,8 +15,7 @@ export const invitationCopy = {
     instagramCopied: 'Invitation copied. Paste it into your Instagram post or message.',
   },
   uk: {
-    text: 'Справжня демократія починається з твого анонімного голосу.\nНе чекай, поки тобі дозволять голосувати на виборах.\nГолосуй зараз зі мною та впливай на майбутнє країни.',
-    disclosure: 'Вигадане демо. Голоси доступні оператору.',
+    ...invitationContent.uk,
     title: 'Тут є місце для нових голосів', more: 'Більше', share: 'Поділитися FreedomSword',
     choose: 'Обери соціальну мережу або застосунок на своєму пристрої.',
     copy: 'Копіювати запрошення', copyLabel: 'Копіювати запрошення та посилання на міні застосунок у Telegram',

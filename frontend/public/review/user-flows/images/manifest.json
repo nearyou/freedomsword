@@ -1,5 +1,5 @@
 {
-  "title": "FreedomSword user flows 3–18",
+  "title": "FreedomSword user flows 3–20",
   "viewport": {
     "width": 390,
     "height": 844
@@ -11,110 +11,124 @@
       "file": "03-get-ready.html",
       "slug": "03-get-ready",
       "width": 780,
-      "height": 2420
+      "height": 1784
     },
     {
-      "title": "4. Identity verification",
-      "file": "04-verification.html",
-      "slug": "04-verification",
+      "title": "4. I’m ready to vote",
+      "file": "04-ready-to-vote.html",
+      "slug": "04-ready-to-vote",
+      "width": 780,
+      "height": 1800
+    },
+    {
+      "title": "5. Identity verification",
+      "file": "05-verification.html",
+      "slug": "05-verification",
       "width": 780,
       "height": 1832
     },
     {
-      "title": "5. Civic agreement",
-      "file": "05-agreement.html",
-      "slug": "05-agreement",
+      "title": "6. Civic agreement",
+      "file": "06-agreement.html",
+      "slug": "06-agreement",
       "width": 780,
       "height": 1832
     },
     {
-      "title": "6. Explore elections",
-      "file": "06-elections.html",
-      "slug": "06-elections",
+      "title": "7. Explore elections",
+      "file": "07-elections.html",
+      "slug": "07-elections",
       "width": 780,
       "height": 3140
     },
     {
-      "title": "7. Meet the candidates",
-      "file": "07-candidates.html",
-      "slug": "07-candidates",
+      "title": "8. Meet the candidates",
+      "file": "08-candidates.html",
+      "slug": "08-candidates",
       "width": 780,
       "height": 2874
     },
     {
-      "title": "8. Candidate profile",
-      "file": "08-candidate-profile.html",
-      "slug": "08-candidate-profile",
+      "title": "9. Candidate profile",
+      "file": "09-candidate-profile.html",
+      "slug": "09-candidate-profile",
       "width": 780,
       "height": 1694
     },
     {
-      "title": "9. Read a platform",
-      "file": "09-platform.html",
-      "slug": "09-platform",
+      "title": "10. Read a platform",
+      "file": "10-platform.html",
+      "slug": "10-platform",
       "width": 780,
       "height": 1688
     },
     {
-      "title": "10. Confirm support",
-      "file": "10-confirm-support.html",
-      "slug": "10-confirm-support",
+      "title": "11. Confirm your vote",
+      "file": "11-confirm-support.html",
+      "slug": "11-confirm-support",
       "width": 780,
       "height": 1688
     },
     {
-      "title": "11. Your support · 100",
-      "file": "11-your-support.html",
-      "slug": "11-your-support",
+      "title": "12. Your vote is cast",
+      "file": "12-vote-cast.html",
+      "slug": "12-vote-cast",
+      "width": 780,
+      "height": 1882
+    },
+    {
+      "title": "13. Your support · 100",
+      "file": "13-your-support.html",
+      "slug": "13-your-support",
       "width": 780,
       "height": 2562
     },
     {
-      "title": "12. Recall preview · 75",
-      "file": "12-recall-preview.html",
-      "slug": "12-recall-preview",
+      "title": "14. Recall preview · 75",
+      "file": "14-recall-preview.html",
+      "slug": "14-recall-preview",
       "width": 780,
       "height": 2562
     },
     {
-      "title": "13. After the recall",
-      "file": "13-cooldown.html",
-      "slug": "13-cooldown",
+      "title": "15. After the recall",
+      "file": "15-cooldown.html",
+      "slug": "15-cooldown",
       "width": 780,
       "height": 2724
     },
     {
-      "title": "14. Invite someone",
-      "file": "14-invitation.html",
-      "slug": "14-invitation",
+      "title": "16. Invite someone",
+      "file": "16-invitation.html",
+      "slug": "16-invitation",
       "width": 780,
-      "height": 1694
+      "height": 1802
     },
     {
-      "title": "15. More social networks",
-      "file": "15-networks.html",
-      "slug": "15-networks",
+      "title": "17. More social networks",
+      "file": "17-networks.html",
+      "slug": "17-networks",
       "width": 780,
       "height": 1688
     },
     {
-      "title": "16. Results",
-      "file": "16-results.html",
-      "slug": "16-results",
+      "title": "18. Results",
+      "file": "18-results.html",
+      "slug": "18-results",
       "width": 780,
-      "height": 1976
+      "height": 1846
     },
     {
-      "title": "17. Track promises",
-      "file": "17-promises.html",
-      "slug": "17-promises",
+      "title": "19. Track promises",
+      "file": "19-promises.html",
+      "slug": "19-promises",
       "width": 780,
       "height": 5218
     },
     {
-      "title": "18. Inspect public records",
-      "file": "18-audit.html",
-      "slug": "18-audit",
+      "title": "20. Inspect public records",
+      "file": "20-audit.html",
+      "slug": "20-audit",
       "width": 780,
       "height": 1688
     }

@@ -40,6 +40,14 @@ Keep the restrained 6/8/12px rounding below and the welcoming sentence-case labe
 
 ## Current direction — 28 October 2026
 
+### Invitation and vote feedback — 31 October 2026
+
+The new invitation screen follows connection step 3 in the review sequence. Its lower action says “I’m ready to vote”; incomplete verification and civic agreement still gate access to voting. The approved English/Ukrainian invitation text is unchanged, and the shared link remains `https://t.me/freedomswordbot?startapp`.
+
+A small app teaser appears below the link. In Telegram 8.0+, “Share to Telegram” prepares a photo invitation for the authenticated citizen using [savePreparedInlineMessage](https://core.telegram.org/bots/api#savepreparedinlinemessage), then opens [shareMessage](https://core.telegram.org/bots/webapps#initializing-mini-apps). The caption is above the photo, so the picture sits below the link. Only Telegram’s user-confirmed recipient picker sends it. Unsupported clients and preparation failures expose the text/link sharing fallback. Tokens and recipient IDs are never accepted from the frontend.
+
+Reusable-support confirmation shows the candidate, allocation amount and six-month withdrawal rule. A successful allocation opens a marked-ballot illustration with confetti, “View my ballot” and “Back to elections”; failed requests, drafts and recalls never celebrate. Legacy voting uses the same celebration with its own election rules. Private MACI submission semantics are unchanged. Confetti respects reduced-motion preferences. Review images now cover screens 3–20.
+
 The user clarified that rounding should be selective, not removed everywhere. Use restrained 6px corners on buttons and fields, 8px on cards and portraits, and 12px on dialogs. Small badges use 3px corners; status dots, step markers and confirmation symbols may be circular. Navigation, page frames, dividers and data rows remain straight. Avoid pill controls and oversized rounded containers. Preserve the two ivory opening screens and their city illustration; the opening text has no colored highlight.
 
 `frontend/src/app/precision.css` defines the shared geometry under `html[data-interface="refined"]`, with separate tokens for controls, cards, dialogs and badges. Election cards separate their image and readable text; candidate cards include a brief biography; results use a ranking with straight bars instead of a donut. The existing verification, voting, recall, agreement and feedback behavior stays intact. These geometry and layout decisions supersede the older concepts below.
@@ -49,6 +57,8 @@ This is a review concept based on Arsen's feedback of 10 and 13–14 October 202
 The [24 October corrections](CLIENT_UPDATES_2026-10-24.md) supersede the earlier wallet, sharing, opening-copy and recall proposals below. They document the implemented reusable-support mode and distinguish current functionality from integrations awaiting credentials.
 
 ## What the client chose
+
+The additional 31 October Live results reference supersedes the earlier bar-only results layout: use a segmented candidate ring, a matching legend and a 2×2 statistic grid. The chart uses current aggregate units, with gray for support outside the visible candidate list and an empty state for zero units. The current API has no eligible-voter denominator, so participation is shown as unavailable rather than inventing a percentage. Private MACI totals stay hidden until a verified tally is published.
 
 - Use a **dark navy interface after the first two screens**. The logo and opening message may remain light and patriotic. Keep later screens quiet and functional, with only occasional blue/gold accents and no repeated flag or landscape treatment.
 - Use **reference 9 as the main flow and layout source**. Use **reference 10 for results after a private poll's verified tally**. The marked individual elements from otherwise rejected boards remain useful: the portrait-led candidate profile, the verification-in-progress visual, the ballot-box illustration, and the post-vote sharing card.

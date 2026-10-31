@@ -7,8 +7,12 @@ import MobileNavigation from '../frontend/src/components/layout/MobileNavigation
 import ShareInvite from '../frontend/src/components/voting/ShareInvite';
 import { getShareNetworks, invitationCopy, invitationMessage, inviteUrl } from '../frontend/src/lib/share';
 import WelcomeScreen from '../frontend/src/components/welcome/WelcomeScreen';
+import { api } from '../frontend/src/lib/client-api';
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock('../frontend/src/lib/client-api', () => ({ api: vi.fn() }));
+
+const push = vi.hoisted(() => vi.fn());
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }));
 vi.mock('next/script', () => ({ default: () => null }));
 vi.mock('next/image', () => ({ default: (props: Record<string, unknown>) => {
   const attributes = { ...props }; delete attributes.priority; delete attributes.unoptimized;
@@ -26,6 +30,7 @@ let container: HTMLDivElement;
 beforeEach(() => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   localStorage.clear(); setLanguage('en');
+  push.mockReset();
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
   container = document.createElement('div'); document.body.append(container); root = createRoot(container);
 });
@@ -61,6 +66,9 @@ it('uses the selected language for the invitation, network payloads, and Instagr
   await act(async () => { setLanguage('uk'); root.render(createElement(ShareInvite)); });
   expect(container.querySelector('.invitation-message')!.textContent).toBe(invitationCopy.uk.text);
   expect(container.querySelector<HTMLAnchorElement>('.share-invite-link a')!.href).toBe('https://t.me/freedomswordbot?startapp');
+  const teaser = container.querySelector('.invitation-teaser')!;
+  expect(teaser.querySelector('img')!.getAttribute('src')).toBe('/brand/invitation-teaser.svg');
+  expect(teaser.previousElementSibling?.className).toBe('share-invite-link');
   await act(async () => { button('Більше').click(); });
   const networks = [...document.querySelectorAll<HTMLAnchorElement>('.share-networks a')];
   expect(networks).toHaveLength(8);
@@ -85,6 +93,30 @@ it('sends every supported share payload to the Telegram Mini App instead of the 
       expect(decodeURIComponent(network.url)).not.toContain('https://freedomsword.org');
     }
   }
+});
+
+it('opens Telegram’s recipient picker with the prepared picture in the selected language', async () => {
+  const shareMessage = vi.fn();
+  const app = { initData: 'native-launch', isVersionAtLeast: () => true, shareMessage };
+  vi.stubGlobal('Telegram', { WebApp: app });
+  vi.mocked(api).mockResolvedValue({ id: 'prepared-picture' });
+  await act(async () => { setLanguage('uk'); root.render(createElement(ShareInvite)); });
+  await act(async () => { button('Поділитися в Telegram').click(); });
+  expect(api).toHaveBeenCalledWith('invitation', { language: 'uk' });
+  expect(shareMessage).toHaveBeenCalledWith('prepared-picture');
+});
+
+it('shows the invitation after step 3 without bypassing verification when continuing', async () => {
+  await act(async () => { root.render(createElement(WelcomeScreen)); });
+  await act(async () => { container.querySelector<HTMLButtonElement>('.fs-launch .fs-button')!.click(); });
+  await act(async () => { button('Skip').click(); });
+  await act(async () => { button('Invite friends').click(); });
+  expect(container.querySelector('.ready-to-vote h1')!.textContent).toBe('I’m ready to vote!');
+  expect(container.querySelector('.invitation-message')!.textContent).toBe(invitationCopy.en.text);
+  expect(container.textContent).toContain('Complete verification and the civic agreement before voting.');
+  await act(async () => { button('I’m ready to vote').click(); });
+  expect(document.querySelector('[role="dialog"]')!.textContent).toContain('Verify');
+  expect(push).not.toHaveBeenCalled();
 });
 
 it('restores a saved language after a new menu mounts and responds to another tab changing it', async () => {

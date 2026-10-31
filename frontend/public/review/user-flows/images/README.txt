@@ -1,4 +1,4 @@
-FreedomSword — user flows 3–18
+FreedomSword — user flows 3–20
 
 Numbered PNGs show each step in full, including content below the initial viewport.
 phone-views/ contains the initial 390 × 844 phone views at 2× resolution.

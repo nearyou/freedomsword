@@ -19,6 +19,7 @@ export default function BallotPanel({
   now,
   onRecall,
   onExplore,
+  onElections,
   onPassport,
   initialCandidateId,
 }: {
@@ -32,12 +33,13 @@ export default function BallotPanel({
   now: number;
   onRecall: (mode: 'partial' | 'full', units?: number) => void;
   onExplore: () => void;
+  onElections?: () => void;
   onPassport: () => void;
   initialCandidateId?: string;
 }) {
   if (election.protocol === 'CONTINUOUS_SUPPORT')
     return <ReusableSupportPanel key={election.id} election={election} connected={citizen.connected}
-      ready={ready && !privateError} now={now} onPassport={onPassport} onRefresh={onRefresh} initialCandidateId={initialCandidateId} />;
+      ready={ready && !privateError} now={now} onPassport={onPassport} onRefresh={onRefresh} onExplore={onElections ?? onExplore} initialCandidateId={initialCandidateId} />;
   if (election.protocol === 'MACI_PRIVATE') {
     return <PrivateBallotPanel key={election.id} election={election} citizen={citizen} ready={ready}
       now={now} onPassport={onPassport} onRefresh={onRefresh} />;
