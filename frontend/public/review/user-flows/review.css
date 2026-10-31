@@ -4780,7 +4780,8 @@ html[data-interface='refined'] .ready-to-vote .share-network-icon[data-network='
 html[data-interface='refined'] .ready-to-vote .share-network-icon[data-network='X'] { color: white; background: #080a0b; }
 html[data-interface='refined'] .ready-to-vote .share-network-icon[data-network='Facebook'] { color: white; background: #1877f2; }
 html[data-interface='refined'] .ready-to-vote .share-network-icon[data-network='WhatsApp'] { color: white; background: #20b568; }
-html[data-interface='refined'] .ready-to-vote .ready-vote-next { background: transparent; border-color: #cbbd9e; color: #23445a; }
+html[data-interface='refined'] .ready-to-vote .ready-vote-next { background: #f19b38; border-color: #d17a1b; color: #142e3d; }
+html[data-interface='refined'] .ready-to-vote .ready-vote-next:hover:not(:disabled) { background: #e98a25; border-color: #b96512; }
 @media (max-height: 730px) { .ready-dove > img { height: 115px; } html[data-interface='refined'] .ready-to-vote { padding-block: 14px; } }
 .share-telegram-picture { width: 100%; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .share-image-fallback { font-size: 12px; line-height: 1.5; margin-top: 12px !important; }
@@ -6355,6 +6356,17 @@ html[data-interface='refined'] .fs-welcome .welcome-language > svg:first-child {
 html[data-interface='refined'] .fs-welcome .welcome-language select { font-size: 11px; padding-block: 3px; }
 html[data-interface='refined'] .fs-welcome.fs-dark .welcome-language {
   color: #edf3f6; background: #102b3e; border-color: #466071;
+}
+/* Give the share screen's language control its own row above the illustration. */
+html[data-interface='refined'] .fs-welcome[data-stage='share'] .welcome-language-row {
+  height: 44px; display: flex; align-items: center; justify-content: flex-end;
+  padding: 6px 22px; position: relative;
+}
+html[data-interface='refined'] .fs-welcome[data-stage='share'] .welcome-language {
+  position: static; flex: none;
+}
+html[data-interface='refined'] .fs-welcome[data-stage='share'] .ready-dove > img {
+  height: clamp(90px, calc(25svh - 80px), 145px);
 }
 html[data-interface='refined'] .fs-welcome .fs-launch,
 html[data-interface='refined'] .fs-welcome[data-telegram='true'] .fs-launch {

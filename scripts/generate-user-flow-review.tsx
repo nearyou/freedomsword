@@ -5,7 +5,7 @@ import { mkdir, readFile, writeFile, copyFile, unlink } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import postcss from 'postcss';
 import tailwind from '@tailwindcss/postcss';
-import { ArrowRight, Check, FileSignature, FileText, Send, ShieldCheck, Wallet } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, FileSignature, FileText, Globe2, Send, ShieldCheck, Wallet } from 'lucide-react';
 import AppShell from '../frontend/src/components/layout/AppShell';
 import CommunityWelcome from '../frontend/src/components/elections/CommunityWelcome';
 import { ElectionGallery } from '../frontend/src/components/elections/ElectionSelector';
@@ -40,8 +40,10 @@ function Shell({ title, tab = 'Candidates', children }: { title: string; tab?: A
     {children}
   </AppShell>;
 }
-function Welcome({ children }: { children: ReactNode }) {
-  return <div className="welcome-root fs-welcome fs-dark" data-stage="connect" data-telegram="true"><div className="welcome-sheet fs-sheet">{children}</div></div>;
+function Welcome({ children, stage = 'connect' }: { children: ReactNode; stage?: 'connect' | 'share' }) {
+  return <div className="welcome-root fs-welcome fs-dark" data-stage={stage} data-telegram="true"><div className="welcome-sheet fs-sheet">
+    {stage === 'share' && <div className="welcome-language-row"><label className="welcome-language"><Globe2 size={17} aria-hidden="true" /><select defaultValue="en" aria-label="Change language"><option value="en">English</option><option value="uk">Українська</option></select><ChevronDown size={13} aria-hidden="true" /></label></div>}
+    {children}</div></div>;
 }
 function Connect() {
   return <Welcome><main className="fs-stage fs-connect">
@@ -82,7 +84,7 @@ function Support({ value, current = value, cooling = 0 }: { value: number; curre
 }
 const flows: { number: number; slug: string; title: string; note: string; view: ReactNode }[] = [
   { number: 3, slug: 'get-ready', title: 'Let’s get you ready', note: 'Connection steps, wallet status, feedback and an entry to the invitation screen.', view: <Connect /> },
-  { number: 4, slug: 'ready-to-vote', title: 'I’m ready to vote', note: 'Reference-style dove and ivory card, approved invitation, Telegram link and circular social buttons. The app teaser is included in the shared picture. Incomplete verification still gates voting.', view: <Welcome><ReadyToVote eligible={false} onContinue={noop} /></Welcome> },
+  { number: 4, slug: 'ready-to-vote', title: 'I’m ready to vote', note: 'Reference-style dove and ivory card, approved invitation, Telegram link and circular social buttons. The app teaser is included in the shared picture. Incomplete verification still gates voting.', view: <Welcome stage="share"><ReadyToVote eligible={false} onContinue={noop} /></Welcome> },
   { number: 4, slug: 'verification', title: 'Identity verification', note: 'Current mock-verification form. Rarimo remains marked as planned.', view: <Welcome><VerificationModal t={copy.en} onClose={noop} busy={false} error="" preview={false} verified={false} available onVerify={async () => true} onAgreement={noop} /></Welcome> },
   { number: 5, slug: 'agreement', title: 'Civic agreement', note: 'Consent layout. Sample document only; the live application fetches the current agreement.', view: <Agreement /> },
   { number: 6, slug: 'elections', title: 'Explore elections', note: 'The community introduction and election gallery.', view: <Shell title="Elections"><CommunityWelcome /><ElectionGallery elections={[election, ...previewElections.slice(1)]} onSelect={noop} /></Shell> },

@@ -13,6 +13,17 @@ html[data-interface='refined'] .fs-welcome .welcome-language select { font-size:
 html[data-interface='refined'] .fs-welcome.fs-dark .welcome-language {
   color: #edf3f6; background: #102b3e; border-color: #466071;
 }
+/* Give the share screen's language control its own row above the illustration. */
+html[data-interface='refined'] .fs-welcome[data-stage='share'] .welcome-language-row {
+  height: 44px; display: flex; align-items: center; justify-content: flex-end;
+  padding: 6px 22px; position: relative;
+}
+html[data-interface='refined'] .fs-welcome[data-stage='share'] .welcome-language {
+  position: static; flex: none;
+}
+html[data-interface='refined'] .fs-welcome[data-stage='share'] .ready-dove > img {
+  height: clamp(90px, calc(25svh - 80px), 145px);
+}
 html[data-interface='refined'] .fs-welcome .fs-launch,
 html[data-interface='refined'] .fs-welcome[data-telegram='true'] .fs-launch {
   padding: 74px 22px 22px;
