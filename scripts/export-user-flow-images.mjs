@@ -9,8 +9,11 @@ const runtime = option('--runtime-modules', process.env.NODE_MODULES_PATH);
 const require = createRequire(runtime ? join(resolve(runtime), 'package.json') : import.meta.url);
 const { chromium } = require('playwright');
 const sharp = require('sharp');
-// Telegram InlineQueryResultPhoto requires JPEG; keep the share image derived from the same artwork.
-await sharp(resolve('frontend/public/brand/invitation-teaser.svg')).flatten({ background: '#102c3e' }).jpeg({ quality: 90 }).toFile(resolve('frontend/public/brand/invitation-teaser.jpg'));
+// Embed the original logo without redrawing it. Telegram requires a JPEG photo.
+const logo = await readFile(resolve('frontend/public/brand/emblem-reference.png'));
+const teaser = (await readFile(resolve('scripts/assets/invitation-teaser.svg'), 'utf8'))
+  .replace('{{FREEDOMSWORD_LOGO}}', `data:image/png;base64,${logo.toString('base64')}`);
+await sharp(Buffer.from(teaser)).jpeg({ quality: 94 }).toFile(resolve('frontend/public/brand/invitation-teaser-v2.jpg'));
 const origin = option('--origin', 'https://freedomsword.org');
 const source = resolve('frontend/public/review/user-flows');
 const destination = resolve(option('--output', join(source, 'images')));

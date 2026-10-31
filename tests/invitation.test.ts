@@ -12,7 +12,7 @@ it.each(['en', 'uk'] as const)('puts the approved %s text and Telegram link abov
   const result = invitationResult(language, 'https://freedomsword.org');
   expect(result.caption).toBe(`${invitationContent[language].text}\n\n${telegramInviteUrl}\n\n${invitationContent[language].disclosure}`);
   expect(result.caption.length).toBeLessThan(1024);
-  expect(result.photo_url).toBe('https://freedomsword.org/brand/invitation-teaser.jpg');
+  expect(result.photo_url).toBe('https://freedomsword.org/brand/invitation-teaser-v2.jpg');
   expect(result.show_caption_above_media).toBe(true);
   expect(result.reply_markup.inline_keyboard[0][0].url).toBe(telegramInviteUrl);
 });

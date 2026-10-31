@@ -1,5 +1,6 @@
 'use client';
-import { ArrowRight, Bird } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 import { useLanguage } from '@frontend/hooks/useLanguage';
 import ShareInvite from '../voting/ShareInvite';
 
@@ -7,7 +8,7 @@ export default function ReadyToVote({ eligible, onContinue }: { eligible: boolea
   const [language] = useLanguage();
   const uk = language === 'uk';
   return <main className="ready-to-vote" aria-labelledby="ready-vote-title">
-    <div className="ready-dove" aria-hidden="true"><Bird size={100} strokeWidth={1} /><span>✦</span></div>
+    <div className="ready-dove" aria-hidden="true"><Image src="/illustrations/ready-dove.webp" width={720} height={480} alt="" unoptimized loading="eager" /></div>
     <h1 id="ready-vote-title">{uk ? 'Я готовий голосувати!' : 'I’m ready to vote!'}</h1>
     <p>{eligible ? uk ? 'Демонстраційну перевірку та громадянську угоду завершено.' : 'Your demo verification and civic agreement are complete.'
       : uk ? 'Долучайтеся та запрошуйте друзів. Перед голосуванням завершіть перевірку й прийміть угоду.' : 'Join in and invite your friends. Complete verification and the civic agreement before voting.'}</p>

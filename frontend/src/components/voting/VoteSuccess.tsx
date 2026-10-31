@@ -12,7 +12,6 @@ export default function VoteSuccess({ name, units, reusable = true, onBallot, on
   useEffect(() => { heading.current?.focus(); }, []);
   return <section className="vote-success panel" aria-labelledby="vote-success-title">
     <BallotIllustration celebrate />
-    <p className="eyebrow">{uk ? 'Ваш вибір збережено' : 'Your choice is recorded'}</p>
     <h2 id="vote-success-title" ref={heading} tabIndex={-1}>{uk ? 'Ваш голос зараховано!' : 'Your vote is cast!'}</h2>
     <p className="vote-success-allocation">{uk ? `${units} одиниць підтримки для` : `${units} units allocated to`}<strong>{name}</strong></p>
     <p>{uk ? 'Ви можете відкликати підтримку відповідно до правил цих виборів.' : 'You can recall your support according to this election’s rules.'}</p>

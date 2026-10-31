@@ -42,6 +42,8 @@ Keep the restrained 6/8/12px rounding below and the welcoming sentence-case labe
 
 ### Invitation and vote feedback — 31 October 2026
 
+The later artwork correction replaces the provisional line bird and vector box with the reference-style illustrated dove and blue 3D ballot box. The invitation teaser uses the existing FreedomSword emblem and **Vote for a better future** beneath the wordmark. The readiness card uses the reference's ivory paper, serif heading, blue share action and circular social icons; its image teaser remains in the shared message and the regular invitation panel. See [artwork assets and generation prompts](CLIENT_ARTWORK_2026-10-31.md).
+
 The new invitation screen follows connection step 3 in the review sequence. Its lower action says “I’m ready to vote”; incomplete verification and civic agreement still gate access to voting. The approved English/Ukrainian invitation text is unchanged, and the shared link remains `https://t.me/freedomswordbot?startapp`.
 
 A small app teaser appears below the link. In Telegram 8.0+, “Share to Telegram” prepares a photo invitation for the authenticated citizen using [savePreparedInlineMessage](https://core.telegram.org/bots/api#savepreparedinlinemessage), then opens [shareMessage](https://core.telegram.org/bots/webapps#initializing-mini-apps). The caption is above the photo, so the picture sits below the link. Only Telegram’s user-confirmed recipient picker sends it. Unsupported clients and preparation failures expose the text/link sharing fallback. Tokens and recipient IDs are never accepted from the frontend.

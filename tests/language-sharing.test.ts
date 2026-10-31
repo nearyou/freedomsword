@@ -67,7 +67,7 @@ it('uses the selected language for the invitation, network payloads, and Instagr
   expect(container.querySelector('.invitation-message')!.textContent).toBe(invitationCopy.uk.text);
   expect(container.querySelector<HTMLAnchorElement>('.share-invite-link a')!.href).toBe('https://t.me/freedomswordbot?startapp');
   const teaser = container.querySelector('.invitation-teaser')!;
-  expect(teaser.querySelector('img')!.getAttribute('src')).toBe('/brand/invitation-teaser.svg');
+  expect(teaser.querySelector('img')!.getAttribute('src')).toBe('/brand/invitation-teaser-v2.jpg');
   expect(teaser.previousElementSibling?.className).toBe('share-invite-link');
   await act(async () => { button('Більше').click(); });
   const networks = [...document.querySelectorAll<HTMLAnchorElement>('.share-networks a')];

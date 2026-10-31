@@ -6,8 +6,8 @@ export function invitationResult(language: 'en' | 'uk', origin: string) {
   const copy = invitationContent[language];
   return {
     type: 'photo', id: randomUUID(),
-    photo_url: new URL('/brand/invitation-teaser.jpg', origin).href,
-    thumbnail_url: new URL('/brand/invitation-teaser.jpg', origin).href,
+    photo_url: new URL('/brand/invitation-teaser-v2.jpg', origin).href,
+    thumbnail_url: new URL('/brand/invitation-teaser-v2.jpg', origin).href,
     photo_width: 720, photo_height: 360,
     caption: `${copy.text}\n\n${telegramInviteUrl}\n\n${copy.disclosure}`,
     show_caption_above_media: true,
